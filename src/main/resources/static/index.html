@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>VNPAY Sandbox Demo</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 520px; margin: 40px auto; padding: 0 16px; }
+    input, select, button { width: 100%; padding: 10px; margin: 6px 0 14px; font-size: 15px; box-sizing: border-box; }
+    button { background: #005baa; color: #fff; border: 0; border-radius: 6px; cursor: pointer; }
+    pre { background: #f4f4f5; padding: 12px; border-radius: 6px; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <h2>Demo thanh toan VNPAY (sandbox)</h2>
+
+  <label>So tien (VND)</label>
+  <input id="amount" type="number" value="50000">
+
+  <label>Noi dung</label>
+  <input id="orderInfo" value="Thanh toan don hang DEMO">
+
+  <label>Ngan hang</label>
+  <select id="bankCode">
+    <option value="">-- De VNPAY hien trang chon --</option>
+    <option value="NCB">NCB (the test)</option>
+    <option value="VNPAYQR">VNPAYQR</option>
+    <option value="VNBANK">The ATM noi dia</option>
+    <option value="INTCARD">The quoc te</option>
+  </select>
+
+  <button onclick="pay()">Thanh toan</button>
+  <pre id="out">The test NCB: 9704198526191432198 | NGUYEN VAN A | 07/15 | OTP 123456</pre>
+
+<script>
+async function pay() {
+  const body = {
+    amount: Number(document.getElementById('amount').value),
+    orderInfo: document.getElementById('orderInfo').value,
+    bankCode: document.getElementById('bankCode').value
+  };
+  const res = await fetch('/api/payments', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  const data = await res.json();
+  document.getElementById('out').textContent = JSON.stringify(data, null, 2);
+  sessionStorage.setItem('txnRef', data.txnRef);
+  window.location.href = data.paymentUrl;
+}
+</script>
+</body>
+</html>

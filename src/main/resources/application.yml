@@ -1,0 +1,20 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: payment-service
+
+vnpay:
+  # Lay tai https://sandbox.vnpayment.vn/devreg/ -> email tra ve TmnCode + HashSecret
+  tmn-code: ${VNPAY_TMN_CODE:CHANGE_ME}
+  hash-secret: ${VNPAY_HASH_SECRET:CHANGE_ME}
+  pay-url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+  api-url: https://sandbox.vnpayment.vn/merchant_webapi/api/transaction
+  # Khi demo qua ngrok: doi thanh https://<id>.ngrok-free.app/vnpay/return
+  return-url: ${VNPAY_RETURN_URL:http://localhost:8080/vnpay/return}
+  expire-minutes: 15
+
+logging:
+  level:
+    com.seminar.vnpay: DEBUG
