@@ -1,52 +1,109 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <title>VNPAY Sandbox Demo</title>
-  <style>
-    body { font-family: system-ui, sans-serif; max-width: 520px; margin: 40px auto; padding: 0 16px; }
-    input, select, button { width: 100%; padding: 10px; margin: 6px 0 14px; font-size: 15px; box-sizing: border-box; }
-    button { background: #005baa; color: #fff; border: 0; border-radius: 6px; cursor: pointer; }
-    pre { background: #f4f4f5; padding: 12px; border-radius: 6px; white-space: pre-wrap; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VNPAY Shop — Demo thanh toán</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h2>Demo thanh toan VNPAY (sandbox)</h2>
 
-  <label>So tien (VND)</label>
-  <input id="amount" type="number" value="50000">
+<header>
+  <div class="wrap">
+    <div class="logo">VN<span>PAY</span> Shop</div>
+    <div class="tag">Sandbox — không mất tiền thật</div>
+  </div>
+</header>
 
-  <label>Noi dung</label>
-  <input id="orderInfo" value="Thanh toan don hang DEMO">
+<main>
+  <h1>Chọn sản phẩm để thanh toán</h1>
+  <p class="sub">Bấm mua → tạo đơn ở server → chuyển sang cổng VNPAY → quay về trang kết quả.</p>
 
-  <label>Ngan hang</label>
+  <div class="grid" id="products"></div>
+
+  <div class="note">
+    <strong>Thẻ test (ngân hàng NCB):</strong><br>
+    Số thẻ <code>9704198526191432198</code> · Tên <code>NGUYEN VAN A</code> ·
+    Ngày phát hành <code>07/15</code> · OTP <code>123456</code>
+  </div>
+</main>
+
+<dialog id="checkout">
+  <h2 style="margin:0 0 2px;font-size:19px;">Thanh toán</h2>
+  <p class="sub" id="dlgProduct" style="margin:0"></p>
+
+  <label for="amount">Số tiền (VND)</label>
+  <input id="amount" type="number" min="5000" step="1000">
+
+  <label for="orderInfo">Nội dung đơn hàng</label>
+  <input id="orderInfo" maxlength="120">
+
+  <label for="bankCode">Phương thức</label>
   <select id="bankCode">
-    <option value="">-- De VNPAY hien trang chon --</option>
-    <option value="NCB">NCB (the test)</option>
-    <option value="VNPAYQR">VNPAYQR</option>
-    <option value="VNBANK">The ATM noi dia</option>
-    <option value="INTCARD">The quoc te</option>
+    <option value="">Để VNPAY hiện trang chọn ngân hàng</option>
+    <option value="NCB">NCB — dùng thẻ test ở trên</option>
+    <option value="VNPAYQR">Quét mã VNPAYQR</option>
+    <option value="VNBANK">Thẻ ATM nội địa</option>
+    <option value="INTCARD">Thẻ quốc tế (Visa/Master)</option>
   </select>
 
-  <button onclick="pay()">Thanh toan</button>
-  <pre id="out">The test NCB: 9704198526191432198 | NGUYEN VAN A | 07/15 | OTP 123456</pre>
+  <div class="row">
+    <button class="ghost" onclick="document.getElementById('checkout').close()">Huỷ</button>
+    <button class="pay-btn" id="payBtn" onclick="pay()">Thanh toán</button>
+  </div>
+  <p id="err" style="color:#dc2626;font-size:13px;margin:10px 0 0;"></p>
+</dialog>
 
 <script>
+const PRODUCTS = [
+  { emoji: '☕', name: 'Cà phê sữa đá', price: 25000 },
+  { emoji: '🎧', name: 'Tai nghe bluetooth', price: 350000 },
+  { emoji: '📘', name: 'Sách Spring Boot', price: 189000 },
+  { emoji: '🎟️', name: 'Vé xem phim', price: 90000 },
+];
+
+const vnd = n => n.toLocaleString('vi-VN') + '₫';
+
+document.getElementById('products').innerHTML = PRODUCTS.map((p, i) => `
+  <div class="card">
+    <div class="emoji">${p.emoji}</div>
+    <div class="name">${p.name}</div>
+    <div class="price">${vnd(p.price)}</div>
+    <button onclick="openCheckout(${i})">Mua ngay</button>
+  </div>`).join('');
+
+function openCheckout(i) {
+  const p = PRODUCTS[i];
+  document.getElementById('dlgProduct').textContent = p.emoji + ' ' + p.name;
+  document.getElementById('amount').value = p.price;
+  document.getElementById('orderInfo').value = 'Thanh toan ' + p.name;
+  document.getElementById('err').textContent = '';
+  document.getElementById('checkout').showModal();
+}
+
 async function pay() {
-  const body = {
-    amount: Number(document.getElementById('amount').value),
-    orderInfo: document.getElementById('orderInfo').value,
-    bankCode: document.getElementById('bankCode').value
-  };
-  const res = await fetch('/api/payments', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  });
-  const data = await res.json();
-  document.getElementById('out').textContent = JSON.stringify(data, null, 2);
-  sessionStorage.setItem('txnRef', data.txnRef);
-  window.location.href = data.paymentUrl;
+  const btn = document.getElementById('payBtn');
+  const err = document.getElementById('err');
+  btn.disabled = true;
+  err.textContent = '';
+  try {
+    // Server ký HMAC-SHA512 rồi trả về URL — trình duyệt KHÔNG bao giờ giữ HashSecret.
+    const res = await fetch('/api/payments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        amount: Number(document.getElementById('amount').value),
+        orderInfo: document.getElementById('orderInfo').value,
+        bankCode: document.getElementById('bankCode').value
+      })
+    });
+    if (!res.ok) throw new Error(await res.text());
+    const data = await res.json();
+    window.location.href = data.paymentUrl;
+  } catch (e) {
+    err.textContent = 'Lỗi: ' + e.message;
+    btn.disabled = false;
+  }
 }
 </script>
 </body>

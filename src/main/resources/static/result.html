@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kết quả thanh toán — VNPAY Shop</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="logo">VN<span>PAY</span> Shop</div>
+    <div class="tag">Sandbox</div>
+  </div>
+</header>
+
+<main>
+  <div class="result">
+    <div class="icon" id="icon">⏳</div>
+    <h2 id="title">Đang xác nhận…</h2>
+    <p class="sub" id="desc">Đang chờ VNPAY gọi IPN về server.</p>
+    <span class="badge wait" id="badge">PENDING</span>
+
+    <table>
+      <tr><th>Mã đơn (vnp_TxnRef)</th><td id="txnRef">—</td></tr>
+      <tr><th>Số tiền</th><td id="amount">—</td></tr>
+      <tr><th>Nội dung</th><td id="orderInfo">—</td></tr>
+      <tr><th>Mã GD tại VNPAY</th><td id="transactionNo">—</td></tr>
+      <tr><th>Ngân hàng</th><td id="bankCode">—</td></tr>
+      <tr><th>vnp_ResponseCode</th><td id="responseCode">—</td></tr>
+      <tr><th>Chữ ký ReturnURL</th><td id="sig">—</td></tr>
+    </table>
+
+    <a class="back" href="/">← Mua tiếp</a>
+  </div>
+
+  <div class="note">
+    <strong>Vì sao trang này phải hỏi lại server?</strong><br>
+    Các tham số trên URL là do trình duyệt mang về — user sửa được. Trạng thái thật lấy từ
+    <code>GET /api/orders/{txnRef}</code>, và giá trị đó chỉ được ghi khi <code>/vnpay/ipn</code> xác thực chữ ký thành công.
+  </div>
+</main>
+
+<script>
+const q = new URLSearchParams(location.search);
+const txnRef = q.get('txnRef');
+const vnd = n => Number(n).toLocaleString('vi-VN') + '₫';
+
+document.getElementById('txnRef').textContent = txnRef || '—';
+document.getElementById('responseCode').textContent = q.get('responseCode') || '—';
+document.getElementById('sig').textContent = q.get('valid') === 'true' ? '✅ hợp lệ' : '❌ KHÔNG hợp lệ';
+
+const UI = {
+  PAID:   { icon: '✅', title: 'Thanh toán thành công', desc: 'Server đã nhận IPN và ghi nhận đơn hàng.', cls: 'ok' },
+  FAILED: { icon: '❌', title: 'Thanh toán thất bại',   desc: 'Giao dịch bị huỷ hoặc ngân hàng từ chối.',  cls: 'err' },
+};
+
+function render(order) {
+  document.getElementById('amount').textContent = vnd(order.amount);
+  document.getElementById('orderInfo').textContent = order.orderInfo;
+  document.getElementById('transactionNo').textContent = order.transactionNo || '—';
+  document.getElementById('bankCode').textContent = order.bankCode || '—';
+  if (order.responseCode) document.getElementById('responseCode').textContent = order.responseCode;
+
+  const ui = UI[order.status];
+  if (!ui) return false;
+  document.getElementById('icon').textContent = ui.icon;
+  document.getElementById('title').textContent = ui.title;
+  document.getElementById('desc').textContent = ui.desc;
+  const badge = document.getElementById('badge');
+  badge.textContent = order.status;
+  badge.className = 'badge ' + ui.cls;
+  return true;
+}
+
+// Poll tối đa ~20s: IPN là cuộc gọi server-to-server nên có thể về sau ReturnURL vài giây.
+(async function poll(tries = 0) {
+  if (!txnRef) {
+    document.getElementById('title').textContent = 'Thiếu mã đơn';
+    return;
+  }
+  try {
+    const res = await fetch('/api/orders/' + encodeURIComponent(txnRef));
+    if (res.ok && render(await res.json())) return;
+  } catch (e) { /* thử lại */ }
+
+  if (tries < 10) {
+    setTimeout(() => poll(tries + 1), 2000);
+  } else {
+    document.getElementById('desc').textContent =
+      'Chưa nhận được IPN sau 20s. Kiểm tra IPN URL trong merchant portal, hoặc chạy đối soát querydr.';
+  }
+})();
+</script>
+</body>
+</html>

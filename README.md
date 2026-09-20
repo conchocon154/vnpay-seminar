@@ -13,7 +13,7 @@ Toàn bộ logic ký/verify nằm trong 1 file không phụ thuộc Spring: `uti
 export VNPAY_TMN_CODE=xxxxxxxx
 export VNPAY_HASH_SECRET=xxxxxxxxxxxxxxxx
 mvn spring-boot:run
-# mở http://localhost:8080
+# mở http://localhost:8080  (cửa hàng demo)
 ```
 
 Thẻ test (NCB): `9704198526191432198` · `NGUYEN VAN A` · `07/15` · OTP `123456`
@@ -26,7 +26,48 @@ Test toàn bộ luồng **không cần ngrok, không cần bấm thẻ** (script
 
 ---
 
-## 2. Luồng chạy
+## 2. Trang web demo (thuần HTML)
+
+| File | Vai trò |
+|---|---|
+| `static/index.html` | Cửa hàng 4 sản phẩm + modal checkout |
+| `static/result.html` | Trang kết quả, poll `/api/orders/{txnRef}` chờ IPN |
+| `static/style.css` | CSS thuần, không framework |
+
+**Vì sao HTML không gọi thẳng VNPAY được?** Muốn tạo URL thanh toán thì phải ký HMAC-SHA512 bằng `HashSecret`.
+Đặt secret trong JavaScript = ai mở View Source cũng ký được đơn giả và tự "xác nhận đã thanh toán".
+Nên trang HTML chỉ gọi `POST /api/payments`, còn việc ký nằm ở server. Đây là ràng buộc bắt buộc của mọi cổng thanh toán.
+
+---
+
+## 3. Host public bằng ngrok
+
+IPN là cuộc gọi **server-to-server** — VNPAY phải với tới được máy bạn, nên `localhost` không đủ.
+
+```bash
+brew install --cask ngrok
+ngrok config add-authtoken <token>      # free, lấy tại dashboard.ngrok.com
+export VNPAY_TMN_CODE=... VNPAY_HASH_SECRET=...
+./start-ngrok.sh                         # mở tunnel + chạy app với đúng ReturnURL
+```
+
+Script in ra 3 URL:
+
+```
+Web:        https://xxxx.ngrok-free.app
+ReturnURL:  https://xxxx.ngrok-free.app/vnpay/return
+IPN URL:    https://xxxx.ngrok-free.app/vnpay/ipn
+```
+
+Dán **ReturnURL** và **IPN URL** vào `sandbox.vnpayment.vn/merchantv2/` → *Cấu hình → Thông tin website*.
+
+Hai lưu ý của ngrok free:
+- URL **đổi mỗi lần chạy lại** → phải khai lại trong merchant portal.
+- Trang cảnh báo *"You are about to visit…"* hiện 1 lần cho trình duyệt. IPN không dính vì không phải browser.
+
+---
+
+## 4. Luồng chạy
 
 ```
 Browser          Payment Service            VNPAY
@@ -47,19 +88,19 @@ Browser          Payment Service            VNPAY
 
 ---
 
-## 3. API của service
+## 5. API của service
 
 | Method | Path | Mục đích |
 |---|---|---|
 | POST | `/api/payments` | `{amount, orderInfo, bankCode}` → `{txnRef, paymentUrl}` |
 | GET | `/api/orders/{txnRef}` | FE polling trạng thái thật |
 | POST | `/api/orders/{txnRef}/verify?transactionDate=yyyyMMddHHmmss` | gọi `querydr` sang VNPAY |
-| GET | `/vnpay/return` | browser quay về (hiển thị) |
+| GET | `/vnpay/return` | browser quay về → verify chữ ký → 302 sang `/result.html` |
 | GET | `/vnpay/ipn` | VNPAY gọi server-to-server (ghi DB) |
 
 ---
 
-## 4. Ký chữ ký — 3 dòng cốt lõi
+## 6. Ký chữ ký — 3 dòng cốt lõi
 
 ```java
 String query = params.entrySet().stream().sorted(...)      // 1. sort alphabet
@@ -72,7 +113,7 @@ Verify callback = đúng công thức đó, sau khi **bỏ `vnp_SecureHash` và 
 
 ---
 
-## 5. Bảng mã cần nhớ
+## 7. Bảng mã cần nhớ
 
 **Trả về cho IPN** (bắt buộc JSON + HTTP 200, VNPAY retry tới khi nhận `00`):
 
@@ -90,7 +131,7 @@ Hay gặp: `24` user hủy · `51` không đủ số dư · `11` hết hạn tha
 
 ---
 
-## 6. 8 cái bẫy hay dính
+## 8. 8 cái bẫy hay dính
 
 1. **`vnp_Amount` phải × 100** và là số nguyên (50.000đ → `5000000`).
 2. **Ký phải URL-encode giá trị**; verify cũng phải encode lại vì servlet đã decode sẵn.
@@ -103,7 +144,7 @@ Hay gặp: `24` user hủy · `51` không đủ số dư · `11` hết hạn tha
 
 ---
 
-## 7. Đưa vào microservice thật
+## 9. Đưa vào microservice thật
 
 - Tách `payment-service` riêng; các service khác chỉ nghe event `OrderPaid` (outbox pattern trong `IpnService`).
 - `HashSecret` vào Vault/K8s Secret, **không** vào `application.yml` commit git.
@@ -111,6 +152,6 @@ Hay gặp: `24` user hủy · `51` không đủ số dư · `11` hết hạn tha
 - Job `@Scheduled` quét đơn PENDING quá 15 phút → gọi `querydr` để tự chốt trạng thái.
 - Không log `vnp_SecureHash`, không log HashSecret.
 
-## 8. Dùng cho đồ án nào
+## 10. Dùng cho đồ án nào
 
 Bất kỳ đồ án có "đặt hàng" hoặc "nạp tiền": e-commerce, đặt vé/phòng/sân, học phí, ví điện tử, SaaS subscription (dùng token hóa thẻ), quyên góp. Chỉ cần thay `OrderStore` bằng repository của bạn.

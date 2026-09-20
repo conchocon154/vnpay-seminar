@@ -43,7 +43,10 @@ Nhấn 2 chi tiết làm 90% người mới sai:
 - Lúc verify callback phải **encode lại** giá trị, vì servlet đã decode sẵn.
 
 ### 3.2 Tạo payment URL — `PaymentService.createPayment()` (3')
-Chạy thật:
+Mở `http://localhost:8080` (cửa hàng demo, HTML thuần) → bấm **Mua ngay** → server ký → redirect sang VNPAY.
+Chỉ rõ cho lớp: trang HTML **không** giữ `HashSecret`, nó chỉ gọi `POST /api/payments`.
+
+Hoặc chạy bằng curl:
 ```bash
 curl -X POST localhost:8080/api/payments -H 'Content-Type: application/json' \
   -d '{"amount":50000,"orderInfo":"Thanh toan don hang DEMO","bankCode":"NCB"}'
@@ -76,7 +79,7 @@ API `querydr`. Cảnh báo: hash của API này **không sort alphabet**, mà l�
 - `VnpayProperties` (`@ConfigurationProperties`) — secret lấy từ env/Vault, không commit.
 - `payment-service` đứng riêng; service khác chỉ nghe event `OrderPaid` publish từ `IpnService`.
 - Bảng `payment_transaction` có `UNIQUE(txn_ref)` + optimistic lock (demo dùng `synchronized` cho gọn).
-- Dev cần IPN: `ngrok http 8080`, khai URL trong merchant portal.
+- Dev cần IPN: `./start-ngrok.sh` → in ra Web/ReturnURL/IPN URL, khai 2 URL sau vào merchant portal.
 - `@Scheduled` mỗi 5 phút quét đơn PENDING quá 15 phút → `querydr` chốt trạng thái.
 
 **Đồ án nào dùng được:** e-commerce, đặt vé/phòng/sân, đóng học phí, ví điện tử, quyên góp, SaaS — bất kỳ chỗ nào có "đặt hàng" hoặc "nạp tiền". Thay mỗi `OrderStore` bằng repository của bạn.
