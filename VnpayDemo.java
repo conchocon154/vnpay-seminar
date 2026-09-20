@@ -1,29 +1,19 @@
-/* =====================================================================================
- *  VNPAY DEMO 
- *  -------------------------------------------------------------------------------
- *  CÁCH CHẠY (cần JDK 17 trở lên, KHÔNG cần Maven, KHÔNG cần thư viện ngoài):
+/*
+ * Demo tích hợp VNPAY, gom hết vào một file.
  *
- *      export VNPAY_TMN_CODE=xxxxxxxx
- *      export VNPAY_HASH_SECRET=xxxxxxxxxxxxxxxx
- *      java VnpayDemo.java
+ * Chạy (cần JDK 17+, không cần Maven, không cần thư viện ngoài):
+ *   export VNPAY_TMN_CODE=xxxxxxxx
+ *   export VNPAY_HASH_SECRET=xxxxxxxxxxxxxxxx
+ *   java VnpayDemo.java
+ * Rồi mở http://localhost:8080
  *
- *  Rồi mở http://localhost:8080
+ * Lấy TmnCode + HashSecret miễn phí ở https://sandbox.vnpayment.vn/devreg/
+ * Thẻ test NCB: 9704198526191432198 | NGUYEN VAN A | 07/15 | OTP 123456
  *
- *  Lấy TmnCode + HashSecret miễn phí tại https://sandbox.vnpayment.vn/devreg/
- *  Thẻ test NCB: 9704198526191432198 | NGUYEN VAN A | 07/15 | OTP 123456
- *
- *  FILE NÀY ĐƯỢC CHIA THÀNH 10 BƯỚC, ĐỌC TỪ TRÊN XUỐNG:
- *    BƯỚC 1  — Cấu hình
- *    BƯỚC 2  — Giao diện web (HTML file)
- *    BƯỚC 3  — Đơn hàng
- *    BƯỚC 4  — Ký HMAC-SHA512          <- VNPAY
- *    BƯỚC 5  — Verify chữ ký
- *    BƯỚC 6  — Tạo URL thanh toán
- *    BƯỚC 7  — Nhận IPN
- *    BƯỚC 8  — Đối soát bằng querydr
- *    BƯỚC 9  — ReturnURL
- *    BƯỚC 10 — Khởi động server
- * ===================================================================================== */
+ * File chia theo 10 bước, đọc từ trên xuống:
+ *   1 cấu hình, 2 giao diện, 3 đơn hàng, 4 ký HMAC, 5 verify,
+ *   6 tạo URL, 7 IPN, 8 querydr, 9 ReturnURL, 10 chạy server
+ */
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
@@ -49,10 +39,10 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class VnpayDemo {
 
-    /* =================================================================================
-     * BƯỚC 1 — CẤU HÌNH
+    /*
+     * Bước 1: cấu hình
      * Đọc từ biến môi trường.
-     * ================================================================================= */
+     */
 
     static final int    PORT           = 8080;
     static final int    EXPIRE_MINUTES = 15;
@@ -60,17 +50,17 @@ public class VnpayDemo {
     static final String TMN_CODE    = env("VNPAY_TMN_CODE", "CHANGE_ME");
     static final String HASH_SECRET = env("VNPAY_HASH_SECRET", "CHANGE_ME");
 
-    /* ---------------------------------------------------------------------------
-     * HAI CHẾ ĐỘ CHẠY — đặt bằng biến môi trường VNPAY_MODE
+    /*
+     * Hai chế độ chạy, đặt bằng biến môi trường VNPAY_MODE.
      *
-     *   local  (mặc định) — chỉ chạy localhost, KHÔNG cần ngrok.
+     *   local (mặc định): chỉ chạy localhost, không cần ngrok.
      *                       IPN không về được, nên đơn được chốt bằng API querydr.
      *                       Dùng khi cả lớp cùng chạy trên máy mình.
      *
-     *   ngrok             — mở tunnel public để VNPAY gọi IPN thật vào máy bạn.
+     *   ngrok: mở tunnel public để VNPAY gọi IPN thật vào máy mình.
      *                       Chương trình tự đọc URL từ ngrok đang chạy (cổng 4040).
      *                       Dùng khi cần demo đúng kiến trúc chuẩn.
-     * --------------------------------------------------------------------------- */
+     */
 
     static final String MODE       = env("VNPAY_MODE", "local");
     static final String PUBLIC_URL = resolvePublicUrl();
@@ -80,7 +70,7 @@ public class VnpayDemo {
     static final String PAY_URL = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
     static final String API_URL = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
 
-    // VNPAY tính giờ GMT+7. KHÔNG dùng "Etc/GMT+7" — theo chuẩn POSIX nó là UTC-7, lệch 14 tiếng.
+    // VNPAY tính giờ GMT+7. Đừng dùng "Etc/GMT+7", theo POSIX nó là UTC-7, lệch 14 tiếng.
     static final ZoneId            VN_ZONE  = ZoneId.of("Asia/Ho_Chi_Minh");
     static final DateTimeFormatter VNP_TIME = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
@@ -89,7 +79,7 @@ public class VnpayDemo {
         return (v == null || v.isBlank()) ? fallback : v;
     }
 
-    /** Chế độ ngrok: hỏi chính ngrok đang chạy xem nó cấp URL nào (API cục bộ cổng 4040). */
+    // Chế độ ngrok: hỏi ngrok đang chạy xem nó cấp URL nào (API cục bộ cổng 4040).
     static String resolvePublicUrl() {
         String explicit = env("VNPAY_PUBLIC_URL", "");
         if (!explicit.isBlank()) return explicit.replaceAll("/+$", "");
@@ -109,11 +99,11 @@ public class VnpayDemo {
         return "http://localhost:" + PORT;
     }
 
-    /* =================================================================================
-     * BƯỚC 2 — GIAO DIỆN WEB
+    /*
+     * Bước 2: giao diện web
      * Nhúng thẳng HTML vào đây cho gọn. Có thể tách ra static/index.html rồi gọi lại tại đây cũng được.
-     * Điểm mấu chốt: trang web KHÔNG giữ HashSecret, nó chỉ gọi POST /api/payments.
-     * ================================================================================= */
+     * Trang web không giữ HashSecret, nó chỉ gọi POST /api/payments.
+     */
 
     static final String PAGE_HTML = """
         <!DOCTYPE html>
@@ -147,7 +137,7 @@ public class VnpayDemo {
 
         <div id="shop">
           <h2>VNPAY Shop</h2>
-          <p class="sub">Sandbox — không mất tiền thật.</p>
+          <p class="sub">Sandbox, không mất tiền thật.</p>
 
           <div class="row">
             <div class="card">
@@ -169,7 +159,7 @@ public class VnpayDemo {
           <label for="bankCode">Phương thức</label>
           <select id="bankCode">
             <option value="">Để VNPAY hiện trang chọn ngân hàng</option>
-            <option value="NCB" selected>NCB — dùng thẻ test bên dưới</option>
+            <option value="NCB" selected>NCB (dùng thẻ test bên dưới)</option>
             <option value="VNPAYQR">Quét mã VNPAYQR</option>
           </select>
 
@@ -251,10 +241,10 @@ public class VnpayDemo {
         </html>
         """;
 
-    /* =================================================================================
-     * BƯỚC 3 — ĐƠN HÀNG
+    /*
+     * Bước 3: đơn hàng
      * Lưu tạm trong RAM.
-     * ================================================================================= */
+     */
 
     static class Order {
         final String txnRef;
@@ -275,10 +265,10 @@ public class VnpayDemo {
 
     static final Map<String, Order> ORDERS = new ConcurrentHashMap<>();
 
-    /* =================================================================================
-     * BƯỚC 4 — KÝ HMAC-SHA512  <-- VNPAY
+    /*
+     * Bước 4: ký HMAC-SHA512, phần khó nhất
      * Gồm bước: Sort alphabet -> URL-encode GIÁ TRỊ -> HMAC-SHA512 ra hex chữ thường.
-     * ================================================================================= */
+     */
 
     static String hmacSHA512(String secretKey, String data) {
         try {
@@ -307,9 +297,9 @@ public class VnpayDemo {
         return sb.toString();
     }
 
-    /* =================================================================================
-     * BƯỚC 5 — VERIFY CHỮ KÝ
-     * ================================================================================= */
+    /*
+     * Bước 5: verify chữ ký
+     */
 
     static boolean isValidSignature(Map<String, String> params) {
         String received = params.get("vnp_SecureHash");
@@ -323,7 +313,7 @@ public class VnpayDemo {
         return constantTimeEquals(expected, received);
     }
 
-    /** So sánh không phụ thuộc thời gian -> chống timing attack. */
+    // So sánh không phụ thuộc thời gian, chống timing attack.
     static boolean constantTimeEquals(String a, String b) {
         if (a == null || b == null || a.length() != b.length()) return false;
         int diff = 0;
@@ -333,9 +323,9 @@ public class VnpayDemo {
         return diff == 0;
     }
 
-    /* =================================================================================
-     * BƯỚC 6 — TẠO URL THANH TOÁN
-     * ================================================================================= */
+    /*
+     * Bước 6: tạo URL thanh toán
+     */
 
     static String createPayment(long amount, String orderInfo, String bankCode, String clientIp) {
         LocalDateTime now = LocalDateTime.now(VN_ZONE);
@@ -366,10 +356,10 @@ public class VnpayDemo {
         return "{\"txnRef\":\"" + txnRef + "\",\"paymentUrl\":\"" + url + "\"}";
     }
 
-    /* =================================================================================
-     * BƯỚC 7 — NHẬN IPN (server-to-server)
-     * VNPAY retry tới khi nhận RspCode=00 -> handler BẮT BUỘC idempotent.
-     * ================================================================================= */
+    /*
+     * Bước 7: nhận IPN, VNPAY gọi thẳng vào server
+     * VNPAY retry tới khi nhận RspCode=00, nên handler phải idempotent.
+     */
 
     static String handleIpn(Map<String, String> params) {
         try {
@@ -402,11 +392,11 @@ public class VnpayDemo {
         return "{\"RspCode\":\"" + code + "\",\"Message\":\"" + message + "\"}";
     }
 
-    /* =================================================================================
-     * BƯỚC 8 — ĐỐI SOÁT BẰNG querydr
-     * Dùng khi IPN không về (rất hay gặp trên sandbox, hoặc khi chạy localhost không ngrok).
-     * An toàn ngang IPN: hỏi thẳng VNPAY -> verify chữ ký response -> so lại số tiền.
-     * ================================================================================= */
+    /*
+     * Bước 8: đối soát bằng querydr
+     * Dùng khi IPN không về, hay gặp trên sandbox hoặc khi chạy localhost.
+     * Vẫn an toàn như IPN: hỏi thẳng VNPAY, verify chữ ký response, so lại số tiền.
+     */
 
     static void reconcile(Order order) {
         if (!"PENDING".equals(order.status)) return;          // đã chốt rồi
@@ -416,7 +406,7 @@ public class VnpayDemo {
         String orderInfo  = "Truy van GD ma:" + order.txnRef;
         String ipAddr     = "127.0.0.1";
 
-        // CHÚ Ý: hash của querydr KHÔNG sort alphabet — nối bằng '|' đúng thứ tự tài liệu.
+        // Hash của querydr không sort alphabet, nối bằng '|' đúng thứ tự tài liệu.
         String hashData = String.join("|",
                 requestId, "2.1.0", "querydr", TMN_CODE,
                 order.txnRef, order.createDate, createDate, ipAddr, orderInfo);
@@ -465,7 +455,7 @@ public class VnpayDemo {
         }
     }
 
-    /** Lấy giá trị chuỗi của một khoá trong JSON phẳng — đủ dùng, khỏi cần thư viện. */
+    // Lấy giá trị một khoá trong JSON phẳng. Đủ dùng, khỏi cần thư viện.
     static String jsonValue(String json, String key) {
         String needle = "\"" + key + "\"";
         int i = json.indexOf(needle);
@@ -476,10 +466,10 @@ public class VnpayDemo {
         return (colon < 0 || open < 0 || close < 0) ? "" : json.substring(open + 1, close);
     }
 
-    /* =================================================================================
-     * BƯỚC 9 — RETURNURL
-     * CHỈ để hiển thị. Không đổi trạng thái đơn theo tham số trên URL.
-     * ================================================================================= */
+    /*
+     * Bước 9: ReturnURL
+     * Chỉ để hiển thị. Đừng đổi trạng thái đơn theo tham số trên URL.
+     */
 
     static String handleReturn(Map<String, String> params) {
         boolean valid = isValidSignature(params);
@@ -493,9 +483,9 @@ public class VnpayDemo {
         return "/?txnRef=" + URLEncoder.encode(txnRef, StandardCharsets.US_ASCII) + "&valid=" + valid;
     }
 
-    /* =================================================================================
-     * BƯỚC 10 — KHỞI ĐỘNG SERVER
-     * ================================================================================= */
+    /*
+     * Bước 10: chạy server
+     */
 
     public static void main(String[] args) throws IOException {
         if ("CHANGE_ME".equals(TMN_CODE) || "CHANGE_ME".equals(HASH_SECRET)) {
@@ -534,7 +524,7 @@ public class VnpayDemo {
             }
         });
 
-        // Trạng thái đơn — nguồn sự thật cho giao diện
+        // Trạng thái đơn, giao diện lấy từ đây
         server.createContext("/api/orders", ex -> {
             Order o = ORDERS.get(parseQuery(ex.getRequestURI().getRawQuery()).get("txnRef"));
             if (o == null) { send(ex, 404, "application/json", "{}"); return; }
@@ -545,7 +535,7 @@ public class VnpayDemo {
                             o.txnRef, o.amount, o.status, o.transactionNo, o.bankCode));
         });
 
-        // ReturnURL — trình duyệt quay về
+        // ReturnURL, trình duyệt quay về
         server.createContext("/vnpay/return", ex -> {
             String location = handleReturn(parseQuery(ex.getRequestURI().getRawQuery()));
             ex.getResponseHeaders().add("Location", location);
@@ -553,7 +543,7 @@ public class VnpayDemo {
             ex.close();
         });
 
-        // IPN — VNPAY gọi server-to-server
+        // IPN, VNPAY gọi thẳng vào server
         server.createContext("/vnpay/ipn", ex ->
                 send(ex, 200, "application/json",
                         handleIpn(parseQuery(ex.getRequestURI().getRawQuery()))));
@@ -563,32 +553,30 @@ public class VnpayDemo {
         boolean ngrokMode = PUBLIC_URL.startsWith("https://");
         System.out.println("""
 
-            ================================================================
-              VNPAY demo — chế độ: %s
-            ================================================================
+            VNPAY demo, chế độ %s
+
               Mở cửa hàng:  %s
               ReturnURL:    %s
               IPN URL:      %s
-            ----------------------------------------------------------------
+
             %s
-            ================================================================
             """.formatted(
-                ngrokMode ? "NGROK (IPN thật)" : "LOCAL (không cần ngrok)",
+                ngrokMode ? "ngrok, IPN thật" : "local, không cần ngrok",
                 PUBLIC_URL,
                 RETURN_URL,
-                ngrokMode ? IPN_URL : "(không dùng — localhost thì VNPAY không gọi tới được)",
+                ngrokMode ? IPN_URL : "(không dùng, localhost thì VNPAY không gọi tới được)",
                 ngrokMode
                     ? "  Khai 2 URL trên vào sandbox.vnpayment.vn/merchantv2\n"
                     + "  -> Cấu hình -> Thông tin website. URL đổi mỗi lần chạy lại ngrok."
                     : "  Không khai gì cả. Đơn được chốt bằng API querydr khi trang\n"
-                    + "  kết quả hỏi trạng thái — chạy được ngay trên máy cá nhân."));
+                    + "  kết quả hỏi trạng thái. Chạy được ngay trên máy cá nhân."));
 
         log("TmnCode=" + TMN_CODE);
     }
 
-    /* ----------------------------- tiện ích nhỏ ----------------------------- */
+    // mấy hàm tiện ích
 
-    /** Tách query string thành map, đã URL-decode giống hệt servlet. */
+    // Tách query string thành map, URL-decode giống servlet.
     static Map<String, String> parseQuery(String raw) {
         Map<String, String> map = new HashMap<>();
         if (raw == null || raw.isBlank()) return map;

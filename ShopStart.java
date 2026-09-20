@@ -1,24 +1,13 @@
-/* =====================================================================================
- *  SHOPSTART — CODE XUẤT PHÁT CHO BUỔI SEMINAR
- *  -------------------------------------------------------------------------------
- *  Server chạy được, cửa hàng hiện ra, NHƯNG chưa có một dòng VNPAY nào.
- *  Trong buổi seminar ta sẽ điền lần lượt 6 chỗ TODO bên dưới.
+/*
+ * Code xuất phát cho buổi seminar VNPAY.
+ * Server chạy được, cửa hàng hiện ra, nhưng chưa có dòng VNPAY nào.
+ * Trong buổi học mình điền lần lượt 6 chỗ TODO.
  *
- *  CHẠY (chỉ cần JDK 17+, không Maven, không thư viện ngoài):
- *      java ShopStart.java
- *  Rồi mở http://localhost:8080
+ * Chạy: java ShopStart.java   (cần JDK 17+, không cần Maven)
+ * Rồi mở http://localhost:8080
  *
- *  ---------------------------------------------------------------------------
- *  LỘ TRÌNH ĐIỀN TRONG BUỔI NÓI
- *    TODO 1 — Cấu hình TmnCode / HashSecret
- *    TODO 2 — Hàm ký HMAC-SHA512              <- trái tim của VNPAY
- *    TODO 3 — Hàm verify chữ ký
- *    TODO 4 — Tạo URL thanh toán
- *    TODO 5 — Nhận IPN (server-to-server)
- *    TODO 6 — ReturnURL + chốt trạng thái đơn
- *
- *  File đáp án đầy đủ: VnpayDemo.java
- * ===================================================================================== */
+ * Bản làm xong: VnpayDemo.java
+ */
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
@@ -40,12 +29,12 @@ public class ShopStart {
 
     static final int PORT = 8080;
 
-    // VNPAY tính giờ GMT+7. KHÔNG dùng "Etc/GMT+7" — theo POSIX nó là UTC-7, lệch 14 tiếng.
+    // VNPAY tính giờ GMT+7. Đừng dùng "Etc/GMT+7", theo POSIX nó là UTC-7, lệch 14 tiếng.
     static final ZoneId            VN_ZONE  = ZoneId.of("Asia/Ho_Chi_Minh");
     static final DateTimeFormatter VNP_TIME = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
-    /* =================================================================================
-     * TODO 1 — CẤU HÌNH
+    /*
+     * TODO 1: cấu hình
      * Lấy TmnCode + HashSecret miễn phí tại https://sandbox.vnpayment.vn/devreg/
      * Đọc từ biến môi trường để không bao giờ commit secret lên git.
      *
@@ -55,16 +44,14 @@ public class ShopStart {
      *                                         "http://localhost:8080/vnpay/return");
      *   static final String PAY_URL = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
      *   static final String API_URL = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
-     * ================================================================================= */
+     */
 
     static String env(String key, String fallback) {
         String v = System.getenv(key);
         return (v == null || v.isBlank()) ? fallback : v;
     }
 
-    /* ---------------------------------------------------------------------------------
-     * ĐƠN HÀNG — phần này đã viết sẵn, không phải đụng tới trong buổi nói.
-     * --------------------------------------------------------------------------------- */
+    // Đơn hàng. Phần này viết sẵn rồi, trong buổi học không đụng tới.
 
     static class Order {
         final String txnRef;
@@ -83,15 +70,15 @@ public class ShopStart {
 
     static final Map<String, Order> ORDERS = new ConcurrentHashMap<>();
 
-    /** Mã đơn duy nhất trong 24h theo TmnCode. */
+    // Mã đơn phải duy nhất trong 24h theo TmnCode.
     static String newTxnRef(String createDate) {
         return createDate + ThreadLocalRandom.current().nextInt(100_000, 999_999);
     }
 
-    /* =================================================================================
-     * TODO 2 — KÝ HMAC-SHA512   <-- TRÁI TIM CỦA VNPAY
+    /*
+     * TODO 2: ký HMAC-SHA512
      *
-     * Ba bước: sort alphabet -> URL-encode GIÁ TRỊ -> HMAC-SHA512 ra hex CHỮ THƯỜNG.
+     * Ba bước: sort alphabet, URL-encode giá trị, rồi HMAC-SHA512 ra hex chữ thường.
      *
      *   static String hmacSHA512(String secretKey, String data) {
      *       Mac mac = Mac.getInstance("HmacSHA512");
@@ -106,10 +93,10 @@ public class ShopStart {
      *       // TreeMap để sort alphabet, bỏ tham số rỗng,
      *       // URLEncoder.encode(value, US_ASCII) cho TỪNG GIÁ TRỊ, nối bằng '&'
      *   }
-     * ================================================================================= */
+     */
 
-    /* =================================================================================
-     * TODO 3 — VERIFY CHỮ KÝ
+    /*
+     * TODO 3: verify chữ ký
      *
      * Dùng lại đúng buildQueryString ở trên, chỉ thêm một việc:
      * bỏ vnp_SecureHash và vnp_SecureHashType ra khỏi map TRƯỚC khi băm.
@@ -119,10 +106,10 @@ public class ShopStart {
      * Hai lỗi chiếm 90% ca "sai chữ ký":
      *   1. quên URL-encode lại (servlet đã decode sẵn tham số)
      *   2. quên bỏ chính vnp_SecureHash ra khỏi chuỗi
-     * ================================================================================= */
+     */
 
-    /* =================================================================================
-     * TODO 4 — TẠO URL THANH TOÁN
+    /*
+     * TODO 4: tạo URL thanh toán
      *
      *   static String createPayment(long amount, String orderInfo, String bankCode, String ip) {
      *       // 1. lưu đơn ở trạng thái PENDING
@@ -130,50 +117,48 @@ public class ShopStart {
      *       // 3. query = buildQueryString(p)
      *       // 4. url = PAY_URL + "?" + query + "&vnp_SecureHash=" + hmacSHA512(HASH_SECRET, query)
      *   }
-     * ================================================================================= */
+     */
 
-    /** Bản tạm: chưa ký được nên báo lỗi cho frontend. Xoá khi làm xong TODO 4. */
+    // Tạm thời báo lỗi cho frontend. Xoá hàm này khi làm xong TODO 4.
     static String createPaymentStub(long amount, String orderInfo) {
         String createDate = LocalDateTime.now(VN_ZONE).format(VNP_TIME);
         String txnRef = newTxnRef(createDate);
         ORDERS.put(txnRef, new Order(txnRef, amount, orderInfo, createDate));
-        log("Đã tạo đơn " + txnRef + " — nhưng CHƯA ký được URL (xem TODO 4)");
+        log("Đã tạo đơn " + txnRef + ", chưa ký được URL (xem TODO 4)");
         return "{\"error\":\"Chưa nhúng VNPAY. Làm TODO 1 đến TODO 4 trong ShopStart.java\"}";
     }
 
-    /* =================================================================================
-     * TODO 5 — NHẬN IPN (server-to-server)
+    /*
+     * TODO 5: nhận IPN (VNPAY gọi thẳng vào server)
      *
-     * VNPAY retry tới khi nhận RspCode=00 -> handler BẮT BUỘC idempotent.
+     * VNPAY retry tới khi nhận RspCode=00, nên handler phải idempotent.
      *
      *   97 chữ ký sai -> 01 không có đơn -> 04 sai số tiền
      *   -> 02 đã xử lý rồi -> 00 ghi nhận xong
      *
-     * Đây là NƠI DUY NHẤT được cộng tiền / giao hàng.
-     * ================================================================================= */
+     * Chỉ được cộng tiền ở đây, không cộng ở chỗ nào khác.
+     */
 
     static String handleIpnStub(Map<String, String> params) {
-        log("Nhận IPN cho txnRef=" + params.get("vnp_TxnRef") + " — nhưng chưa verify (xem TODO 5)");
+        log("Nhận IPN cho txnRef=" + params.get("vnp_TxnRef") + ", chưa verify (xem TODO 5)");
         return "{\"RspCode\":\"99\",\"Message\":\"Chua lam TODO 5\"}";
     }
 
-    /* =================================================================================
-     * TODO 6 — RETURNURL
+    /*
+     * TODO 6: ReturnURL
      *
-     * Trình duyệt user quay về đây. CHỈ để hiển thị — không đổi trạng thái đơn
-     * theo tham số trên URL, vì user sửa URL được.
+     * Trình duyệt quay về đây, chỉ để hiển thị.
+     * Đừng đổi trạng thái đơn theo tham số trên URL vì user sửa URL được.
      *
-     * Nếu chạy KHÔNG có ngrok thì IPN không về được, lúc đó gọi API querydr
+     * Chạy không có ngrok thì IPN không về được, lúc đó gọi API querydr
      * để hỏi thẳng VNPAY trạng thái thật (xem VnpayDemo.java).
-     * ================================================================================= */
+     */
 
     static String handleReturnStub(Map<String, String> params) {
         return "/?txnRef=" + params.getOrDefault("vnp_TxnRef", "") + "&valid=false";
     }
 
-    /* ---------------------------------------------------------------------------------
-     * GIAO DIỆN — đã viết sẵn, giống hệt bản đáp án.
-     * --------------------------------------------------------------------------------- */
+    // Giao diện, giống hệt bản làm xong.
 
     static final String PAGE_HTML = """
         <!DOCTYPE html>
@@ -181,13 +166,11 @@ public class ShopStart {
         <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>VNPAY Shop — code xuất phát</title>
+        <title>VNPAY Shop</title>
         <style>
           body{font-family:system-ui,-apple-system,sans-serif;max-width:640px;margin:36px auto;
                padding:0 18px;color:#16181d;line-height:1.55}
           h2{margin:0 0 4px} .sub{color:#6b7280;margin:0 0 20px;font-size:14px}
-          .status{background:#fef3c7;border:1px solid #fcd34d;border-radius:8px;
-               padding:10px 14px;font-size:13.5px;margin-bottom:22px}
           .row{display:flex;gap:12px;flex-wrap:wrap}
           .card{flex:1 1 180px;border:1px solid #e5e7eb;border-radius:10px;padding:16px}
           .price{color:#005baa;font-weight:700;font-size:18px;margin:4px 0 12px}
@@ -203,11 +186,7 @@ public class ShopStart {
         <body>
 
         <h2>VNPAY Shop</h2>
-        <p class="sub">Cửa hàng demo cho buổi seminar.</p>
-
-        <div class="status">
-          <b>Trạng thái: chưa nhúng VNPAY.</b> Server chạy rồi, phần ký chữ ký còn trống.
-        </div>
+        <p class="sub">Cửa hàng demo.</p>
 
         <div class="row">
           <div class="card">
@@ -229,7 +208,7 @@ public class ShopStart {
         <label for="bankCode">Phương thức</label>
         <select id="bankCode">
           <option value="">Để VNPAY hiện trang chọn ngân hàng</option>
-          <option value="NCB" selected>NCB — dùng thẻ test bên dưới</option>
+          <option value="NCB" selected>NCB (dùng thẻ test bên dưới)</option>
           <option value="VNPAYQR">Quét mã VNPAYQR</option>
         </select>
 
@@ -247,7 +226,7 @@ public class ShopStart {
           document.getElementById('orderInfo').value = 'Thanh toan ' + info;
         }
 
-        // Phần này đã xong: gọi server xin URL. Trình duyệt KHÔNG bao giờ giữ HashSecret.
+        // Gọi server xin URL. Trình duyệt không giữ HashSecret.
         async function pay(){
           const body = new URLSearchParams({
             amount:    document.getElementById('amount').value,
@@ -269,9 +248,7 @@ public class ShopStart {
         </html>
         """;
 
-    /* ---------------------------------------------------------------------------------
-     * SERVER
-     * --------------------------------------------------------------------------------- */
+    // Server
 
     public static void main(String[] args) throws IOException {
         HttpServer server = HttpServer.create(new InetSocketAddress(PORT), 0);
@@ -312,12 +289,12 @@ public class ShopStart {
 
         server.start();
         log("ShopStart đang chạy tại http://localhost:" + PORT);
-        log("Cửa hàng hiện ra được, nhưng chưa nhúng VNPAY — mở file này và tìm TODO 1.");
+        log("Chưa nhúng VNPAY. Mở file này rồi tìm TODO 1.");
     }
 
-    /* ----------------------------- tiện ích nhỏ ----------------------------- */
+    // mấy hàm tiện ích
 
-    /** Tách query string thành map, đã URL-decode giống hệt servlet. */
+    // Tách query string thành map, URL-decode giống servlet.
     static Map<String, String> parseQuery(String raw) {
         Map<String, String> map = new HashMap<>();
         if (raw == null || raw.isBlank()) return map;

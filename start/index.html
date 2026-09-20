@@ -1,33 +1,18 @@
 <!DOCTYPE html>
-<!--
-  ===========================================================================
-   VNPAY SEMINAR — CODE XUẤT PHÁT (chưa nhúng VNPAY)
-  ---------------------------------------------------------------------------
-   Đây là một cửa hàng HTML thuần. Mở bằng cách double-click file này.
-   Mọi thứ chạy được, TRỪ nút "Thanh toán" — đó là việc của buổi hôm nay.
-
-   Trong seminar ta sẽ lần lượt điền vào 4 chỗ đánh dấu TODO bên dưới:
-
-     TODO 1  — Hàm pay(): gọi server để lấy URL thanh toán đã ký
-     TODO 2  — Chuyển trang sang cổng VNPAY
-     TODO 3  — Trang kết quả: hỏi lại server trạng thái thật
-     TODO 4  — Vì sao KHÔNG ký chữ ký ngay tại đây
-
-   File đáp án đầy đủ: VnpayDemo.java (chạy bằng `java VnpayDemo.java`)
-  ===========================================================================
--->
+<!-- Code xuất phát cho buổi seminar VNPAY.
+     Mở file này bằng cách double-click. Mọi thứ chạy được trừ nút Thanh toán.
+     Trong buổi học mình sẽ điền 4 chỗ TODO bên dưới.
+     Bản làm xong: VnpayDemo.java -->
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>VNPAY Shop — code xuất phát</title>
+<title>VNPAY Shop</title>
 <style>
   body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;max-width:640px;margin:36px auto;
        padding:0 18px;color:#16181d;line-height:1.55}
   h2{margin:0 0 4px}
   .sub{color:#6b7280;margin:0 0 20px;font-size:14px}
-  .status{background:#fef3c7;border:1px solid #fcd34d;border-radius:8px;padding:10px 14px;
-       font-size:13.5px;margin-bottom:22px}
   .row{display:flex;gap:12px;flex-wrap:wrap}
   .card{flex:1 1 180px;border:1px solid #e5e7eb;border-radius:10px;padding:16px}
   .price{color:#005baa;font-weight:700;font-size:18px;margin:4px 0 12px}
@@ -44,7 +29,6 @@
 
 <h2>VNPAY Shop</h2>
 <p class="sub">Cửa hàng demo.</p>
-
 
 <div class="row">
   <div class="card">
@@ -66,7 +50,7 @@
 <label for="bankCode">Phương thức</label>
 <select id="bankCode">
   <option value="">Để VNPAY hiện trang chọn ngân hàng</option>
-  <option value="NCB" selected>NCB — dùng thẻ test bên dưới</option>
+  <option value="NCB" selected>NCB (dùng thẻ test bên dưới)</option>
   <option value="VNPAYQR">Quét mã VNPAYQR</option>
 </select>
 
@@ -78,19 +62,17 @@
   <b>Thẻ test NCB:</b> 9704198526191432198 · NGUYEN VAN A · 07/15 · OTP 123456
 </div>
 
-<!--
-  TODO 3 — TRANG KẾT QUẢ
-  Sau khi thanh toán xong, VNPAY đưa người dùng quay lại kèm ?txnRef=...
-  Chỗ này sẽ là khối hiển thị kết quả. Quy tắc: KHÔNG đọc trạng thái từ URL,
-  mà gọi GET /api/orders?txnRef=... để hỏi server.
+<!-- TODO 3: trang kết quả.
+     Thanh toán xong VNPAY trả người dùng về kèm ?txnRef=...
+     Đừng đọc trạng thái từ URL, gọi GET /api/orders?txnRef=... để hỏi server.
 
-  <div id="result">
-    <table>
-      <tr><th>Mã đơn</th><td id="rRef"></td></tr>
-      <tr><th>Trạng thái</th><td id="rStatus"></td></tr>
-      <tr><th>Mã GD tại VNPAY</th><td id="rNo"></td></tr>
-    </table>
-  </div>
+     <div id="result">
+       <table>
+         <tr><th>Mã đơn</th><td id="rRef"></td></tr>
+         <tr><th>Trạng thái</th><td id="rStatus"></td></tr>
+         <tr><th>Mã GD tại VNPAY</th><td id="rNo"></td></tr>
+       </table>
+     </div>
 -->
 
 <script>
@@ -106,26 +88,18 @@ async function pay(){
 
   console.log('Đơn hàng:', { amount, orderInfo, bankCode });
 
-  /* ------------------------------------------------------------------
-     TODO 1 — GỌI SERVER LẤY URL THANH TOÁN
-
-     const body = new URLSearchParams({ amount, orderInfo, bankCode });
-     const res  = await fetch('/api/payments', { method: 'POST', body: body });
-     const data = await res.json();
-
-     TODO 2 — CHUYỂN TRANG SANG VNPAY
-
-     window.location.href = data.paymentUrl;
-
-     ------------------------------------------------------------------
-     TODO 4 — CÂU HỎI PHẢI TRẢ LỜI ĐƯỢC TRƯỚC KHI GÕ DÒNG NÀO
-
-     "Sao không ký chữ ký ngay ở JavaScript cho nhanh, khỏi cần server?"
-
-     Vì ký cần HashSecret. Đặt nó trong file này thì ai bấm Ctrl+U xem
-     source cũng ký được đơn giả và tự xác nhận 'đã thanh toán'.
-     HashSecret CHỈ được nằm trên server — ràng buộc của mọi cổng thanh toán.
-     ------------------------------------------------------------------ */
+  // TODO 1: gọi server xin URL thanh toán
+  //   const body = new URLSearchParams({ amount, orderInfo, bankCode });
+  //   const res  = await fetch('/api/payments', { method: 'POST', body: body });
+  //   const data = await res.json();
+  //
+  // TODO 2: chuyển trang sang VNPAY
+  //   window.location.href = data.paymentUrl;
+  //
+  // TODO 4: trả lời được câu này trước đã.
+  //   "Sao không ký luôn ở JavaScript cho nhanh, khỏi cần server?"
+  //   Ký cần HashSecret. Để nó trong file này thì ai bấm Ctrl+U cũng ký được
+  //   đơn giả rồi tự xác nhận là đã thanh toán. Secret phải nằm trên server.
 
   document.getElementById('msg').innerHTML =
       '<span style="color:#b45309">Chưa nối VNPAY.</span> ' +
