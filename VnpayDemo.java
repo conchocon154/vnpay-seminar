@@ -54,17 +54,31 @@ public class VnpayDemo {
      * Đọc từ biến môi trường.
      * ================================================================================= */
 
+    static final int    PORT           = 8080;
+    static final int    EXPIRE_MINUTES = 15;
+
     static final String TMN_CODE    = env("VNPAY_TMN_CODE", "CHANGE_ME");
     static final String HASH_SECRET = env("VNPAY_HASH_SECRET", "CHANGE_ME");
 
-    // Đổi sang URL ngrok khi muốn nhận IPN thật: https://xxxx.ngrok-free.app/vnpay/return
-    static final String RETURN_URL  = env("VNPAY_RETURN_URL", "http://localhost:8080/vnpay/return");
+    /* ---------------------------------------------------------------------------
+     * HAI CHẾ ĐỘ CHẠY — đặt bằng biến môi trường VNPAY_MODE
+     *
+     *   local  (mặc định) — chỉ chạy localhost, KHÔNG cần ngrok.
+     *                       IPN không về được, nên đơn được chốt bằng API querydr.
+     *                       Dùng khi cả lớp cùng chạy trên máy mình.
+     *
+     *   ngrok             — mở tunnel public để VNPAY gọi IPN thật vào máy bạn.
+     *                       Chương trình tự đọc URL từ ngrok đang chạy (cổng 4040).
+     *                       Dùng khi cần demo đúng kiến trúc chuẩn.
+     * --------------------------------------------------------------------------- */
+
+    static final String MODE       = env("VNPAY_MODE", "local");
+    static final String PUBLIC_URL = resolvePublicUrl();
+    static final String RETURN_URL = PUBLIC_URL + "/vnpay/return";
+    static final String IPN_URL    = PUBLIC_URL + "/vnpay/ipn";
 
     static final String PAY_URL = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
     static final String API_URL = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
-
-    static final int    PORT           = 8080;
-    static final int    EXPIRE_MINUTES = 15;
 
     // VNPAY tính giờ GMT+7. KHÔNG dùng "Etc/GMT+7" — theo chuẩn POSIX nó là UTC-7, lệch 14 tiếng.
     static final ZoneId            VN_ZONE  = ZoneId.of("Asia/Ho_Chi_Minh");
@@ -73,6 +87,26 @@ public class VnpayDemo {
     static String env(String key, String fallback) {
         String v = System.getenv(key);
         return (v == null || v.isBlank()) ? fallback : v;
+    }
+
+    /** Chế độ ngrok: hỏi chính ngrok đang chạy xem nó cấp URL nào (API cục bộ cổng 4040). */
+    static String resolvePublicUrl() {
+        String explicit = env("VNPAY_PUBLIC_URL", "");
+        if (!explicit.isBlank()) return explicit.replaceAll("/+$", "");
+
+        if ("ngrok".equalsIgnoreCase(MODE)) {
+            try {
+                HttpResponse<String> res = HttpClient.newHttpClient().send(
+                        HttpRequest.newBuilder(URI.create("http://127.0.0.1:4040/api/tunnels")).GET().build(),
+                        HttpResponse.BodyHandlers.ofString());
+                for (String part : res.body().split("\"public_url\":\"")) {
+                    if (part.startsWith("https://")) return part.substring(0, part.indexOf('"'));
+                }
+            } catch (Exception e) {
+                System.out.println("!! Không đọc được URL ngrok. Đã chạy `ngrok http 8080` chưa?");
+            }
+        }
+        return "http://localhost:" + PORT;
     }
 
     /* =================================================================================
@@ -525,8 +559,31 @@ public class VnpayDemo {
                         handleIpn(parseQuery(ex.getRequestURI().getRawQuery()))));
 
         server.start();
-        log("VNPAY demo đang chạy tại http://localhost:" + PORT);
-        log("TmnCode=" + TMN_CODE + "  ReturnUrl=" + RETURN_URL);
+
+        boolean ngrokMode = PUBLIC_URL.startsWith("https://");
+        System.out.println("""
+
+            ================================================================
+              VNPAY demo — chế độ: %s
+            ================================================================
+              Mở cửa hàng:  %s
+              ReturnURL:    %s
+              IPN URL:      %s
+            ----------------------------------------------------------------
+            %s
+            ================================================================
+            """.formatted(
+                ngrokMode ? "NGROK (IPN thật)" : "LOCAL (không cần ngrok)",
+                PUBLIC_URL,
+                RETURN_URL,
+                ngrokMode ? IPN_URL : "(không dùng — localhost thì VNPAY không gọi tới được)",
+                ngrokMode
+                    ? "  Khai 2 URL trên vào sandbox.vnpayment.vn/merchantv2\n"
+                    + "  -> Cấu hình -> Thông tin website. URL đổi mỗi lần chạy lại ngrok."
+                    : "  Không khai gì cả. Đơn được chốt bằng API querydr khi trang\n"
+                    + "  kết quả hỏi trạng thái — chạy được ngay trên máy cá nhân."));
+
+        log("TmnCode=" + TMN_CODE);
     }
 
     /* ----------------------------- tiện ích nhỏ ----------------------------- */

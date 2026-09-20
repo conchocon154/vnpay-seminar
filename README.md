@@ -8,9 +8,12 @@ Toàn bộ logic ký/verify nằm trong 1 file không phụ thuộc Spring: `uti
 
 ## 0a. Code xuất phát cho buổi seminar
 
-[`start/index.html`](start/index.html) — cửa hàng HTML thuần, **chưa nhúng VNPAY**.
-Double-click là mở, nút Thanh toán chưa nối gì. Trong file có 4 chỗ đánh dấu `TODO` đúng
-thứ tự sẽ điền trong buổi nói. File đáp án là `VnpayDemo.java` bên dưới.
+| File | Dùng khi nào |
+|---|---|
+| [`start/index.html`](start/index.html) | HTML thuần, double-click là mở. Không server, không VNPAY. 4 chỗ `TODO`. |
+| [`ShopStart.java`](ShopStart.java) | Có server, cửa hàng chạy được, phần VNPAY để trống. 6 chỗ `TODO`. `java ShopStart.java` |
+
+Đáp án của cả hai là [`VnpayDemo.java`](VnpayDemo.java).
 
 ---
 
@@ -19,11 +22,26 @@ thứ tự sẽ điền trong buổi nói. File đáp án là `VnpayDemo.java` b
 Muốn thử ngay mà không cài gì: [`VnpayDemo.java`](VnpayDemo.java) là **toàn bộ demo trong một file**,
 HTML nhúng bên trong, không Maven, không Spring, không thư viện ngoài. Chỉ cần JDK 17+.
 
+Điền `VNPAY_TMN_CODE` và `VNPAY_HASH_SECRET` vào file `.env`, rồi chọn một trong hai bản:
+
 ```bash
-export VNPAY_TMN_CODE=xxxxxxxx
-export VNPAY_HASH_SECRET=xxxxxxxxxxxxxxxx
-java VnpayDemo.java          # rồi mở http://localhost:8080
+./run-local.sh     # BẢN 1 — không cần ngrok
 ```
+
+```bash
+./run-ngrok.sh     # BẢN 2 — có ngrok, nhận IPN thật
+```
+
+| | Bản không ngrok | Bản có ngrok |
+|---|---|---|
+| Cài đặt | Không cần gì thêm | Cần ngrok + authtoken |
+| Khai URL trong portal | Không | Có, đổi mỗi lần chạy lại |
+| IPN | Không về được | VNPAY gọi thật vào `/vnpay/ipn` |
+| Chốt đơn bằng | API `querydr` | IPN, `querydr` làm dự phòng |
+| Hợp cho | Cả lớp chạy trên máy mình | Demo đúng kiến trúc chuẩn |
+
+`run-ngrok.sh` tự mở tunnel và **tự đọc URL ngrok cấp** (qua API cục bộ cổng 4040) — không phải
+copy URL bằng tay. Chương trình in sẵn 2 URL cần dán vào merchant portal.
 
 File được chia thành 10 bước đánh số, đọc từ trên xuống: cấu hình → giao diện → đơn hàng → ký →
 verify → tạo URL → IPN → querydr → ReturnURL → khởi động server.
