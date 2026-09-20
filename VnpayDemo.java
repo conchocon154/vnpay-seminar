@@ -1,5 +1,5 @@
 /* =====================================================================================
- *  VNPAY DEMO — TOÀN BỘ TRONG MỘT FILE
+ *  VNPAY DEMO 
  *  -------------------------------------------------------------------------------
  *  CÁCH CHẠY (cần JDK 17 trở lên, KHÔNG cần Maven, KHÔNG cần thư viện ngoài):
  *
@@ -14,9 +14,9 @@
  *
  *  FILE NÀY ĐƯỢC CHIA THÀNH 10 BƯỚC, ĐỌC TỪ TRÊN XUỐNG:
  *    BƯỚC 1  — Cấu hình
- *    BƯỚC 2  — Giao diện web (HTML nhúng ngay trong file)
+ *    BƯỚC 2  — Giao diện web (HTML file)
  *    BƯỚC 3  — Đơn hàng
- *    BƯỚC 4  — Ký HMAC-SHA512          <- trái tim của VNPAY
+ *    BƯỚC 4  — Ký HMAC-SHA512          <- VNPAY
  *    BƯỚC 5  — Verify chữ ký
  *    BƯỚC 6  — Tạo URL thanh toán
  *    BƯỚC 7  — Nhận IPN
@@ -51,7 +51,7 @@ public class VnpayDemo {
 
     /* =================================================================================
      * BƯỚC 1 — CẤU HÌNH
-     * Đọc từ biến môi trường để KHÔNG bao giờ commit secret lên git.
+     * Đọc từ biến môi trường.
      * ================================================================================= */
 
     static final String TMN_CODE    = env("VNPAY_TMN_CODE", "CHANGE_ME");
@@ -77,7 +77,7 @@ public class VnpayDemo {
 
     /* =================================================================================
      * BƯỚC 2 — GIAO DIỆN WEB
-     * Nhúng thẳng HTML vào đây cho gọn. Dự án thật thì tách ra static/index.html.
+     * Nhúng thẳng HTML vào đây cho gọn. Có thể tách ra static/index.html rồi gọi lại tại đây cũng được.
      * Điểm mấu chốt: trang web KHÔNG giữ HashSecret, nó chỉ gọi POST /api/payments.
      * ================================================================================= */
 
@@ -219,7 +219,7 @@ public class VnpayDemo {
 
     /* =================================================================================
      * BƯỚC 3 — ĐƠN HÀNG
-     * Lưu tạm trong RAM. Dự án thật thay bằng một bảng DB có UNIQUE(txn_ref).
+     * Lưu tạm trong RAM.
      * ================================================================================= */
 
     static class Order {
@@ -242,8 +242,8 @@ public class VnpayDemo {
     static final Map<String, Order> ORDERS = new ConcurrentHashMap<>();
 
     /* =================================================================================
-     * BƯỚC 4 — KÝ HMAC-SHA512  <-- TRÁI TIM CỦA VNPAY
-     * Ba bước: sort alphabet -> URL-encode GIÁ TRỊ -> HMAC-SHA512 ra hex chữ thường.
+     * BƯỚC 4 — KÝ HMAC-SHA512  <-- VNPAY
+     * Gồm bước: Sort alphabet -> URL-encode GIÁ TRỊ -> HMAC-SHA512 ra hex chữ thường.
      * ================================================================================= */
 
     static String hmacSHA512(String secretKey, String data) {
@@ -259,7 +259,7 @@ public class VnpayDemo {
         }
     }
 
-    /** Chuỗi trả về vừa dùng làm hashData, vừa làm query string -> không bao giờ lệch nhau. */
+    /** Chuỗi trả về vừa dùng làm hashData, vừa làm query string -> không bị lệch nhau. */
     static String buildQueryString(Map<String, String> params) {
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, String> e : new TreeMap<>(params).entrySet()) {   // sort alphabet
@@ -275,7 +275,6 @@ public class VnpayDemo {
 
     /* =================================================================================
      * BƯỚC 5 — VERIFY CHỮ KÝ
-     * Dùng lại đúng hàm trên, chỉ thêm: bỏ chính vnp_SecureHash ra trước khi băm.
      * ================================================================================= */
 
     static boolean isValidSignature(Map<String, String> params) {

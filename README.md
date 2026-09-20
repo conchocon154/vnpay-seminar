@@ -6,7 +6,15 @@ Toàn bộ logic ký/verify nằm trong 1 file không phụ thuộc Spring: `uti
 
 ---
 
-## 0. Bản một file — dành cho cả lớp
+## 0a. Code xuất phát cho buổi seminar
+
+[`start/index.html`](start/index.html) — cửa hàng HTML thuần, **chưa nhúng VNPAY**.
+Double-click là mở, nút Thanh toán chưa nối gì. Trong file có 4 chỗ đánh dấu `TODO` đúng
+thứ tự sẽ điền trong buổi nói. File đáp án là `VnpayDemo.java` bên dưới.
+
+---
+
+## 0b. Bản một file — dành cho cả lớp
 
 Muốn thử ngay mà không cài gì: [`VnpayDemo.java`](VnpayDemo.java) là **toàn bộ demo trong một file**,
 HTML nhúng bên trong, không Maven, không Spring, không thư viện ngoài. Chỉ cần JDK 17+.
