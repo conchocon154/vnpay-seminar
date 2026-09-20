@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Thiết lập VNPAY</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  .panel { background:#fff; border:1px solid var(--line); border-radius:14px; padding:26px; max-width:560px; }
+  .ok-line { color:var(--ok); font-weight:600; }
+  .hint { font-size:12.5px; color:var(--muted); margin:4px 0 0; }
+  .msg { margin-top:14px; font-size:14px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="logo">VN<span>PAY</span> Shop</div>
+    <div class="tag">Thiết lập</div>
+  </div>
+</header>
+
+<main>
+  <h1>Thiết lập kết nối VNPAY</h1>
+  <p class="sub">Dán 2 giá trị VNPAY gửi trong email đăng ký sandbox. App sẽ áp dụng ngay, không cần khởi động lại.</p>
+
+  <div class="panel">
+    <div id="current"></div>
+
+    <label for="tmnCode">vnp_TmnCode</label>
+    <input id="tmnCode" placeholder="8 ký tự, ví dụ ABCDEFGH" autocomplete="off" spellcheck="false">
+    <p class="hint">Mã website trong email VNPAY.</p>
+
+    <label for="hashSecret">HashSecret</label>
+    <input id="hashSecret" type="password" placeholder="chuỗi bí mật dùng để ký HMAC-SHA512" autocomplete="off" spellcheck="false">
+    <p class="hint">Chỉ nằm trên server. Không bao giờ được gửi xuống trình duyệt của khách.</p>
+
+    <label for="returnUrl">Return URL</label>
+    <input id="returnUrl" autocomplete="off" spellcheck="false">
+    <p class="hint">Phải trùng đúng URL đã khai trong merchant portal. Đổi mỗi lần chạy lại ngrok.</p>
+
+    <div class="row">
+      <button class="pay-btn" id="saveBtn" onclick="save()">Lưu và áp dụng</button>
+    </div>
+    <div class="msg" id="msg"></div>
+  </div>
+
+  <div class="note">
+    <strong>Trang này chỉ dành cho sandbox.</strong> Nó ghi đè credential lúc đang chạy, nên server chỉ chấp nhận
+    request gõ thẳng vào <code>localhost</code> — mở qua link ngrok sẽ bị từ chối. Lên production thì xoá
+    <code>SetupController</code> và nạp secret từ Vault / K8s Secret.
+  </div>
+</main>
+
+<script>
+async function load() {
+  const s = await (await fetch('/api/config/status')).json();
+  document.getElementById('returnUrl').value = s.returnUrl || '';
+  document.getElementById('current').innerHTML = s.configured
+    ? `<p class="ok-line">✅ Đã cấu hình — TmnCode <code>${s.tmnCode}</code>, HashSecret <code>${s.hashSecretMasked}</code></p>`
+    : `<p style="color:#dc2626;font-weight:600;">⚠️ Chưa cấu hình — chưa tạo được giao dịch.</p>`;
+  if (s.configured) document.getElementById('tmnCode').value = s.tmnCode;
+}
+
+async function save() {
+  const btn = document.getElementById('saveBtn'), msg = document.getElementById('msg');
+  btn.disabled = true; msg.textContent = '';
+  try {
+    const res = await fetch('/api/config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        tmnCode: document.getElementById('tmnCode').value,
+        hashSecret: document.getElementById('hashSecret').value,
+        returnUrl: document.getElementById('returnUrl').value
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Lỗi không xác định');
+    msg.innerHTML = `<span class="ok-line">✅ ${data.message}</span> — đã ghi vào <code>${data.savedTo}</code>.
+                     <a href="/">Về cửa hàng →</a>`;
+    document.getElementById('hashSecret').value = '';
+    load();
+  } catch (e) {
+    msg.innerHTML = `<span style="color:#dc2626;">❌ ${e.message}</span>`;
+  } finally {
+    btn.disabled = false;
+  }
+}
+load();
+</script>
+</body>
+</html>

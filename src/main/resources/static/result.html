@@ -19,7 +19,7 @@
   <div class="result">
     <div class="icon" id="icon">⏳</div>
     <h2 id="title">Đang xác nhận…</h2>
-    <p class="sub" id="desc">Đang chờ VNPAY gọi IPN về server.</p>
+    <p class="sub" id="desc">Đang chờ server xác nhận với VNPAY.</p>
     <span class="badge wait" id="badge">PENDING</span>
 
     <table>
@@ -38,7 +38,7 @@
   <div class="note">
     <strong>Vì sao trang này phải hỏi lại server?</strong><br>
     Các tham số trên URL là do trình duyệt mang về — user sửa được. Trạng thái thật lấy từ
-    <code>GET /api/orders/{txnRef}</code>, và giá trị đó chỉ được ghi khi <code>/vnpay/ipn</code> xác thực chữ ký thành công.
+    <code>GET /api/orders/{txnRef}</code>, và giá trị đó chỉ được ghi sau khi server tự xác thực với VNPAY — qua IPN, hoặc qua API <code>querydr</code> nếu IPN không về.
   </div>
 </main>
 
@@ -52,7 +52,7 @@ document.getElementById('responseCode').textContent = q.get('responseCode') || '
 document.getElementById('sig').textContent = q.get('valid') === 'true' ? '✅ hợp lệ' : '❌ KHÔNG hợp lệ';
 
 const UI = {
-  PAID:   { icon: '✅', title: 'Thanh toán thành công', desc: 'Server đã nhận IPN và ghi nhận đơn hàng.', cls: 'ok' },
+  PAID:   { icon: '✅', title: 'Thanh toán thành công', desc: 'Server đã xác thực trực tiếp với VNPAY và ghi nhận đơn hàng.', cls: 'ok' },
   FAILED: { icon: '❌', title: 'Thanh toán thất bại',   desc: 'Giao dịch bị huỷ hoặc ngân hàng từ chối.',  cls: 'err' },
 };
 
@@ -89,7 +89,7 @@ function render(order) {
     setTimeout(() => poll(tries + 1), 2000);
   } else {
     document.getElementById('desc').textContent =
-      'Chưa nhận được IPN sau 20s. Kiểm tra IPN URL trong merchant portal, hoặc chạy đối soát querydr.';
+      'Chưa chốt được sau 20s. Kiểm tra IPN URL trong merchant portal, hoặc gọi POST /api/orders/{txnRef}/verify.';
   }
 })();
 </script>

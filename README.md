@@ -84,7 +84,11 @@ Browser          Payment Service            VNPAY
    │                      │─ POST querydr ────>│  (3) đối soát chủ động khi IPN mất
 ```
 
-**Quy tắc sống còn:** cộng tiền/giao hàng **chỉ** ở IPN (1). ReturnURL (2) user sửa URL được → chỉ dùng để vẽ màn hình.
+**Quy tắc sống còn:** cộng tiền/giao hàng **chỉ** từ nguồn server-to-server — IPN (1) hoặc `querydr` (3).
+ReturnURL (2) user sửa URL được → chỉ dùng để vẽ màn hình.
+
+> Thực tế gặp phải: portal sandbox không cho khai IPN URL (*Danh sách website* trống, *Cài đặt thông báo* lỗi kết nối),
+> nên IPN không về. `ReconcileService` gọi `querydr` ngay trên ReturnURL để chốt đơn — vẫn verify chữ ký và so số tiền, không tin tham số URL.
 
 ---
 
@@ -95,6 +99,7 @@ Browser          Payment Service            VNPAY
 | POST | `/api/payments` | `{amount, orderInfo, bankCode}` → `{txnRef, paymentUrl}` |
 | GET | `/api/orders/{txnRef}` | FE polling trạng thái thật |
 | POST | `/api/orders/{txnRef}/verify?transactionDate=yyyyMMddHHmmss` | gọi `querydr` sang VNPAY |
+| | | *ReturnURL cũng tự gọi `querydr` khi đơn còn PENDING* |
 | GET | `/vnpay/return` | browser quay về → verify chữ ký → 302 sang `/result.html` |
 | GET | `/vnpay/ipn` | VNPAY gọi server-to-server (ghi DB) |
 

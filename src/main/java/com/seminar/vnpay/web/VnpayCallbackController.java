@@ -2,7 +2,9 @@ package com.seminar.vnpay.web;
 
 import com.seminar.vnpay.config.VnpayProperties;
 import com.seminar.vnpay.service.IpnService;
+import com.seminar.vnpay.service.ReconcileService;
 import com.seminar.vnpay.util.VnpayUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,10 +21,13 @@ public class VnpayCallbackController {
 
     private final VnpayProperties props;
     private final IpnService ipnService;
+    private final ReconcileService reconcileService;
 
-    public VnpayCallbackController(VnpayProperties props, IpnService ipnService) {
+    public VnpayCallbackController(VnpayProperties props, IpnService ipnService,
+                                   ReconcileService reconcileService) {
         this.props = props;
         this.ipnService = ipnService;
+        this.reconcileService = reconcileService;
     }
 
     /**
@@ -31,8 +36,16 @@ public class VnpayCallbackController {
      * Verify chu ky xong thi redirect sang trang tinh result.html.
      */
     @GetMapping("/vnpay/return")
-    public ResponseEntity<Void> returnUrl(@RequestParam Map<String, String> params) {
+    public ResponseEntity<Void> returnUrl(@RequestParam Map<String, String> params,
+                                          HttpServletRequest http) {
         boolean validSignature = VnpayUtils.isValidSignature(params, props.getHashSecret());
+
+        // Du phong khi IPN chua khai duoc: hoi thang VNPAY qua querydr de chot trang thai.
+        // Van khong tin tham so tren URL - chi dung txnRef lam khoa tra cuu.
+        if (validSignature) {
+            reconcileService.confirm(params.get("vnp_TxnRef"), params.get("vnp_PayDate"),
+                    PaymentController.clientIp(http));
+        }
 
         URI target = UriComponentsBuilder.fromPath("/result.html")
                 .queryParam("txnRef", params.getOrDefault("vnp_TxnRef", ""))

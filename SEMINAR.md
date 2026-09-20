@@ -69,8 +69,20 @@ Kết quả chạy thật:
 5. Đơn hàng   → status: PAID, transactionNo: 14422574
 ```
 
-### 3.4 Đối soát — `VnpayQueryService` (1')
-API `querydr`. Cảnh báo: hash của API này **không sort alphabet**, mà là chuỗi nối bằng `|` theo đúng thứ tự tài liệu. Dùng cho job quét đơn PENDING quá hạn.
+### 3.4 Đối soát — `VnpayQueryService` + `ReconcileService` (2')
+
+**Kể câu chuyện thật này, nó đắt giá hơn mọi slide lý thuyết:**
+
+> Khi tích hợp, portal sandbox không cho khai IPN URL — mục *Danh sách website* trống, *Cài đặt thông báo* báo `Kết nối hệ thống tạm thời bị gián đoạn`. Tức là IPN **không bao giờ về**. Nếu chỉ code theo tài liệu thì demo chết tại chỗ.
+
+Cách cứu: gọi API `querydr` — server tự hỏi VNPAY trạng thái thật. Vẫn an toàn y như IPN vì có đủ 3 lớp: hỏi thẳng VNPAY (không qua trình duyệt) → verify chữ ký response → so lại số tiền với DB.
+
+Log thật của giao dịch demo:
+```
+Chot bang querydr: txnRef=20260920125606777443 status=PAID transactionNo=15683165
+```
+
+Cảnh báo khi code: hash của `querydr` **không sort alphabet**, mà là chuỗi nối bằng `|` đúng thứ tự tài liệu. Copy nhầm hàm ký của luồng `pay` là fail ngay.
 
 ---
 
@@ -97,6 +109,7 @@ API `querydr`. Cảnh báo: hash của API này **không sort alphabet**, mà l�
 6. So sánh chữ ký kiểu constant-time; không log secret/hash.
 
 **Giới hạn**
+- Sandbox có lúc không khai được IPN URL → phải có đường lùi `querydr`, đừng phụ thuộc mỗi IPN.
 - Không phải REST API thuần → bắt buộc redirect, khó cho mobile app (phải nhúng WebView).
 - Sandbox không phản ánh 100% production (hạn mức, ngân hàng bảo trì).
 - Hoàn tiền phải qua API `refund` + đối soát tay, không tự động.
@@ -107,7 +120,7 @@ API `querydr`. Cảnh báo: hash của API này **không sort alphabet**, mà l�
 ## Phần 6 — Q&A (3')
 
 Câu hay bị hỏi, chuẩn bị sẵn:
-- *IPN không về thì sao?* → job `querydr` chốt trạng thái.
+- *IPN không về thì sao?* → `querydr`. Chính bài này đã phải dùng nó vì portal sandbox hỏng.
 - *localhost nhận IPN kiểu gì?* → ngrok, hoặc `demo-local.sh` tự ký.
 - *Sai chữ ký mà không biết vì sao?* → in ra `hashData` rồi so từng ký tự; 90% do quên encode hoặc quên bỏ `vnp_SecureHash`.
 - *Có test được không cần thẻ?* → có, unit test `VnpayUtilsTest` (6 test, chạy offline).
@@ -121,7 +134,7 @@ Câu hay bị hỏi, chuẩn bị sẵn:
 | Copy logic ký/verify | `util/VnpayUtils.java` |
 | Tạo URL thanh toán | `service/PaymentService.java` |
 | Xử lý IPN | `service/IpnService.java` |
-| Đối soát | `service/VnpayQueryService.java` |
+| Đối soát | `service/VnpayQueryService.java` + `service/ReconcileService.java` |
 | Hướng dẫn + bảng mã lỗi + 8 cái bẫy | `README.md` |
 | Test không cần thẻ | `./demo-local.sh`, `mvn test` |
 

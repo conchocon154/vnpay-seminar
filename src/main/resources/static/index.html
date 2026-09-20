@@ -19,6 +19,8 @@
   <h1>Chọn sản phẩm để thanh toán</h1>
   <p class="sub">Bấm mua → tạo đơn ở server → chuyển sang cổng VNPAY → quay về trang kết quả.</p>
 
+  <div id="setupWarn"></div>
+
   <div class="grid" id="products"></div>
 
   <div class="note">
@@ -80,6 +82,16 @@ function openCheckout(i) {
   document.getElementById('err').textContent = '';
   document.getElementById('checkout').showModal();
 }
+
+// Nhac cau hinh neu chua co TmnCode/HashSecret.
+fetch('/api/config/status').then(r => r.json()).then(s => {
+  if (!s.configured) {
+    document.getElementById('setupWarn').innerHTML =
+      '<div class="note" style="background:#fee2e2;border-color:#fecaca;margin:0 0 20px;">' +
+      '<strong>Chưa cấu hình VNPAY.</strong> Dán TmnCode và HashSecret tại ' +
+      '<a href="/setup.html">trang thiết lập</a> trước khi thanh toán.</div>';
+  }
+});
 
 async function pay() {
   const btn = document.getElementById('payBtn');

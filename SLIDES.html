@@ -1,0 +1,578 @@
+<title>Tích hợp VNPAY Sandbox</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#EFF1F4; --surface:#FFFFFF; --surface-2:#F5F7FA;
+  --ink:#101722; --ink-2:#3C4757; --muted:#6B7788;
+  --line:#D8DEE6; --line-2:#E8ECF1;
+  --accent:#0A5BA8; --accent-soft:#E3EDF7;
+  --hot:#C42B22; --hot-soft:#FBE9E7;
+  --ok:#0B6B47; --ok-soft:#E0F2EA;
+  --code-bg:#111A27; --code-ink:#D7E3F2; --code-dim:#7A8CA3; --code-key:#7FC2FF;
+  --shadow:0 1px 2px rgba(16,23,34,.06),0 8px 24px rgba(16,23,34,.06);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0B111A; --surface:#141C28; --surface-2:#1A2432;
+    --ink:#E9EEF5; --ink-2:#BCC7D6; --muted:#8998AB;
+    --line:#26313F; --line-2:#1F2937;
+    --accent:#6FB2F0; --accent-soft:#16283C;
+    --hot:#F2897F; --hot-soft:#2E1917;
+    --ok:#6BD3A8; --ok-soft:#10261E;
+    --code-bg:#0A1119; --code-ink:#D7E3F2; --code-dim:#6F8299; --code-key:#7FC2FF;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0B111A; --surface:#141C28; --surface-2:#1A2432;
+  --ink:#E9EEF5; --ink-2:#BCC7D6; --muted:#8998AB;
+  --line:#26313F; --line-2:#1F2937;
+  --accent:#6FB2F0; --accent-soft:#16283C;
+  --hot:#F2897F; --hot-soft:#2E1917;
+  --ok:#6BD3A8; --ok-soft:#10261E;
+  --code-bg:#0A1119; --code-ink:#D7E3F2; --code-dim:#6F8299; --code-key:#7FC2FF;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;
+}
+code,pre,.mono{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+
+/* ---------- deck shell ---------- */
+.deck{min-height:100%;display:flex;flex-direction:column;padding:0 16px 84px}
+.slide{max-width:1000px;width:100%;margin:0 auto;padding-block:clamp(22px,4vh,44px);animation:in .28s ease-out}
+@keyframes in{from{opacity:.4;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.slide{animation:none}}
+
+.eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:11.5px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--accent);background:var(--accent-soft);
+  padding:5px 11px;border-radius:999px;margin-bottom:16px;
+}
+h1{font-size:clamp(30px,5.4vw,52px);line-height:1.08;margin:0 0 14px;letter-spacing:-.022em;text-wrap:balance}
+h2{font-size:clamp(23px,3.6vw,36px);line-height:1.16;margin:0 0 10px;letter-spacing:-.018em;text-wrap:balance}
+h3{font-size:16px;margin:0 0 8px;letter-spacing:-.005em}
+.lede{font-size:clamp(15px,2vw,18.5px);color:var(--ink-2);max-width:62ch;margin:0 0 26px}
+p{margin:0 0 12px}
+strong{font-weight:600}
+
+/* ---------- pieces ---------- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+
+pre{
+  background:var(--code-bg);color:var(--code-ink);border-radius:10px;
+  padding:16px 18px;overflow-x:auto;margin:0 0 14px;
+  font-size:clamp(12px,1.55vw,14.5px);line-height:1.62;
+}
+pre .c{color:var(--code-dim)}
+pre .k{color:var(--code-key)}
+pre .s{color:#9BE3B4}
+pre .hl{color:#FFD479;font-weight:500}
+code:not(pre code){
+  background:var(--surface-2);border:1px solid var(--line-2);
+  padding:1px 6px;border-radius:5px;font-size:.89em;
+}
+
+table{width:100%;border-collapse:collapse;font-size:14.5px;margin-bottom:14px}
+.tablewrap{overflow-x:auto}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line-2);vertical-align:top}
+th{color:var(--muted);font-weight:500;font-size:12px;letter-spacing:.05em;text-transform:uppercase}
+td.mono,th.mono{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
+
+ul,ol{margin:0 0 12px;padding-left:20px}
+li{margin-bottom:7px}
+li::marker{color:var(--muted)}
+
+.rule{height:1px;background:var(--line);border:0;margin:22px 0}
+
+/* flow lanes */
+.flow{display:grid;gap:10px;margin-bottom:16px}
+.step{display:grid;grid-template-columns:30px 118px 1fr;gap:12px;align-items:start;
+  background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:13px 15px}
+.step .n{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--accent);font-size:15px}
+.lane{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--muted);padding-top:3px}
+.step.key{border-color:var(--accent);background:var(--accent-soft)}
+.step.key .lane{color:var(--accent)}
+@media (max-width:560px){.step{grid-template-columns:26px 1fr}.step .lane{display:none}}
+
+.pill{display:inline-block;font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:999px;
+  letter-spacing:.03em;white-space:nowrap}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}
+.pill.bad{background:var(--hot-soft);color:var(--hot)}
+.pill.neutral{background:var(--surface-2);color:var(--muted);border:1px solid var(--line-2)}
+
+.callout{border-left:3px solid var(--hot);background:var(--hot-soft);padding:14px 18px;border-radius:0 10px 10px 0;margin-bottom:16px}
+.callout.good{border-left-color:var(--ok);background:var(--ok-soft)}
+.callout.info{border-left-color:var(--accent);background:var(--accent-soft)}
+.callout p:last-child,.callout ul:last-child{margin-bottom:0}
+.callout .t{font-weight:600;margin-bottom:5px}
+
+.kpi{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}
+.kpi > div{flex:1 1 150px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:13px 15px}
+.kpi .v{font-family:"IBM Plex Mono",monospace;font-size:clamp(17px,2.6vw,22px);font-weight:600;
+  letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.kpi .l{font-size:12px;color:var(--muted);margin-top:2px}
+
+.qa{margin-bottom:16px}
+.qa dt{font-weight:600;margin-bottom:4px}
+.qa dd{margin:0 0 14px;color:var(--ink-2)}
+
+.agenda{counter-reset:ag;display:grid;gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface)}
+.agenda div{display:flex;gap:14px;align-items:baseline;padding:12px 18px;border-bottom:1px solid var(--line-2)}
+.agenda div:last-child{border-bottom:0}
+.agenda div::before{counter-increment:ag;content:counter(ag,decimal-leading-zero);
+  font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--accent);font-weight:600}
+.agenda .t{font-weight:500}
+.agenda .m{margin-left:auto;font-size:12.5px;color:var(--muted);white-space:nowrap}
+
+.title-meta{display:flex;flex-wrap:wrap;gap:8px 22px;font-size:14px;color:var(--muted);margin-top:26px}
+.title-meta .mono{color:var(--ink-2)}
+
+/* ---------- nav bar ---------- */
+.bar{
+  position:fixed;left:0;right:0;bottom:0;background:var(--surface);
+  border-top:1px solid var(--line);
+  padding:9px 14px calc(9px + env(safe-area-inset-bottom,0px));
+  display:flex;align-items:center;gap:12px;z-index:20
+}
+.bar .prog{flex:1;height:3px;background:var(--line-2);border-radius:2px;overflow:hidden}
+.bar .prog i{display:block;height:100%;background:var(--accent);transition:width .25s ease}
+.bar button{
+  font:inherit;font-size:14px;font-weight:500;color:var(--ink);
+  background:var(--surface-2);border:1px solid var(--line);border-radius:8px;
+  padding:7px 14px;cursor:pointer;min-width:44px
+}
+.bar button:hover{border-color:var(--accent);color:var(--accent)}
+.bar button:disabled{opacity:.38;cursor:default;border-color:var(--line)}
+.bar button:focus-visible,.bar select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.count{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--muted);
+  font-variant-numeric:tabular-nums;white-space:nowrap}
+.hint{font-size:12px;color:var(--muted)}
+@media (max-width:640px){.hint{display:none}}
+</style>
+
+<div class="deck">
+<main id="stage"></main>
+</div>
+
+<nav class="bar">
+  <button id="prev" aria-label="Slide trước">‹</button>
+  <button id="next" aria-label="Slide sau">›</button>
+  <span class="count" id="count">1 / 13</span>
+  <div class="prog"><i id="prog"></i></div>
+  <span class="hint">← → để chuyển slide</span>
+</nav>
+
+<script>
+const S = [];
+
+S.push(`
+<span class="eyebrow">Seminar · Microservices</span>
+<h1>Tích hợp VNPAY Sandbox vào Spring Boot</h1>
+<p class="lede">Ba việc phải code: <strong>tạo yêu cầu thanh toán</strong>, <strong>nhận callback</strong>,
+<strong>đối soát giao dịch</strong>. Không SDK, không OAuth — chỉ redirect và một chữ ký HMAC-SHA512.</p>
+
+<div class="callout info">
+  <p class="t">Mục tiêu của 30 phút này</p>
+  <p>Nghe xong về mở IDE là tự nối VNPAY vào đồ án của mình được. Toàn bộ code trong bài đã chạy thật
+  trên sandbox, không phải pseudo-code.</p>
+</div>
+
+<div class="title-meta">
+  <span>Source code &amp; tài liệu · <span class="mono">github.com/conchocon154/vnpay-seminar</span></span>
+</div>
+`);
+
+S.push(`
+<span class="eyebrow">Nội dung</span>
+<h2>Đi theo đúng thứ tự một lập trình viên phải làm</h2>
+<p class="lede">Bảy phần, trong đó 12 phút là gõ code thật trên máy.</p>
+<div class="agenda">
+  <div><span class="t">Bài toán kinh doanh</span><span class="m">3'</span></div>
+  <div><span class="t">Kiến trúc &amp; luồng chạy</span><span class="m">4'</span></div>
+  <div><span class="t">Hands-on: ký chữ ký, tạo URL, nhận IPN</span><span class="m">12'</span></div>
+  <div><span class="t">Đưa vào microservice Spring Boot</span><span class="m">4'</span></div>
+  <div><span class="t">Best practices &amp; giới hạn</span><span class="m">4'</span></div>
+  <div><span class="t">Hỏi đáp</span><span class="m">3'</span></div>
+  <div><span class="t">Bàn giao source code cho lớp</span><span class="m">—</span></div>
+</div>
+`);
+
+S.push(`
+<span class="eyebrow">01 · Bài toán</span>
+<h2>Vì sao không tự viết chức năng thanh toán?</h2>
+<p class="lede">Đồ án nào có "đặt hàng" cũng cần thu tiền. Nhưng tự nhận thẻ thì vướng hai bức tường.</p>
+
+<div class="grid g2">
+  <div class="card">
+    <h3>Bức tường pháp lý</h3>
+    <p>Lưu số thẻ trên server của bạn là vi phạm <strong>PCI-DSS</strong>. Ngân hàng cũng không cấp API
+    trực tiếp cho một đồ án sinh viên.</p>
+  </div>
+  <div class="card">
+    <h3>Bức tường kỹ thuật</h3>
+    <p>Việt Nam có hàng chục ngân hàng nội địa, mỗi nơi một giao thức. Tự tích hợp từng cái là bất khả thi.</p>
+  </div>
+</div>
+
+<hr class="rule">
+
+<p><strong>VNPAY giải quyết bằng cách đảo ngược luồng:</strong> user nhập thẻ <em>trên trang của VNPAY</em>,
+không phải trang của bạn. Server bạn chỉ trao đổi chữ ký — không bao giờ nhìn thấy số thẻ.</p>
+
+<div class="callout good">
+  <p class="t">Câu để nhớ cả buổi</p>
+  <p>VNPAY chỉ là <strong>redirect + HMAC-SHA512</strong>. Nắm được chữ ký là nắm được 90% bài toán.</p>
+</div>
+
+<p class="hint" style="font-size:14px;color:var(--muted)">Đăng ký sandbox miễn phí tại
+<code>sandbox.vnpayment.vn/devreg</code> — email trả về <code>TmnCode</code> và <code>HashSecret</code>.</p>
+`);
+
+S.push(`
+<span class="eyebrow">02 · Kiến trúc</span>
+<h2>Bốn đường đi, và chỉ hai đường được tin</h2>
+
+<div class="flow">
+  <div class="step">
+    <span class="n">1</span><span class="lane">Browser → BE</span>
+    <div><strong>Tạo đơn &amp; ký URL.</strong> Service lưu đơn ở trạng thái <code>PENDING</code>,
+    ký tham số, trả về <code>paymentUrl</code>. Trình duyệt redirect sang VNPAY.</div>
+  </div>
+  <div class="step key">
+    <span class="n">2</span><span class="lane">VNPAY → BE</span>
+    <div><strong>IPN — server-to-server.</strong> VNPAY gọi thẳng vào server bạn.
+    <span class="pill ok">Được tin</span> Đây mới là chỗ cộng tiền / giao hàng.</div>
+  </div>
+  <div class="step">
+    <span class="n">3</span><span class="lane">VNPAY → Browser</span>
+    <div><strong>ReturnURL.</strong> Trình duyệt user quay về.
+    <span class="pill bad">Không được tin</span> Chỉ dùng để vẽ màn hình kết quả.</div>
+  </div>
+  <div class="step key">
+    <span class="n">4</span><span class="lane">BE → VNPAY</span>
+    <div><strong>querydr.</strong> Server chủ động hỏi lại trạng thái thật.
+    <span class="pill ok">Được tin</span> Đường lùi khi IPN thất lạc.</div>
+  </div>
+</div>
+
+<div class="callout">
+  <p class="t">Ném câu này cho lớp trước khi sang slide sau</p>
+  <p>"Tại sao không cộng tiền luôn ở ReturnURL cho nhanh?"</p>
+  <p>Vì đó là URL nằm trên trình duyệt của user. Sửa <code>vnp_ResponseCode=00</code> là mua hàng miễn phí.
+  Và nếu user tắt tab ngay sau khi trả tiền, ReturnURL không bao giờ về — bạn mất đơn đã thu tiền.</p>
+</div>
+`);
+
+S.push(`
+<span class="eyebrow">03 · Hands-on</span>
+<h2>Chữ ký: ba bước, sai một bước là fail</h2>
+<p class="lede">Đây là toàn bộ phần khó của VNPAY. Nắm ba dòng này thì mọi luồng còn lại chỉ là gọi hàm.</p>
+
+<pre><span class="c">// 1. sort alphabet · 2. URL-encode GIÁ TRỊ · 3. HMAC-SHA512 → hex thường</span>
+<span class="k">String</span> query = params.entrySet().stream()
+        .sorted(Map.Entry.comparingByKey())
+        .filter(e -&gt; !e.getValue().isEmpty())          <span class="c">// bỏ tham số rỗng</span>
+        .map(e -&gt; e.getKey() + <span class="s">"="</span> + URLEncoder.encode(e.getValue(), US_ASCII))
+        .collect(joining(<span class="s">"&amp;"</span>));
+
+<span class="k">String</span> secureHash = <span class="hl">hmacSHA512</span>(hashSecret, query);
+<span class="k">String</span> paymentUrl = PAY_URL + <span class="s">"?"</span> + query + <span class="s">"&amp;vnp_SecureHash="</span> + secureHash;</pre>
+
+<p>Verify callback dùng <em>đúng</em> công thức đó, sau khi bỏ <code>vnp_SecureHash</code> và
+<code>vnp_SecureHashType</code> ra khỏi map.</p>
+
+<div class="callout">
+  <p class="t">Hai lỗi chiếm 90% ca "sai chữ ký"</p>
+  <ul>
+    <li>Quên <strong>URL-encode</strong> lúc verify — servlet đã decode sẵn tham số, phải encode lại mới khớp.</li>
+    <li>Quên bỏ <strong>chính <code>vnp_SecureHash</code></strong> ra khỏi chuỗi trước khi băm.</li>
+  </ul>
+</div>
+`);
+
+S.push(`
+<span class="eyebrow">03 · Hands-on</span>
+<h2>Tạo yêu cầu thanh toán</h2>
+
+<div class="tablewrap">
+<table>
+  <tr><th>Tham số</th><th>Giá trị</th><th>Bẫy</th></tr>
+  <tr><td class="mono">vnp_Amount</td><td class="mono">5000000</td><td><strong>Nhân 100</strong>, số nguyên. 50.000đ → 5000000</td></tr>
+  <tr><td class="mono">vnp_TxnRef</td><td class="mono">20260920125606777443</td><td>Duy nhất trong 24h theo TmnCode</td></tr>
+  <tr><td class="mono">vnp_CreateDate</td><td class="mono">20260920125606</td><td>Giờ <strong>GMT+7</strong>, không phải giờ máy chủ</td></tr>
+  <tr><td class="mono">vnp_ReturnUrl</td><td class="mono">https://…/vnpay/return</td><td>Phải khớp domain đã đăng ký</td></tr>
+  <tr><td class="mono">vnp_BankCode</td><td class="mono">NCB</td><td>Bỏ trống = VNPAY hiện trang chọn ngân hàng</td></tr>
+</table>
+</div>
+
+<pre>p.put(<span class="s">"vnp_Amount"</span>, String.valueOf(amount * <span class="hl">100</span>));
+p.put(<span class="s">"vnp_CreateDate"</span>, LocalDateTime.now(<span class="hl">ZoneId.of("Asia/Ho_Chi_Minh")</span>).format(VNP_TIME));
+p.put(<span class="s">"vnp_ExpireDate"</span>, now.plusMinutes(<span class="hl">15</span>).format(VNP_TIME));</pre>
+
+<div class="callout">
+  <p class="t">Bẫy nằm ngay trong demo chính chủ của VNPAY</p>
+  <p>Code mẫu của họ dùng <code>TimeZone.getTimeZone("Etc/GMT+7")</code>. Theo chuẩn POSIX,
+  <code>Etc/GMT+7</code> nghĩa là <strong>UTC−7</strong> — lệch 14 tiếng so với Việt Nam.
+  Dùng <code>Asia/Ho_Chi_Minh</code>.</p>
+</div>
+`);
+
+S.push(`
+<span class="eyebrow">03 · Hands-on</span>
+<h2>Nhận IPN: năm nhánh, trả đúng mã</h2>
+<p class="lede">VNPAY <strong>retry cho tới khi nhận được <code>RspCode = 00</code></strong>.
+Nên handler bắt buộc phải idempotent.</p>
+
+<pre><span class="c">// 97 — chữ ký sai</span>
+<span class="k">if</span> (!VnpayUtils.isValidSignature(params, secret))   <span class="k">return</span> rsp(<span class="s">"97"</span>, <span class="s">"Invalid Checksum"</span>);
+
+<span class="c">// 01 — không có đơn</span>
+Order order = store.findByTxnRef(txnRef).orElse(<span class="k">null</span>);
+<span class="k">if</span> (order == <span class="k">null</span>)                                 <span class="k">return</span> rsp(<span class="s">"01"</span>, <span class="s">"Order not Found"</span>);
+
+<span class="c">// 04 — chống sửa số tiền trên URL</span>
+<span class="k">if</span> (vnpAmount != order.getAmount() * 100)          <span class="k">return</span> rsp(<span class="s">"04"</span>, <span class="s">"Invalid Amount"</span>);
+
+<span class="k">synchronized</span> (order) {
+    <span class="c">// 02 — đã xử lý rồi, KHÔNG cộng tiền lần hai</span>
+    <span class="k">if</span> (order.getStatus() != PENDING)              <span class="k">return</span> rsp(<span class="s">"02"</span>, <span class="s">"Order already confirmed"</span>);
+
+    <span class="k">boolean</span> paid = <span class="s">"00"</span>.equals(responseCode) &amp;&amp; <span class="s">"00"</span>.equals(transactionStatus);
+    order.setStatus(paid ? PAID : FAILED);
+}
+<span class="k">return</span> rsp(<span class="s">"00"</span>, <span class="s">"Confirm Success"</span>);   <span class="c">// VNPAY ngừng retry</span></pre>
+
+<p>Thành công ⟺ <code>vnp_ResponseCode == "00"</code> <strong>và</strong>
+<code>vnp_TransactionStatus == "00"</code>. Hay gặp: <code>24</code> user huỷ ·
+<code>51</code> không đủ số dư · <code>11</code> hết hạn thanh toán.</p>
+`);
+
+S.push(`
+<span class="eyebrow">03 · Hands-on</span>
+<h2>Khi IPN không bao giờ về</h2>
+
+<div class="callout">
+  <p class="t">Chuyện thật xảy ra khi dựng bài seminar này</p>
+  <p>Portal sandbox <strong>không cho khai IPN URL</strong>: mục <em>Danh sách website</em> trống trơn,
+  <em>Cài đặt thông báo</em> báo <code>Kết nối hệ thống tạm thời bị gián đoạn</code>.
+  Code đúng hết, nhưng IPN không bao giờ tới. Nếu chỉ làm theo tài liệu thì demo chết tại chỗ.</p>
+</div>
+
+<p>Đường lùi là API <strong><code>querydr</code></strong> — server tự hỏi VNPAY trạng thái thật.
+An toàn ngang IPN vì vẫn đủ ba lớp: hỏi thẳng VNPAY (không qua trình duyệt) → verify chữ ký response →
+so lại số tiền với DB.</p>
+
+<pre><span class="c">// Hash của querydr KHÔNG sort alphabet — nối bằng '|' đúng thứ tự tài liệu</span>
+<span class="k">String</span> hashData = String.join(<span class="s">"<span class="hl">|</span>"</span>,
+        requestId, version, command, tmnCode,
+        txnRef, transactionDate, createDate, ipAddr, orderInfo);</pre>
+
+<p>Copy nhầm hàm ký của luồng <code>pay</code> sang đây là fail ngay — đây là chỗ sai phổ biến nhất
+sau phần encode.</p>
+
+<div class="callout good">
+  <p class="t">Bài học mang đi</p>
+  <p>Đừng phụ thuộc mỗi IPN. Một job <code>@Scheduled</code> quét đơn <code>PENDING</code> quá hạn rồi gọi
+  <code>querydr</code> là thứ mọi hệ thống thanh toán thật đều có.</p>
+</div>
+`);
+
+S.push(`
+<span class="eyebrow">04 · Demo</span>
+<h2>Giao dịch thật trên sandbox</h2>
+<p class="lede">Chạy qua ngrok để VNPAY với tới được máy local. Thẻ test NCB:
+<code>9704198526191432198</code> · <code>NGUYEN VAN A</code> · <code>07/15</code> · OTP <code>123456</code>.</p>
+
+<div class="kpi">
+  <div><div class="v">25.000đ</div><div class="l">Số tiền giao dịch</div></div>
+  <div><div class="v">15683165</div><div class="l">Mã GD tại VNPAY</div></div>
+  <div><div class="v">PAID</div><div class="l">Trạng thái đơn</div></div>
+  <div><div class="v">querydr</div><div class="l">Nguồn chốt đơn</div></div>
+</div>
+
+<pre><span class="c">// log server, giao dịch thật</span>
+INFO c.s.vnpay.service.ReconcileService :
+  Chot bang <span class="hl">querydr</span>: txnRef=20260920125606777443 status=<span class="hl">PAID</span> transactionNo=15683165
+
+<span class="c">// GET /api/orders/20260920125606777443</span>
+{<span class="s">"amount"</span>:25000, <span class="s">"status"</span>:<span class="s">"PAID"</span>, <span class="s">"transactionNo"</span>:<span class="s">"15683165"</span>,
+ <span class="s">"bankCode"</span>:<span class="s">"NCB"</span>, <span class="s">"payDate"</span>:<span class="s">"20260920130557"</span>}</pre>
+
+<div class="callout info">
+  <p class="t">Demo dự phòng — dùng khi mạng trường chập chờn</p>
+  <p><code>./demo-local.sh</code> tự ký IPN bằng chính HashSecret, diễn được cả ba ca
+  (thành công → <code>00</code>, retry → <code>02</code>, bị sửa tiền → <code>97</code>)
+  mà không cần internet, không cần bấm thẻ.</p>
+</div>
+`);
+
+S.push(`
+<span class="eyebrow">05 · Tích hợp</span>
+<h2>Đặt vào đâu trong một microservice</h2>
+
+<div class="grid g2">
+  <div class="card">
+    <h3>Ranh giới service</h3>
+    <p><code>payment-service</code> đứng riêng. Các service khác không gọi VNPAY — chúng chỉ nghe event
+    <code>OrderPaid</code> phát ra từ IPN handler (outbox pattern).</p>
+  </div>
+  <div class="card">
+    <h3>Cấu hình &amp; bí mật</h3>
+    <p><code>@ConfigurationProperties(prefix="vnpay")</code>. <code>HashSecret</code> nạp từ Vault hoặc
+    K8s Secret — không bao giờ commit vào <code>application.yml</code>.</p>
+  </div>
+  <div class="card">
+    <h3>Chống trùng ở tầng DB</h3>
+    <p>Bảng <code>payment_transaction</code> với <code>UNIQUE(txn_ref)</code> + optimistic lock.
+    Demo dùng <code>synchronized</code> cho gọn, production thì không đủ khi chạy nhiều instance.</p>
+  </div>
+  <div class="card">
+    <h3>Nhiều cổng thanh toán</h3>
+    <p>MoMo, ZaloPay mỗi bên một kiểu ký. Bọc sau interface <code>PaymentGateway</code> ngay từ đầu nếu
+    đồ án cần hơn một cổng.</p>
+  </div>
+</div>
+
+<hr class="rule">
+
+<h3>Đồ án nào dùng được ngay</h3>
+<p>Bất kỳ đồ án có "đặt hàng" hoặc "nạp tiền": e-commerce, đặt vé / phòng / sân, đóng học phí, ví điện tử,
+quyên góp, SaaS subscription. Việc phải làm chỉ là thay <code>OrderStore</code> bằng repository của bạn.</p>
+`);
+
+S.push(`
+<span class="eyebrow">06 · Best practices</span>
+<h2>Sáu quy tắc và bốn giới hạn</h2>
+
+<div class="grid g2">
+  <div>
+    <h3>Phải làm</h3>
+    <ol>
+      <li>Chỉ tin nguồn server-to-server: IPN hoặc <code>querydr</code>.</li>
+      <li>So lại số tiền với DB trước khi đánh dấu <code>PAID</code>.</li>
+      <li>Idempotent bằng trạng thái đơn — trả <code>02</code> nếu đã xử lý.</li>
+      <li><code>vnp_TxnRef</code> duy nhất trong 24h; retry phải sinh mã mới.</li>
+      <li>Thời gian <code>Asia/Ho_Chi_Minh</code>, không dùng <code>Etc/GMT+7</code>.</li>
+      <li>So sánh chữ ký constant-time; không log secret hay hash.</li>
+    </ol>
+  </div>
+  <div>
+    <h3>Giới hạn phải biết trước</h3>
+    <ul>
+      <li>Không phải REST API thuần — bắt buộc redirect, mobile app phải nhúng WebView.</li>
+      <li>Sandbox không phản ánh 100% production: hạn mức, ngân hàng bảo trì, và như đã thấy,
+      có lúc không khai được IPN.</li>
+      <li>Hoàn tiền qua API <code>refund</code> + đối soát tay, không tự động.</li>
+      <li>ngrok free đổi URL mỗi lần chạy lại → phải khai lại trong merchant portal.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="callout">
+  <p class="t">Một dòng nếu chỉ được nhớ một dòng</p>
+  <p>Tham số trên trình duyệt là <em>dữ liệu do user mang về</em>, không phải sự thật.
+  Sự thật chỉ đến từ kênh server-to-server có chữ ký.</p>
+</div>
+`);
+
+S.push(`
+<span class="eyebrow">07 · Hỏi đáp</span>
+<h2>Bốn câu chắc chắn bị hỏi</h2>
+
+<dl class="qa">
+  <dt>IPN không về thì đơn hàng treo mãi à?</dt>
+  <dd>Không. Job <code>@Scheduled</code> quét đơn <code>PENDING</code> quá hạn rồi gọi <code>querydr</code> để chốt.
+  Chính bài demo này đã phải chạy bằng đường đó vì portal sandbox hỏng.</dd>
+
+  <dt>Máy local thì VNPAY gọi IPN vào đâu?</dt>
+  <dd><code>ngrok http 8080</code> để có URL public, khai vào merchant portal. Hoặc dùng
+  <code>demo-local.sh</code> tự ký IPN — không cần internet.</dd>
+
+  <dt>Báo sai chữ ký mà không hiểu vì sao?</dt>
+  <dd>In <code>hashData</code> ra rồi so từng ký tự với query thật. Gần như luôn là một trong hai:
+  quên URL-encode, hoặc quên bỏ <code>vnp_SecureHash</code> khỏi chuỗi.</dd>
+
+  <dt>Test được không nếu chưa có thẻ, chưa có mạng?</dt>
+  <dd>Được. <code>mvn test</code> chạy 6 unit test cho phần ký/verify/chống sửa tiền, hoàn toàn offline.</dd>
+</dl>
+`);
+
+S.push(`
+<span class="eyebrow">Bàn giao</span>
+<h2>Lấy về dùng cho đồ án của bạn</h2>
+<p class="lede">Repo public, có sẵn README, script demo và test. Ba bước là chạy được trong project của bạn.</p>
+
+<div class="tablewrap">
+<table>
+  <tr><th>Bạn cần gì</th><th>Mở file nào</th></tr>
+  <tr><td>Copy logic ký / verify</td><td class="mono">util/VnpayUtils.java</td></tr>
+  <tr><td>Tạo URL thanh toán</td><td class="mono">service/PaymentService.java</td></tr>
+  <tr><td>Xử lý IPN</td><td class="mono">service/IpnService.java</td></tr>
+  <tr><td>Đối soát khi IPN mất</td><td class="mono">service/ReconcileService.java</td></tr>
+  <tr><td>Bảng mã lỗi &amp; 8 cái bẫy</td><td class="mono">README.md</td></tr>
+  <tr><td>Test không cần thẻ</td><td class="mono">./demo-local.sh · mvn test</td></tr>
+</table>
+</div>
+
+<div class="callout good">
+  <p class="t">Ba bước để nhét vào đồ án của bạn</p>
+  <ol style="margin-bottom:0">
+    <li>Copy <code>VnpayUtils.java</code> sang project.</li>
+    <li>Thay <code>OrderStore</code> bằng repository sẵn có của bạn.</li>
+    <li>Khai <code>vnpay.*</code> trong <code>application.yml</code>, nạp secret từ biến môi trường.</li>
+  </ol>
+</div>
+
+<p style="font-size:17px"><strong>github.com/conchocon154/vnpay-seminar</strong></p>
+`);
+
+/* ---------- deck engine ---------- */
+const stage = document.getElementById('stage');
+const prevB = document.getElementById('prev');
+const nextB = document.getElementById('next');
+const countEl = document.getElementById('count');
+const progEl = document.getElementById('prog');
+let i = 0;
+
+function render(){
+  stage.innerHTML = '<section class="slide">' + S[i] + '</section>';
+  countEl.textContent = (i + 1) + ' / ' + S.length;
+  progEl.style.width = ((i + 1) / S.length * 100) + '%';
+  prevB.disabled = i === 0;
+  nextB.disabled = i === S.length - 1;
+  window.scrollTo(0, 0);
+  try { location.hash = 's' + (i + 1); } catch (e) {}
+}
+function go(n){ const t = Math.min(Math.max(n, 0), S.length - 1); if (t !== i) { i = t; render(); } }
+
+prevB.addEventListener('click', () => go(i - 1));
+nextB.addEventListener('click', () => go(i + 1));
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); go(i + 1); }
+  else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); go(i - 1); }
+  else if (e.key === 'Home') { e.preventDefault(); go(0); }
+  else if (e.key === 'End') { e.preventDefault(); go(S.length - 1); }
+});
+let tx = null;
+document.addEventListener('touchstart', e => { tx = e.changedTouches[0].clientX; }, {passive:true});
+document.addEventListener('touchend', e => {
+  if (tx === null) return;
+  const dx = e.changedTouches[0].clientX - tx;
+  if (Math.abs(dx) > 60) go(dx < 0 ? i + 1 : i - 1);
+  tx = null;
+}, {passive:true});
+
+const m = /^#s(\d+)$/.exec(location.hash || '');
+if (m) i = Math.min(Math.max(parseInt(m[1], 10) - 1, 0), S.length - 1);
+render();
+</script>
