@@ -38,7 +38,10 @@ HTML nhúng bên trong, không Maven, không Spring, không thư viện ngoài. 
 | Khai URL trong portal | Không | Có, đổi mỗi lần chạy lại |
 | IPN | Không về được | VNPAY gọi thật vào `/vnpay/ipn` |
 | Chốt đơn bằng | API `querydr` | IPN, `querydr` làm dự phòng |
-| Hợp cho | Cả lớp chạy trên máy mình | Demo đúng kiến trúc chuẩn |
+| Hợp cho | Khi mạng hỏng, dùng dự phòng | Buổi seminar dùng bản này |
+
+Buổi seminar chạy bản ngrok theo yêu cầu môn học. Hướng dẫn đăng ký và cài ngrok cho cả lớp
+nằm ở [`CHUAN-BI.md`](CHUAN-BI.md). Bản không ngrok giữ lại để dự phòng khi mạng trục trặc.
 
 `run-ngrok.sh` tự mở tunnel và **tự đọc URL ngrok cấp** (qua API cục bộ cổng 4040) — không phải
 copy URL bằng tay. Chương trình in sẵn 2 URL cần dán vào merchant portal.
