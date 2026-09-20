@@ -131,6 +131,7 @@ Câu hay bị hỏi, chuẩn bị sẵn:
 
 | Bạn cần | Mở file |
 |---|---|
+| **Bản một file để cả lớp chạy ngay** | `VnpayDemo.java` — `java VnpayDemo.java`, không cần Maven |
 | Copy logic ký/verify | `util/VnpayUtils.java` |
 | Tạo URL thanh toán | `service/PaymentService.java` |
 | Xử lý IPN | `service/IpnService.java` |

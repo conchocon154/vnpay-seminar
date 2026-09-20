@@ -6,6 +6,24 @@ Toàn bộ logic ký/verify nằm trong 1 file không phụ thuộc Spring: `uti
 
 ---
 
+## 0. Bản một file — dành cho cả lớp
+
+Muốn thử ngay mà không cài gì: [`VnpayDemo.java`](VnpayDemo.java) là **toàn bộ demo trong một file**,
+HTML nhúng bên trong, không Maven, không Spring, không thư viện ngoài. Chỉ cần JDK 17+.
+
+```bash
+export VNPAY_TMN_CODE=xxxxxxxx
+export VNPAY_HASH_SECRET=xxxxxxxxxxxxxxxx
+java VnpayDemo.java          # rồi mở http://localhost:8080
+```
+
+File được chia thành 10 bước đánh số, đọc từ trên xuống: cấu hình → giao diện → đơn hàng → ký →
+verify → tạo URL → IPN → querydr → ReturnURL → khởi động server.
+
+Phần còn lại của README nói về bản Spring Boot đầy đủ bên dưới.
+
+---
+
 ## 1. Chạy trong 3 phút
 
 ```bash
