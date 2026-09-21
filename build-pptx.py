@@ -7,8 +7,9 @@ from pptx import Presentation
 from pptx.util import Inches, Pt
 from pptx.dml.color import RGBColor
 from pptx.enum.shapes import MSO_SHAPE
-from pptx.enum.text import MSO_ANCHOR
+from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
 import math
+import pathlib
 
 # bảng màu
 INK    = RGBColor(0x11, 0x11, 0x11)
@@ -60,8 +61,7 @@ def _p(tf, text, size, bold=False, color=INK, font=FONT, space=4, first=False, a
     p.text = text
     p.space_after = Pt(space)
     p.line_spacing = 1.18
-    if align is not None:
-        p.alignment = align
+    p.alignment = PP_ALIGN.LEFT if align is None else align
     for r in p.runs:
         r.font.size = Pt(size)
         r.font.bold = bold
@@ -84,9 +84,43 @@ def _rounded(s, left, top, width, height, fill, line=None, radius=0.035):
     return sh
 
 
-def wrapped(lines, size, width_in):
-    per = max(16, int(width_in * 96 / (size * 0.52)))
-    return sum(max(1, math.ceil(len(t) / per)) for t in lines)
+# Đo bề rộng chữ bằng chính file font, thay vì đoán số ký tự trên một dòng.
+_FONTDIR = str(pathlib.Path.home() / "Library" / "Fonts")
+_cache = {}
+
+
+def _font(size, bold):
+    key = (round(size, 1), bold)
+    if key not in _cache:
+        try:
+            from PIL import ImageFont
+            name = "BeVietnamPro-Bold.ttf" if bold else "BeVietnamPro-Regular.ttf"
+            _cache[key] = ImageFont.truetype(_FONTDIR + "/" + name, int(size * 96 / 72))
+        except Exception:
+            _cache[key] = None
+    return _cache[key]
+
+
+def wrapped(lines, size, width_in, bold=False):
+    """Số dòng thật sau khi xuống dòng tự động, đo bằng font thật."""
+    f = _font(size, bold)
+    if f is None:
+        per = max(14, int(width_in * 96 / (size * 0.62)))
+        return sum(max(1, math.ceil(len(t) / per)) for t in lines)
+
+    limit = width_in * 96
+    total = 0
+    for text in lines:
+        words, cur, n = text.split(), "", 1
+        for w in words:
+            trial = w if not cur else cur + " " + w
+            if f.getlength(trial) <= limit:
+                cur = trial
+            else:
+                n += 1
+                cur = w
+        total += n
+    return total
 
 
 def title(s, eyebrow, action):
@@ -115,9 +149,8 @@ def cards(s, items, height=None):
     gap = Inches(0.22)
     w = int((CW - gap * (n - 1)) / n)
     wi = w / 914400
-    h = height or max(
-        Pt(14 * 1.35) * wrapped([b for _, b in items], 14, wi - 0.5) + Inches(0.78)
-        for _, b in items)
+    h = height or Pt(13.5 * 1.5) * max(
+        wrapped([b], 13.5, wi - 0.62) for _, b in items) + Inches(0.74)
     for i, (head, body) in enumerate(items):
         left = MARGIN + i * (w + gap)
         _rounded(s, left, Y, w, h, CARD, LINE)
@@ -170,7 +203,8 @@ def tiers(s, items):
         _rounded(s, MARGIN, top, CW, rh, TINT if strong else CARD, LINE)
         chip = _rounded(s, MARGIN + Inches(0.18), top + Inches(0.17),
                         Inches(0.42), Inches(0.38), ACCENT if strong else RGBColor(0xDD, 0xE3, 0xEA))
-        _p(_tf(chip), num, 13, bold=True,
+        chip.text_frame.vertical_anchor = MSO_ANCHOR.MIDDLE
+        _p(_tf(chip), num, 13, bold=True, align=PP_ALIGN.CENTER,
            color=RGBColor(0xFF, 0xFF, 0xFF) if strong else INK2, font=MONO, space=0, first=True)
         tb = s.shapes.add_textbox(MARGIN + Inches(0.78), top + Inches(0.09),
                                   Inches(2.0), Inches(0.55))
@@ -183,8 +217,9 @@ def tiers(s, items):
             pill = _rounded(s, MARGIN + CW - Inches(1.65), top + Inches(0.19),
                             Inches(1.42), Inches(0.34),
                             RGBColor(0xDE, 0xF3, 0xE8) if kind == "ok" else RGBColor(0xFD, 0xE8, 0xE6))
-            _p(_tf(pill), label, 11.5, bold=True, color=OK if kind == "ok" else WARN,
-               space=0, first=True)
+            pill.text_frame.vertical_anchor = MSO_ANCHOR.MIDDLE
+            _p(_tf(pill), label, 11.5, bold=True, align=PP_ALIGN.CENTER,
+               color=OK if kind == "ok" else WARN, space=0, first=True)
     Y = Y + len(items) * (rh + Inches(0.1)) + GAP
 
 
@@ -194,17 +229,20 @@ def code(s, lines, size=12.5, path=None):
         tb = s.shapes.add_textbox(MARGIN, Y, CW, Inches(0.24))
         _p(_tf(tb), path, 11, color=MUTED, font=MONO, space=0, first=True)
         Y = Y + Inches(0.26)
-    h = Pt(size * 1.34) * len(lines) + Inches(0.3)
+    lh = Pt(size * 1.42)
+    h = lh * len(lines) + Inches(0.3)
     box = _rounded(s, MARGIN, Y, CW, h, CODEBG)
     tf = box.text_frame
     tf.word_wrap = False
+    tf.vertical_anchor = MSO_ANCHOR.TOP
     tf.margin_left = Inches(0.26); tf.margin_top = Inches(0.13)
     tf.margin_right = Inches(0.16); tf.margin_bottom = Inches(0.1)
     for i, t in enumerate(lines):
         p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
         p.text = t
         p.space_after = Pt(0)
-        p.line_spacing = 1.34
+        p.alignment = PP_ALIGN.LEFT
+        p.line_spacing = lh
         for r in p.runs:
             r.font.size = Pt(size)
             r.font.name = MONO
@@ -215,7 +253,7 @@ def code(s, lines, size=12.5, path=None):
 def callout(s, head, body, kind="warn"):
     global Y
     color = {"warn": WARN, "ok": OK, "info": ACCENT}[kind]
-    h = Pt(13.5 * 1.35) * wrapped([body], 13.5, 11.2) + Inches(0.62)
+    h = Pt(13.5 * 1.42) * wrapped([body], 13.5, 11.2) + Inches(0.56)
     _rounded(s, MARGIN, Y, CW, h, CARD, LINE)
     bar = s.shapes.add_shape(MSO_SHAPE.RECTANGLE, MARGIN, Y + Inches(0.06), Pt(3.2), h - Inches(0.12))
     bar.fill.solid(); bar.fill.fore_color.rgb = color
@@ -248,7 +286,8 @@ def placeholder(s, label, height_in=2.2):
     box.line.color.rgb = RGBColor(0xC3, 0xCB, 0xD6)
     box.line.width = Pt(1); box.line.dash_style = 4
     box.shadow.inherit = False
-    _p(_tf(box), label, 13, color=MUTED, space=0, first=True)
+    box.text_frame.vertical_anchor = MSO_ANCHOR.MIDDLE
+    _p(_tf(box), label, 13, color=MUTED, space=0, first=True, align=PP_ALIGN.CENTER)
     Y = Y + Inches(height_in) + GAP
 
 
@@ -278,7 +317,7 @@ _p(tf, "SEMINAR · SPRING BOOT MICROSERVICES", 12, bold=True, color=ACCENT, spac
 _p(tf, "Nhúng VNPAY vào cửa hàng có sẵn", 40, bold=True, color=INK, space=10)
 _p(tf, "Mở ShopStart.java đã tải trước. Hôm nay điền sáu chỗ TODO trong đó.",
    17, color=INK2, space=0)
-Y = Inches(4.3)
+Y = Inches(4.05)
 picture(s, ASSETS + "cua-hang.jpg", 2.5,
         "Cửa hàng chạy sẵn. Nút Thanh toán chưa nối gì, đó là việc hôm nay.")
 
@@ -309,10 +348,8 @@ tiers(s, [
     ("3", "VNPAY đến browser", "ReturnURL, trình duyệt khách quay về", ("bad", "Không tin")),
     ("4", "Server đến VNPAY", "querydr, hỏi lại trạng thái thật", ("ok", "Tin được")),
 ])
-callout(s, "Hỏi cả lớp trước khi sang slide sau",
-        "Sao không cộng tiền luôn ở ReturnURL cho nhanh? Vì đó là URL trên trình duyệt của khách. "
-        "Sửa vnp_ResponseCode=00 là mua hàng miễn phí. Khách tắt tab sau khi trả tiền thì "
-        "ReturnURL không bao giờ về, mình mất đơn đã thu tiền.")
+lead(s, "Đường 2 và 4 là server gọi server, có chữ ký nên tin được. Đường 3 chạy qua "
+        "trình duyệt của khách nên chỉ dùng để vẽ màn hình.", size=14)
 
 # 4. lộ trình
 s = slide()
@@ -566,13 +603,10 @@ lead(s, "Giới hạn phải biết trước: bắt buộc redirect nên app mob
 
 # 18. hỏi đáp
 s = slide()
-title(s, "Hỏi đáp", "Bốn câu chắc chắn bị hỏi")
-table(s, ["Câu hỏi", "Trả lời"], [
-    ["IPN không về thì đơn treo mãi à?", "Job quét đơn PENDING quá hạn rồi gọi querydr chốt"],
-    ["Sao phải cài ngrok?", "Cần địa chỉ công khai để VNPAY gọi vào, deploy server thật cũng được"],
-    ["Sai chữ ký mà không hiểu vì sao?", "In hashData ra so từng ký tự, thường là quên encode"],
-    ["Chưa có thẻ thì test kiểu gì?", "Phần ký và verify có unit test chạy offline"],
-], widths=[4.4, 6.8])
+tb = s.shapes.add_textbox(MARGIN, Inches(2.7), CW, Inches(2.0))
+tf = _tf(tb)
+_p(tf, "HỎI ĐÁP", 12, bold=True, color=ACCENT, space=12, first=True)
+_p(tf, "Còn thắc mắc gì không?", 40, bold=True, color=INK, space=0)
 
 # 19. bàn giao
 s = slide()
@@ -585,6 +619,59 @@ tiers(s, [
 callout(s, "Sau buổi hôm nay",
         "Mình bỏ VnpayDemo.java, tức bản đã điền xong sáu TODO, vào đúng thư mục Drive lúc nãy. "
         "Có gì không chạy cứ nhắn mình.", "ok")
+
+# Ghi chú người thuyết trình. Phần này chỉ mình nhìn thấy trong chế độ trình chiếu,
+# khán giả không thấy trên màn hình.
+NOTES = {
+ 1: "Hỏi xem ai đã tải file và chạy thử chưa. Ai chưa có thì lấy trong thư mục Drive.\n"
+    "Nhắc: cần JDK 17 trở lên, không cần Maven.",
+ 2: "Nhấn một câu thôi: VNPAY không có SDK, chỉ là redirect cộng một chữ ký.\n"
+    "Nếu lớp hỏi PCI-DSS là gì thì nói ngắn: bộ chuẩn bảo mật cho ai chạm vào dữ liệu thẻ, "
+    "tự lưu số thẻ là phải tuân thủ, rất tốn kém.",
+ 3: "Ném câu hỏi này cho lớp trước khi sang slide sau:\n"
+    "  Sao không cộng tiền luôn ở ReturnURL cho nhanh?\n\n"
+    "Câu trả lời: đó là URL trên trình duyệt của khách, sửa vnp_ResponseCode=00 là mua hàng "
+    "miễn phí. Thêm nữa, khách tắt tab ngay sau khi trả tiền thì ReturnURL không bao giờ về, "
+    "mình mất đơn đã thu tiền. IPN là kênh server gọi server và có retry.",
+ 4: "Nói rõ nhịp: mỗi TODO vài phút, ai gõ không kịp cứ xem, cuối buổi có bản làm xong.\n"
+    "Bảo cả lớp mở file ra ngay bây giờ, tìm chữ TODO 1.",
+ 5: "Hỏi lớp đã có TmnCode và HashSecret trong email chưa. Ai chưa có thì ngồi xem cùng bạn bên cạnh.",
+ 6: "Đây là phần dừng lâu nhất. Đọc chậm ba bước rồi mới chiếu code.\n"
+    "Nếu ai hỏi vì sao phải hex chữ thường: vì VNPAY so chuỗi, hoa thường khác nhau.",
+ 7: "Chỉ tay vào hai dòng URLEncoder. Nhấn: encode phần giá trị, không phải tên tham số.\n"
+    "Hỏi lớp: nội dung đơn hàng có dấu cách thì chuyện gì xảy ra nếu quên encode?",
+ 8: "Nhấn chỗ remove vnp_SecureHash. Nhiều người quên và ngồi tìm bug cả buổi.\n"
+    "Nói thêm: servlet đã decode sẵn nên lúc verify phải encode lại.",
+ 9: "Nhắc lại con số 100. Viết lên bảng: 25.000đ thành 2500000.\n"
+    "Chuyện Etc/GMT+7 nên kể như một câu chuyện, vì nó nằm trong code mẫu của chính VNPAY.",
+10: "Cho lớp 3 phút tự chạy. Đi quanh lớp xem ai kẹt.\n"
+    "Quá nửa lớp không sang được trang VNPAY thì gửi luôn bản làm xong vào group rồi đi tiếp.",
+11: "Bảo cả lớp mở ngrok ngay lúc này, vì địa chỉ đổi mỗi lần chạy lại.\n"
+    "Ai chưa gắn authtoken thì giờ mới lòi ra, xử lý luôn.",
+12: "Nhấn hai chữ idempotent. Hỏi lớp: nếu VNPAY gọi lại lần hai mà mình cộng tiền tiếp thì sao?\n"
+    "Mã trả về nên đọc to từng cái: 97, 01, 04, 02, 00.",
+13: "Chỉ vào chỗ không có dòng nào đổi trạng thái đơn. Đó mới là ý chính của slide.",
+14: "Kể thật chuyện portal sandbox hỏng lúc mình dựng bài. Phần này lớp nhớ lâu nhất.\n"
+    "Nhắc: hash của querydr nối bằng dấu gạch đứng, không sort alphabet. Copy nhầm hàm ký là fail.",
+15: "Mở sẵn cửa sổ terminal trước khi chiếu slide này để chỉ vào dòng log thật.\n"
+    "Mạng trục trặc thì chạy demo-local.sh, diễn được cả ba ca mà không cần internet.",
+16: "Phần này nói nhanh, chủ yếu để lớp biết đường mang về đồ án.",
+17: "Đọc lướt sáu dòng, dừng lại ở dòng so số tiền và dòng idempotent.",
+18: "Bốn câu hay bị hỏi, chuẩn bị sẵn:\n\n"
+    "1. IPN không về thì đơn treo mãi à?\n"
+    "   Không. Job quét đơn PENDING quá hạn rồi gọi querydr để chốt. Bài này đã phải dùng đường đó.\n\n"
+    "2. Sao phải cài ngrok, không có cách nào khác?\n"
+    "   Cần một địa chỉ công khai để VNPAY gọi vào. Deploy lên server thật cũng được nhưng chậm hơn.\n\n"
+    "3. Báo sai chữ ký mà không hiểu vì sao?\n"
+    "   In hashData ra rồi so từng ký tự. Gần như luôn là quên encode, hoặc quên bỏ vnp_SecureHash.\n\n"
+    "4. Chưa có thẻ, chưa có mạng thì test kiểu gì?\n"
+    "   Phần ký và verify có unit test chạy offline hoàn toàn.",
+19: "Nhắc lớp là bản làm xong sẽ nằm trong thư mục Drive ngay sau buổi.\n"
+    "Cảm ơn và kết thúc.",
+}
+for idx, sl in enumerate(prs.slides, 1):
+    if idx in NOTES:
+        sl.notes_slide.notes_text_frame.text = NOTES[idx]
 
 out = __file__.rsplit("/", 1)[0] + "/VNPAY-seminar.pptx"
 prs.save(out)
