@@ -43,7 +43,7 @@ def textbox(s, left, top, width, height):
     return tf
 
 
-def para(tf, text, size=16, bold=False, color=INK, space_after=6, font="Calibri", first=False):
+def para(tf, text, size=16, bold=False, color=INK, space_after=6, font="Arial", first=False):
     p = tf.paragraphs[0] if first else tf.add_paragraph()
     p.text = text
     p.space_after = Pt(space_after)
@@ -86,7 +86,7 @@ def body(s, lines, top=None, size=16):
 def code(s, lines, top=None, height=None, size=13):
     global Y
     n = len(lines)
-    h = height or Pt(size * 1.62) * n + Inches(0.32)
+    h = height or Pt(size * 1.34) * n + Inches(0.26)
     box = s.shapes.add_textbox(MARGIN, Y, CW, h)
     Y = Y + h + GAP
     box.fill.solid()
@@ -96,22 +96,22 @@ def code(s, lines, top=None, height=None, size=13):
     tf.word_wrap = False
     tf.margin_left = Inches(0.22)
     tf.margin_right = Inches(0.16)
-    tf.margin_top = Inches(0.14)
-    tf.margin_bottom = Inches(0.14)
+    tf.margin_top = Inches(0.11)
+    tf.margin_bottom = Inches(0.09)
     for i, t in enumerate(lines):
         p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
         p.text = t
         p.space_after = Pt(0)
         for r in p.runs:
             r.font.size = Pt(size)
-            r.font.name = "Consolas"
+            r.font.name = "Roboto Mono"
             r.font.color.rgb = CODEFG
     return box
 
 
 def note(s, head, lines, top=None, accent=RED):
     global Y
-    h = Pt(15 * 1.35) * (wrapped(lines, 14, 11.8) + 1) + Inches(0.36)
+    h = Pt(15 * 1.3) * (wrapped(lines, 14, 11.8) + 1) + Inches(0.26)
     box = s.shapes.add_textbox(MARGIN, Y, CW, h)
     Y = Y + h + GAP
     box.fill.solid()
@@ -131,7 +131,7 @@ def filetag(s, path, top=None):
     global Y
     h = Inches(0.24)
     tf = textbox(s, MARGIN, Y, CW, h)
-    para(tf, path, size=12, color=MUTED, font="Consolas", space_after=0, first=True)
+    para(tf, path, size=12, color=MUTED, font="Roboto Mono", space_after=0, first=True)
     Y = Y + h + Inches(0.04)
 
 
