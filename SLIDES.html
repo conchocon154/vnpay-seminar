@@ -150,8 +150,8 @@ S.push(`
 
 <div class="callout info">
   <p class="t">Chưa tải file?</p>
-  <p><code>github.com/conchocon154/vnpay-seminar</code>, hoặc lấy trong thư mục Drive mình gửi.
-  Cần JDK 17 trở lên, không cần Maven.</p>
+  <p>Lấy trong thư mục Drive mình gửi trước buổi. Cần JDK 17 trở lên, không cần Maven,
+  không cần cài thư viện nào.</p>
 </div>
 `);
 
@@ -629,31 +629,29 @@ S.push(`
 
 S.push(`
 <span class="eyebrow">Bàn giao</span>
-<h2>Lấy về dùng cho đồ án</h2>
-<p class="lede">Repo public, có README với bảng mã lỗi, script demo và test chạy offline.</p>
+<h2>Mang về dùng cho đồ án</h2>
+<p class="lede">Sau buổi hôm nay mình bỏ bản làm xong vào đúng thư mục Drive lúc nãy, ai cần thì tải.</p>
 
 <div class="tablewrap">
 <table>
-  <tr><th>Cần gì</th><th>Mở file nào</th></tr>
-  <tr><td>Bản làm xong của buổi hôm nay</td><td class="mono">VnpayDemo.java</td></tr>
-  <tr><td>Bản Spring Boot đầy đủ</td><td class="mono">src/main/java/com/seminar/vnpay/</td></tr>
-  <tr><td>Chỉ cần hàm ký và verify</td><td class="mono">util/VnpayUtils.java</td></tr>
-  <tr><td>Đối soát khi IPN mất</td><td class="mono">service/ReconcileService.java</td></tr>
-  <tr><td>Chạy có ngrok / không ngrok</td><td class="mono">run-ngrok.sh · run-local.sh</td></tr>
-  <tr><td>Test không cần thẻ</td><td class="mono">demo-local.sh · mvn test</td></tr>
+  <tr><th>Cần gì</th><th>Lấy ở đâu</th></tr>
+  <tr><td>Bản đã điền xong 6 TODO</td><td class="mono">VnpayDemo.java</td></tr>
+  <tr><td>Hàm ký và verify chữ ký</td><td class="mono">trong đó, mục Bước 4 và Bước 5</td></tr>
+  <tr><td>Đối soát khi IPN không về</td><td class="mono">mục Bước 8</td></tr>
+  <tr><td>Chạy có ngrok hay không ngrok</td><td class="mono">biến môi trường VNPAY_MODE</td></tr>
 </table>
 </div>
 
 <div class="callout good">
   <p class="t">Ba bước để nhét vào đồ án của bạn</p>
   <ol style="margin-bottom:0">
-    <li>Copy <code>VnpayUtils.java</code> sang project.</li>
-    <li>Thay chỗ lưu đơn hàng bằng repository sẵn có.</li>
-    <li>Khai <code>vnpay.*</code> trong <code>application.yml</code>, nạp secret từ biến môi trường.</li>
+    <li>Copy hai hàm <code>hmacSHA512</code> và <code>buildQueryString</code> sang project.</li>
+    <li>Thay chỗ lưu đơn hàng bằng repository sẵn có của bạn.</li>
+    <li>Nạp <code>TmnCode</code> và <code>HashSecret</code> từ biến môi trường, đừng hardcode.</li>
   </ol>
 </div>
 
-<p style="font-size:17px"><strong>github.com/conchocon154/vnpay-seminar</strong></p>
+<p style="margin-top:22px">Có gì không chạy cứ nhắn mình.</p>
 `);
 
 const stage=document.getElementById('stage'),prevB=document.getElementById('prev'),

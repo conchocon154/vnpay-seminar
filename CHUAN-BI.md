@@ -119,5 +119,3 @@ Cả hai đều hiện được cửa hàng, bấm Thanh toán thì báo "Chưa 
 5. `java ShopStart.java` chạy được, mở http://localhost:8080 thấy cửa hàng
 
 Đủ 5 cái này là code theo được từ đầu tới cuối.
-
-Source code đầy đủ: https://github.com/conchocon154/vnpay-seminar
