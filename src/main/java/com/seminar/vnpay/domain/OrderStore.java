@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-/** Thay bang JpaRepository trong du an that. */
+/** Dự án thật thay chỗ này bằng JpaRepository. */
 @Repository
 public class OrderStore {
 

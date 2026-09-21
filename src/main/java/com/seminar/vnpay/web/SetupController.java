@@ -15,11 +15,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Trang thiet lap cho moi truong DEV: dan TmnCode/HashSecret thang tren web thay vi sua .env.
+ * Trang thiết lập cho môi trường dev, dán TmnCode và HashSecret thẳng trên web thay vì sửa .env.
  *
- * CANH BAO: endpoint nay ghi de credential luc dang chay -> CHI DUNG CHO SANDBOX.
- * Truoc khi len production phai xoa class nay va nap secret tu Vault/K8s Secret.
- * Da chan san: chi nhan request goi truc tiep vao localhost, khong nhan qua tunnel/proxy.
+ * Endpoint này ghi đè credential lúc đang chạy nên chỉ dùng cho sandbox.
+ * Lên production thì xoá hẳn class này đi và nạp secret từ Vault hoặc K8s Secret.
+ * Đã chặn sẵn: chỉ nhận request gõ thẳng vào localhost, đi qua tunnel hay proxy là từ chối.
  */
 @RestController
 @RequestMapping("/api/config")
@@ -74,7 +74,7 @@ public class SetupController {
         return ResponseEntity.ok(Map.of("message", "Da luu", "savedTo", savedTo));
     }
 
-    /** Ghi lai .env de lan sau khoi dong khong phai nhap lai. File nay nam trong .gitignore. */
+    /** Ghi lại .env để lần sau khỏi nhập lại. File này nằm trong .gitignore. */
     private String writeEnvFile() throws IOException {
         Path env = Path.of(System.getProperty("user.dir"), ".env");
         String content = """
@@ -88,8 +88,8 @@ public class SetupController {
     }
 
     /**
-     * Chan cau hinh qua tunnel: ngrok luon dat Host = *.ngrok-free.app va them X-Forwarded-For,
-     * nen chi request go thang localhost moi di qua duoc.
+     * ngrok luôn đặt Host thành *.ngrok-free.app và thêm X-Forwarded-For,
+     * nên chỉ request gõ thẳng localhost mới lọt qua được cửa này.
      */
     private boolean isLocalRequest(HttpServletRequest http) {
         if (http.getHeader("X-Forwarded-For") != null) {

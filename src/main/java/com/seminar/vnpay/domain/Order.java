@@ -2,18 +2,18 @@ package com.seminar.vnpay.domain;
 
 import java.time.Instant;
 
-/** Don hang toi gian. Trong microservice that: 1 bang trong DB + cot version de optimistic lock. */
+/** Đơn hàng rút gọn cho demo. Dự án thật thì đây là một bảng DB, có thêm cột version để optimistic lock. */
 public class Order {
 
     public enum Status { PENDING, PAID, FAILED }
 
-    private final String txnRef;      // vnp_TxnRef - duy nhat trong 24h theo TmnCode
-    private final long amount;        // VND, chua nhan 100
+    private final String txnRef;      // vnp_TxnRef, phải duy nhất trong 24h theo TmnCode
+    private final long amount;        // VND, chưa nhân 100
     private final String orderInfo;
     private final Instant createdAt = Instant.now();
 
     private volatile Status status = Status.PENDING;
-    private volatile String transactionNo;   // ma giao dich ben VNPAY
+    private volatile String transactionNo;   // mã giao dịch bên VNPAY
     private volatile String responseCode;
     private volatile String bankCode;
     private volatile String payDate;

@@ -11,11 +11,11 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Chot trang thai don hang bang API querydr (server-to-server) thay vi cho IPN.
+ * Chốt trạng thái đơn bằng API querydr thay vì ngồi chờ IPN.
  *
- * Dung khi: IPN chua khai duoc trong merchant portal, IPN that lac, hoac job doi soat cuoi ngay.
- * Van an toan nhu IPN vi: hoi thang VNPAY + verify chu ky response + so lai so tien.
- * KHONG bao gio tin tham so tren URL trinh duyet.
+ * Dùng khi chưa khai được IPN URL trong merchant portal, khi IPN thất lạc,
+ * hoặc cho job đối soát cuối ngày. Vẫn an toàn như IPN vì hỏi thẳng VNPAY,
+ * verify chữ ký của response, rồi so lại số tiền. Tham số trên URL trình duyệt thì không tin.
  */
 @Service
 public class ReconcileService {
@@ -30,7 +30,7 @@ public class ReconcileService {
         this.orderStore = orderStore;
     }
 
-    /** @param transactionDate yyyyMMddHHmmss - lay tu vnp_PayDate, thieu thi dung gio tao don. */
+    /** @param transactionDate dạng yyyyMMddHHmmss, lấy từ vnp_PayDate. Thiếu thì dùng giờ tạo đơn. */
     public Optional<Order> confirm(String txnRef, String transactionDate, String clientIp) {
         Optional<Order> found = orderStore.findByTxnRef(txnRef);
         if (found.isEmpty()) {
@@ -38,7 +38,7 @@ public class ReconcileService {
         }
         Order order = found.get();
         if (order.getStatus() != Order.Status.PENDING) {
-            return found;   // da chot roi - idempotent
+            return found;   // chốt rồi thì thôi
         }
 
         String date = (transactionDate == null || transactionDate.isBlank())
@@ -65,7 +65,7 @@ public class ReconcileService {
             if (order.getStatus() != Order.Status.PENDING) {
                 return found;
             }
-            // "00" o vnp_ResponseCode = truy van thanh cong; con ket qua GD nam o vnp_TransactionStatus.
+            // vnp_ResponseCode nói truy vấn có thành công không, còn kết quả giao dịch nằm ở vnp_TransactionStatus.
             if (!"00".equals(responseCode)) {
                 log.info("querydr txnRef={} chua co ket qua, vnp_ResponseCode={}", txnRef, responseCode);
                 return found;

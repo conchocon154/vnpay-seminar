@@ -34,11 +34,11 @@
 
     <label for="hashSecret">HashSecret</label>
     <input id="hashSecret" type="password" placeholder="chuỗi bí mật dùng để ký HMAC-SHA512" autocomplete="off" spellcheck="false">
-    <p class="hint">Chỉ nằm trên server. Không bao giờ được gửi xuống trình duyệt của khách.</p>
+    <p class="hint">Giá trị này chỉ nằm trên server, không bao giờ gửi xuống trình duyệt của khách.</p>
 
     <label for="returnUrl">Return URL</label>
     <input id="returnUrl" autocomplete="off" spellcheck="false">
-    <p class="hint">Phải trùng đúng URL đã khai trong merchant portal. Đổi mỗi lần chạy lại ngrok.</p>
+    <p class="hint">Phải trùng URL đã khai trong merchant portal. Chạy lại ngrok là đổi.</p>
 
     <div class="row">
       <button class="pay-btn" id="saveBtn" onclick="save()">Lưu và áp dụng</button>
@@ -47,8 +47,8 @@
   </div>
 
   <div class="note">
-    <strong>Trang này chỉ dành cho sandbox.</strong> Nó ghi đè credential lúc đang chạy, nên server chỉ chấp nhận
-    request gõ thẳng vào <code>localhost</code> — mở qua link ngrok sẽ bị từ chối. Lên production thì xoá
+    <strong>Trang này chỉ dành cho sandbox.</strong> Nó ghi đè credential lúc đang chạy nên server chỉ nhận
+    request gõ thẳng vào <code>localhost</code>, mở qua link ngrok là bị từ chối. Lên production thì xoá
     <code>SetupController</code> và nạp secret từ Vault / K8s Secret.
   </div>
 </main>
@@ -58,8 +58,8 @@ async function load() {
   const s = await (await fetch('/api/config/status')).json();
   document.getElementById('returnUrl').value = s.returnUrl || '';
   document.getElementById('current').innerHTML = s.configured
-    ? `<p class="ok-line">✅ Đã cấu hình — TmnCode <code>${s.tmnCode}</code>, HashSecret <code>${s.hashSecretMasked}</code></p>`
-    : `<p style="color:#dc2626;font-weight:600;">⚠️ Chưa cấu hình — chưa tạo được giao dịch.</p>`;
+    ? `<p class="ok-line">Đã cấu hình xong. TmnCode <code>${s.tmnCode}</code>, HashSecret <code>${s.hashSecretMasked}</code></p>`
+    : `<p style="color:#dc2626;font-weight:600;">Chưa cấu hình nên chưa tạo được giao dịch.</p>`;
   if (s.configured) document.getElementById('tmnCode').value = s.tmnCode;
 }
 
@@ -78,12 +78,12 @@ async function save() {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Lỗi không xác định');
-    msg.innerHTML = `<span class="ok-line">✅ ${data.message}</span> — đã ghi vào <code>${data.savedTo}</code>.
+    msg.innerHTML = `<span class="ok-line">${data.message}</span>, đã ghi vào <code>${data.savedTo}</code>.
                      <a href="/">Về cửa hàng →</a>`;
     document.getElementById('hashSecret').value = '';
     load();
   } catch (e) {
-    msg.innerHTML = `<span style="color:#dc2626;">❌ ${e.message}</span>`;
+    msg.innerHTML = `<span style="color:#dc2626;">${e.message}</span>`;
   } finally {
     btn.disabled = false;
   }

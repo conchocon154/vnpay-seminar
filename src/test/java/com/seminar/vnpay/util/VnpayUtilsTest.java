@@ -27,7 +27,7 @@ class VnpayUtilsTest {
         Map<String, String> p = new LinkedHashMap<>();
         p.put("vnp_Version", "2.1.0");
         p.put("vnp_Amount", "5000000");
-        p.put("vnp_BankCode", "");          // bi loai bo
+        p.put("vnp_BankCode", "");          // bị loại bỏ
         p.put("vnp_Command", "pay");
         assertEquals("vnp_Amount=5000000&vnp_Command=pay&vnp_Version=2.1.0",
                 VnpayUtils.buildQueryString(p));
@@ -39,7 +39,7 @@ class VnpayUtilsTest {
         assertEquals("vnp_OrderInfo=Thanh+toan+don+hang+1%2B2", VnpayUtils.buildQueryString(p));
     }
 
-    /** Mo phong dung luong di: ky -> gui URL -> servlet decode -> verify. */
+    /** Đi đúng một vòng như thật: ký, gửi URL, servlet decode, rồi verify. */
     @Test
     void ky_roi_verify_lai_thi_hop_le() {
         Map<String, String> p = new HashMap<>();
@@ -62,7 +62,7 @@ class VnpayUtilsTest {
         p.put("vnp_Amount", "5000000");
         Map<String, String> received = decodeQuery(VnpayUtils.signAndBuildQuery(p, SECRET));
 
-        received.put("vnp_Amount", "100");   // hacker sua tay
+        received.put("vnp_Amount", "100");   // kẻ xấu sửa tay
         assertFalse(VnpayUtils.isValidSignature(received, SECRET));
     }
 
@@ -71,7 +71,7 @@ class VnpayUtilsTest {
         assertFalse(VnpayUtils.isValidSignature(Map.of("vnp_TxnRef", "abc"), SECRET));
     }
 
-    /** Servlet container URL-decode san param, test nay mo phong dung hanh vi do. */
+    /** Servlet đã URL-decode sẵn param, hàm này mô phỏng lại đúng hành vi đó. */
     private static Map<String, String> decodeQuery(String query) {
         Map<String, String> map = new HashMap<>();
         for (String pair : query.split("&")) {

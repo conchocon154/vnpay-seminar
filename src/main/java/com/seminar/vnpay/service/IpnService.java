@@ -13,9 +13,9 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Xu ly IPN (Instant Payment Notification) - server-to-server.
- * DAY la nguon su that duy nhat de cong tien / giao hang.
- * VNPAY retry cho den khi nhan duoc RspCode=00 => handler BAT BUOC idempotent.
+ * Xử lý IPN, cuộc gọi từ server VNPAY sang server mình.
+ * Chỉ ở đây mới được cộng tiền hay giao hàng.
+ * VNPAY retry tới khi nhận được RspCode 00, nên hàm này gọi mấy lần cũng chỉ ghi nhận một lần.
  */
 @Service
 public class IpnService {
@@ -32,12 +32,12 @@ public class IpnService {
 
     public Map<String, String> handle(Map<String, String> params) {
         try {
-            // B1: chu ky sai -> 97
+            // Chữ ký sai
             if (!VnpayUtils.isValidSignature(params, props.getHashSecret())) {
                 return respond("97", "Invalid Checksum");
             }
 
-            // B2: khong tim thay don -> 01
+            // Không tìm thấy đơn
             String txnRef = params.get("vnp_TxnRef");
             Optional<Order> found = orderStore.findByTxnRef(txnRef);
             if (found.isEmpty()) {
@@ -45,14 +45,14 @@ public class IpnService {
             }
             Order order = found.get();
 
-            // B3: sai so tien -> 04 (chong sua amount tren URL)
+            // Số tiền không khớp, chặn trò sửa amount trên URL
             long amountFromVnpay = Long.parseLong(params.get("vnp_Amount"));
             if (amountFromVnpay != order.getAmount() * 100) {
                 return respond("04", "Invalid Amount");
             }
 
             synchronized (order) {
-                // B4: da xu ly roi -> 02 (idempotent, KHONG cong tien lan 2)
+                // Đã xử lý rồi thì thôi, không cộng tiền lần hai
                 if (order.getStatus() != Order.Status.PENDING) {
                     return respond("02", "Order already confirmed");
                 }
@@ -70,10 +70,10 @@ public class IpnService {
 
                 log.info("IPN txnRef={} status={} vnpTransactionNo={}",
                         txnRef, order.getStatus(), order.getTransactionNo());
-                // Cho vao outbox de publish event OrderPaid cho service khac (neu co).
+                // Chỗ này bỏ vào outbox rồi phát event OrderPaid cho service khác.
             }
 
-            // B5: da ghi nhan xong -> 00. VNPAY se ngung retry.
+            // Ghi nhận xong, trả 00 để VNPAY ngừng retry
             return respond("00", "Confirm Success");
 
         } catch (Exception e) {

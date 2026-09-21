@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Mo tunnel ngrok -> lay URL public -> chay Spring Boot voi dung ReturnURL.
-# Dung 1 lenh:  ./start-ngrok.sh
+# Mở tunnel ngrok, lấy URL công khai, rồi chạy Spring Boot với đúng ReturnURL.
+# Gõ một lệnh là xong: ./start-ngrok.sh
 set -euo pipefail
 
 PORT=${PORT:-8080}

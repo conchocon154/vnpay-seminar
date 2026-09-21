@@ -1,8 +1,8 @@
-# VNPAY Sandbox × Spring Boot — Demo tái sử dụng được
+# Tích hợp VNPAY Sandbox vào Spring Boot
 
-Tích hợp cổng thanh toán VNPAY (sandbox) vào microservice Spring Boot: **tạo yêu cầu thanh toán → nhận callback → đối soát giao dịch**.
+Tích hợp cổng thanh toán VNPAY sandbox vào microservice Spring Boot. Ba việc phải code: tạo yêu cầu thanh toán, nhận callback, đối soát giao dịch.
 
-Toàn bộ logic ký/verify nằm trong 1 file không phụ thuộc Spring: `util/VnpayUtils.java` — copy sang project khác là chạy.
+Toàn bộ logic ký và verify gói trong một file không phụ thuộc Spring là `util/VnpayUtils.java`, copy sang project khác là chạy.
 
 ---
 
@@ -17,7 +17,7 @@ Toàn bộ logic ký/verify nằm trong 1 file không phụ thuộc Spring: `uti
 
 ---
 
-## 0b. Bản một file — dành cho cả lớp
+## 0b. Bản gói trong một file
 
 Muốn thử ngay mà không cài gì: [`VnpayDemo.java`](VnpayDemo.java) là **toàn bộ demo trong một file**,
 HTML nhúng bên trong, không Maven, không Spring, không thư viện ngoài. Chỉ cần JDK 17+.
@@ -25,11 +25,11 @@ HTML nhúng bên trong, không Maven, không Spring, không thư viện ngoài. 
 Điền `VNPAY_TMN_CODE` và `VNPAY_HASH_SECRET` vào file `.env`, rồi chọn một trong hai bản:
 
 ```bash
-./run-local.sh     # BẢN 1 — không cần ngrok
+./run-local.sh     # bản không cần ngrok
 ```
 
 ```bash
-./run-ngrok.sh     # BẢN 2 — có ngrok, nhận IPN thật
+./run-ngrok.sh     # bản có ngrok, nhận IPN thật
 ```
 
 | | Bản không ngrok | Bản có ngrok |
@@ -43,11 +43,11 @@ HTML nhúng bên trong, không Maven, không Spring, không thư viện ngoài. 
 Buổi seminar chạy bản ngrok theo yêu cầu môn học. Hướng dẫn đăng ký và cài ngrok cho cả lớp
 nằm ở [`CHUAN-BI.md`](CHUAN-BI.md). Bản không ngrok giữ lại để dự phòng khi mạng trục trặc.
 
-`run-ngrok.sh` tự mở tunnel và **tự đọc URL ngrok cấp** (qua API cục bộ cổng 4040) — không phải
+`run-ngrok.sh` tự mở tunnel rồi tự đọc URL ngrok cấp qua API cục bộ cổng 4040, không phải
 copy URL bằng tay. Chương trình in sẵn 2 URL cần dán vào merchant portal.
 
-File được chia thành 10 bước đánh số, đọc từ trên xuống: cấu hình → giao diện → đơn hàng → ký →
-verify → tạo URL → IPN → querydr → ReturnURL → khởi động server.
+File chia thành 10 bước đánh số, đọc từ trên xuống: cấu hình, giao diện, đơn hàng, ký, verify,
+tạo URL, IPN, querydr, ReturnURL, chạy server.
 
 Phần còn lại của README nói về bản Spring Boot đầy đủ bên dưới.
 
@@ -89,7 +89,7 @@ Nên trang HTML chỉ gọi `POST /api/payments`, còn việc ký nằm ở serv
 
 ## 3. Host public bằng ngrok
 
-IPN là cuộc gọi **server-to-server** — VNPAY phải với tới được máy bạn, nên `localhost` không đủ.
+IPN là cuộc gọi từ server VNPAY sang server bạn. Máy ở `localhost` thì họ không với tới được.
 
 ```bash
 brew install --cask ngrok
@@ -106,10 +106,10 @@ ReturnURL:  https://xxxx.ngrok-free.app/vnpay/return
 IPN URL:    https://xxxx.ngrok-free.app/vnpay/ipn
 ```
 
-Dán **ReturnURL** và **IPN URL** vào `sandbox.vnpayment.vn/merchantv2/` → *Cấu hình → Thông tin website*.
+Dán ReturnURL và IPN URL vào `sandbox.vnpayment.vn/merchantv2/`, mục Cấu hình rồi Thông tin website.
 
 Hai lưu ý của ngrok free:
-- URL **đổi mỗi lần chạy lại** → phải khai lại trong merchant portal.
+- URL đổi mỗi lần chạy lại, nên phải khai lại trong merchant portal.
 - Trang cảnh báo *"You are about to visit…"* hiện 1 lần cho trình duyệt. IPN không dính vì không phải browser.
 
 ---
@@ -131,11 +131,11 @@ Browser          Payment Service            VNPAY
    │                      │─ POST querydr ────>│  (3) đối soát chủ động khi IPN mất
 ```
 
-**Quy tắc sống còn:** cộng tiền/giao hàng **chỉ** từ nguồn server-to-server — IPN (1) hoặc `querydr` (3).
-ReturnURL (2) user sửa URL được → chỉ dùng để vẽ màn hình.
+Chỉ cộng tiền hay giao hàng từ nguồn server gọi server, tức là IPN (1) hoặc `querydr` (3).
+ReturnURL (2) thì khách sửa URL được, chỉ dùng để vẽ màn hình.
 
 > Thực tế gặp phải: portal sandbox không cho khai IPN URL (*Danh sách website* trống, *Cài đặt thông báo* lỗi kết nối),
-> nên IPN không về. `ReconcileService` gọi `querydr` ngay trên ReturnURL để chốt đơn — vẫn verify chữ ký và so số tiền, không tin tham số URL.
+> nên IPN không về. `ReconcileService` gọi `querydr` ngay trên ReturnURL để chốt đơn, vẫn verify chữ ký và so số tiền chứ không tin tham số URL.
 
 ---
 
@@ -143,22 +143,22 @@ ReturnURL (2) user sửa URL được → chỉ dùng để vẽ màn hình.
 
 | Method | Path | Mục đích |
 |---|---|---|
-| POST | `/api/payments` | `{amount, orderInfo, bankCode}` → `{txnRef, paymentUrl}` |
+| POST | `/api/payments` | nhận `{amount, orderInfo, bankCode}`, trả `{txnRef, paymentUrl}` |
 | GET | `/api/orders/{txnRef}` | FE polling trạng thái thật |
 | POST | `/api/orders/{txnRef}/verify?transactionDate=yyyyMMddHHmmss` | gọi `querydr` sang VNPAY |
 | | | *ReturnURL cũng tự gọi `querydr` khi đơn còn PENDING* |
-| GET | `/vnpay/return` | browser quay về → verify chữ ký → 302 sang `/result.html` |
+| GET | `/vnpay/return` | trình duyệt quay về, verify chữ ký rồi 302 sang `/result.html` |
 | GET | `/vnpay/ipn` | VNPAY gọi server-to-server (ghi DB) |
 
 ---
 
-## 6. Ký chữ ký — 3 dòng cốt lõi
+## 6. Ba dòng cốt lõi của việc ký
 
 ```java
 String query = params.entrySet().stream().sorted(...)      // 1. sort alphabet
         .map(e -> e.getKey() + "=" + URLEncoder.encode(e.getValue(), US_ASCII))  // 2. encode GIÁ TRỊ
         .collect(joining("&"));
-String secureHash = hmacSHA512(hashSecret, query);          // 3. HMAC-SHA512 → hex thường
+String secureHash = hmacSHA512(hashSecret, query);          // 3. băm ra hex chữ thường
 ```
 
 Verify callback = đúng công thức đó, sau khi **bỏ `vnp_SecureHash` và `vnp_SecureHashType`**.
@@ -185,14 +185,14 @@ Hay gặp: `24` user hủy · `51` không đủ số dư · `11` hết hạn tha
 
 ## 8. 8 cái bẫy hay dính
 
-1. **`vnp_Amount` phải × 100** và là số nguyên (50.000đ → `5000000`).
-2. **Ký phải URL-encode giá trị**; verify cũng phải encode lại vì servlet đã decode sẵn.
-3. **Thời gian theo GMT+7**, format `yyyyMMddHHmmss`. Demo chính chủ của VNPAY dùng `Etc/GMT+7` — POSIX hiểu là **UTC−7**, sai 14 tiếng. Dùng `Asia/Ho_Chi_Minh`.
-4. **`vnp_TxnRef` duy nhất trong 24h** theo TmnCode. Retry thanh toán phải sinh mã mới.
-5. **IPN phải public internet** → dev dùng `ngrok http 8080`, khai URL trong merchant portal.
-6. **IPN phải idempotent** — VNPAY retry nhiều lần; trả `02` nếu đã xử lý.
-7. **Luôn so lại số tiền** với DB trước khi đánh dấu PAID (chống sửa `vnp_Amount`).
-8. **`vnp_ReturnUrl` phải khớp domain** đã đăng ký, không thì VNPAY từ chối.
+1. `vnp_Amount` phải nhân 100 và là số nguyên. 50.000đ thành `5000000`.
+2. Lúc ký phải URL-encode phần giá trị. Lúc verify cũng phải encode lại, vì servlet đã decode sẵn.
+3. Thời gian theo GMT+7, dạng `yyyyMMddHHmmss`. Demo của chính VNPAY dùng `Etc/GMT+7`, mà POSIX hiểu đó là UTC trừ 7, sai 14 tiếng. Dùng `Asia/Ho_Chi_Minh`.
+4. `vnp_TxnRef` duy nhất trong 24h theo TmnCode. Thanh toán lại phải sinh mã mới.
+5. IPN phải có địa chỉ công khai. Lúc dev thì chạy `ngrok http 8080` rồi khai URL trong merchant portal.
+6. IPN phải idempotent. VNPAY retry nhiều lần, đơn đã xử lý thì trả `02`.
+7. Luôn so lại số tiền với DB trước khi đánh dấu PAID, để chặn trò sửa `vnp_Amount`.
+8. `vnp_ReturnUrl` phải khớp domain đã đăng ký, không thì VNPAY từ chối.
 
 ---
 
@@ -200,8 +200,8 @@ Hay gặp: `24` user hủy · `51` không đủ số dư · `11` hết hạn tha
 
 - Tách `payment-service` riêng; các service khác chỉ nghe event `OrderPaid` (outbox pattern trong `IpnService`).
 - `HashSecret` vào Vault/K8s Secret, **không** vào `application.yml` commit git.
-- Bảng `payment_transaction` với `UNIQUE(txn_ref)` + optimistic lock — thay cho `synchronized` trong demo.
-- Job `@Scheduled` quét đơn PENDING quá 15 phút → gọi `querydr` để tự chốt trạng thái.
+- Bảng `payment_transaction` với `UNIQUE(txn_ref)` và optimistic lock, thay cho `synchronized` trong demo.
+- Job `@Scheduled` quét đơn PENDING quá 15 phút rồi gọi `querydr` để tự chốt trạng thái.
 - Không log `vnp_SecureHash`, không log HashSecret.
 
 ## 10. Dùng cho đồ án nào

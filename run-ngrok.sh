@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# BẢN 2 — CÓ NGROK
-# Mở tunnel public để VNPAY gọi IPN thật vào máy bạn, đúng kiến trúc chuẩn.
-# Chương trình tự đọc URL ngrok cấp, bạn chỉ việc dán 2 URL vào merchant portal.
+# Bản có ngrok.
+# Mở tunnel công khai để VNPAY gọi IPN thật vào máy mình.
+# Chương trình tự đọc URL ngrok cấp, việc còn lại chỉ là dán 2 URL vào merchant portal.
 set -euo pipefail
 cd "$(dirname "$0")"
 [ -f .env ] && { set -a; . ./.env; set +a; }
@@ -15,7 +15,7 @@ ngrok config check >/dev/null 2>&1 || {
   exit 1
 }
 
-# Dùng lại tunnel đang mở nếu có, không thì mở mới
+# Có tunnel đang mở thì dùng lại, không thì mở mới
 if ! curl -sf -o /dev/null http://127.0.0.1:4040/api/tunnels; then
   ngrok http 8080 --log=stdout > /tmp/ngrok-vnpay.log 2>&1 &
   NGROK_PID=$!

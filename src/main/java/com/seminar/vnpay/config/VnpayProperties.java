@@ -5,17 +5,17 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "vnpay")
 public class VnpayProperties {
 
-    /** Ma website (TmnCode) lay tu sandbox merchant portal. */
+    /** Mã website, lấy trong email VNPAY gửi lúc đăng ký sandbox. */
     private String tmnCode;
-    /** Chuoi bi mat de ky HMAC-SHA512. KHONG commit len git. */
+    /** Chuỗi bí mật dùng để ký. Đừng commit lên git. */
     private String hashSecret;
-    /** URL trang thanh toan sandbox. */
+    /** Trang thanh toán của sandbox. */
     private String payUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-    /** API truy van / hoan tien (server-to-server). */
+    /** API truy vấn và hoàn tiền, server gọi server. */
     private String apiUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
-    /** URL trinh duyet quay ve sau khi thanh toan. */
+    /** Nơi trình duyệt quay về sau khi khách trả tiền xong. */
     private String returnUrl = "http://localhost:8080/vnpay/return";
-    /** So phut don hang het han. */
+    /** Đơn hết hạn sau bao nhiêu phút. */
     private int expireMinutes = 15;
 
     public String getTmnCode() { return tmnCode; }

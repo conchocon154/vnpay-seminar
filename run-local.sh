@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# BẢN 1 — KHÔNG CẦN NGROK
-# Chạy hoàn toàn trên localhost. IPN không về được, nên đơn hàng được chốt
-# bằng API querydr (server tự hỏi VNPAY trạng thái thật).
-# Dùng khi cả lớp cùng chạy trên máy cá nhân.
+# Bản không cần ngrok.
+# Chạy hết trên localhost. IPN không về được nên đơn chốt bằng API querydr,
+# tức là server tự hỏi VNPAY trạng thái thật.
+# Hợp khi cả lớp cùng chạy trên máy mình.
 set -euo pipefail
 cd "$(dirname "$0")"
 [ -f .env ] && { set -a; . ./.env; set +a; }

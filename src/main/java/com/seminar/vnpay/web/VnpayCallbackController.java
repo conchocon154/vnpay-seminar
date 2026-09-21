@@ -31,17 +31,17 @@ public class VnpayCallbackController {
     }
 
     /**
-     * ReturnURL: trinh duyet cua user quay ve. CHI DE HIEN THI.
-     * Tuyet doi khong cong tien / giao hang o day - user co the sua URL.
-     * Verify chu ky xong thi redirect sang trang tinh result.html.
+     * ReturnURL, nơi trình duyệt của khách quay về. Chỉ dùng để hiển thị.
+     * Đừng cộng tiền hay giao hàng ở đây, vì khách sửa URL được.
+     * Verify chữ ký xong thì chuyển sang trang result.html.
      */
     @GetMapping("/vnpay/return")
     public ResponseEntity<Void> returnUrl(@RequestParam Map<String, String> params,
                                           HttpServletRequest http) {
         boolean validSignature = VnpayUtils.isValidSignature(params, props.getHashSecret());
 
-        // Du phong khi IPN chua khai duoc: hoi thang VNPAY qua querydr de chot trang thai.
-        // Van khong tin tham so tren URL - chi dung txnRef lam khoa tra cuu.
+        // Phòng khi chưa khai được IPN, hỏi thẳng VNPAY qua querydr để chốt trạng thái.
+        // Vẫn không tin tham số trên URL, chỉ mượn txnRef làm khoá tra cứu.
         if (validSignature) {
             reconcileService.confirm(params.get("vnp_TxnRef"), params.get("vnp_PayDate"),
                     PaymentController.clientIp(http));
@@ -59,8 +59,8 @@ public class VnpayCallbackController {
     }
 
     /**
-     * IPN URL: VNPAY goi server-to-server. Phai public tren internet (dung ngrok khi dev).
-     * Bat buoc tra JSON {"RspCode":"..","Message":".."} va HTTP 200.
+     * IPN, VNPAY gọi thẳng vào đây nên địa chỉ phải công khai trên internet. Khi dev thì dùng ngrok.
+     * Phải trả JSON {"RspCode":"..","Message":".."} kèm HTTP 200.
      */
     @GetMapping(value = "/vnpay/ipn", produces = MediaType.APPLICATION_JSON_VALUE)
     public Map<String, String> ipn(@RequestParam Map<String, String> params) {

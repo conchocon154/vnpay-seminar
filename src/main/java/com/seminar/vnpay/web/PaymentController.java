@@ -27,7 +27,7 @@ public class PaymentController {
 
     public record CreatePaymentRequest(long amount, String orderInfo, String bankCode) {}
 
-    /** B1: FE goi API nay -> nhan paymentUrl -> window.location = paymentUrl. */
+    /** Frontend gọi API này, nhận paymentUrl rồi tự chuyển trang sang VNPAY. */
     @PostMapping("/payments")
     public Map<String, String> create(@RequestBody CreatePaymentRequest req, HttpServletRequest http) {
         String info = (req.orderInfo() == null || req.orderInfo().isBlank())
@@ -35,7 +35,7 @@ public class PaymentController {
         return paymentService.createPayment(req.amount(), info, req.bankCode(), clientIp(http));
     }
 
-    /** FE polling trang thai don hang trong khi cho IPN ve. */
+    /** Frontend hỏi trạng thái đơn trong lúc chờ VNPAY xác nhận. */
     @GetMapping("/orders/{txnRef}")
     public ResponseEntity<Map<String, Object>> get(@PathVariable String txnRef) {
         return orderStore.findByTxnRef(txnRef)
@@ -44,7 +44,7 @@ public class PaymentController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    /** Doi soat chu dong: hoi thang VNPAY trang thai that cua giao dich. */
+    /** Hỏi thẳng VNPAY trạng thái thật của giao dịch. */
     @PostMapping("/orders/{txnRef}/verify")
     public Map<String, Object> verify(@PathVariable String txnRef,
                                       @RequestParam String transactionDate,
@@ -65,7 +65,7 @@ public class PaymentController {
         return m;
     }
 
-    /** VNPAY can IPv4. Sau nginx/gateway phai doc X-Forwarded-For. */
+    /** VNPAY cần IPv4. Chạy sau nginx hay gateway thì phải đọc X-Forwarded-For. */
     static String clientIp(HttpServletRequest request) {
         String forwarded = request.getHeader("X-Forwarded-For");
         String ip = (forwarded != null && !forwarded.isBlank())

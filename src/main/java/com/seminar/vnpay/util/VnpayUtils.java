@@ -8,15 +8,15 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * Toan bo "phan kho" cua VNPAY nam o day: ky va verify HMAC-SHA512.
- * Class nay khong phu thuoc Spring -> copy nguyen si sang project khac duoc.
+ * Ký và verify HMAC-SHA512. Phần khó của VNPAY nằm gọn trong file này.
+ * Không phụ thuộc Spring nên copy nguyên si sang project khác là chạy.
  */
 public final class VnpayUtils {
 
     private VnpayUtils() {
     }
 
-    /** HMAC-SHA512(secretKey, data) -> chuoi hex thuong. */
+    /** Băm data bằng secretKey, trả về chuỗi hex chữ thường. */
     public static String hmacSHA512(String secretKey, String data) {
         try {
             Mac mac = Mac.getInstance("HmacSHA512");
@@ -33,9 +33,9 @@ public final class VnpayUtils {
     }
 
     /**
-     * Sap xep tham so theo alphabet, URL-encode GIA TRI, noi bang '&'.
-     * Chuoi tra ve vua dung lam hashData, vua dung lam query string.
-     * LUU Y: tham so rong/null bi loai bo - VNPAY cung khong tinh chung vao chu ky.
+     * Sắp tham số theo alphabet, URL-encode phần giá trị, rồi nối bằng '&'.
+     * Chuỗi trả về vừa làm hashData vừa làm query string nên hai bên không lệch nhau.
+     * Tham số rỗng bị loại, vì VNPAY cũng không tính chúng vào chữ ký.
      */
     public static String buildQueryString(Map<String, String> params) {
         StringBuilder sb = new StringBuilder();
@@ -54,15 +54,15 @@ public final class VnpayUtils {
         return sb.toString();
     }
 
-    /** Ky tham so va tra ve query string da kem vnp_SecureHash. */
+    /** Ký rồi trả về query string đã kèm sẵn vnp_SecureHash. */
     public static String signAndBuildQuery(Map<String, String> params, String secretKey) {
         String query = buildQueryString(params);
         return query + "&vnp_SecureHash=" + hmacSHA512(secretKey, query);
     }
 
     /**
-     * Verify chu ky tren ReturnURL / IPN.
-     * params = toan bo query params nhan duoc (servlet da URL-decode san).
+     * Verify chữ ký nhận được ở ReturnURL hoặc IPN.
+     * params là toàn bộ query param đọc ra, servlet đã URL-decode sẵn.
      */
     public static boolean isValidSignature(Map<String, String> params, String secretKey) {
         String received = params.get("vnp_SecureHash");
@@ -76,7 +76,7 @@ public final class VnpayUtils {
         return constantTimeEquals(expected, received);
     }
 
-    /** So sanh khong phu thuoc thoi gian -> chong timing attack. */
+    /** So sánh không phụ thuộc thời gian, chống timing attack. */
     public static boolean constantTimeEquals(String a, String b) {
         if (a == null || b == null || a.length() != b.length()) {
             return false;

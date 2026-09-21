@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>VNPAY Shop — Demo thanh toán</title>
+<title>VNPAY Shop</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -11,13 +11,13 @@
 <header>
   <div class="wrap">
     <div class="logo">VN<span>PAY</span> Shop</div>
-    <div class="tag">Sandbox — không mất tiền thật</div>
+    <div class="tag">Sandbox, không mất tiền thật</div>
   </div>
 </header>
 
 <main>
   <h1>Chọn sản phẩm để thanh toán</h1>
-  <p class="sub">Bấm mua → tạo đơn ở server → chuyển sang cổng VNPAY → quay về trang kết quả.</p>
+  <p class="sub">Bấm mua thì server tạo đơn, chuyển sang cổng VNPAY, trả tiền xong quay về đây.</p>
 
   <div id="setupWarn"></div>
 
@@ -43,7 +43,7 @@
   <label for="bankCode">Phương thức</label>
   <select id="bankCode">
     <option value="">Để VNPAY hiện trang chọn ngân hàng</option>
-    <option value="NCB">NCB — dùng thẻ test ở trên</option>
+    <option value="NCB">NCB (dùng thẻ test ở trên)</option>
     <option value="VNPAYQR">Quét mã VNPAYQR</option>
     <option value="VNBANK">Thẻ ATM nội địa</option>
     <option value="INTCARD">Thẻ quốc tế (Visa/Master)</option>
@@ -99,7 +99,7 @@ async function pay() {
   btn.disabled = true;
   err.textContent = '';
   try {
-    // Server ký HMAC-SHA512 rồi trả về URL — trình duyệt KHÔNG bao giờ giữ HashSecret.
+    // Server ký rồi trả URL về. Trình duyệt không bao giờ giữ HashSecret.
     const res = await fetch('/api/payments', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

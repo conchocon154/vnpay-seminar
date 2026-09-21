@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-# Test toan bo luong ma KHONG can ngrok, KHONG can bam the that.
-# Tu ky IPN bang chinh HashSecret cua minh -> gia lap VNPAY goi ve.
+# Chạy thử cả luồng mà không cần ngrok, không cần bấm thẻ.
+# Script tự ký IPN bằng HashSecret của mình để giả làm VNPAY gọi về.
 set -euo pipefail
 
 BASE=${BASE:-http://localhost:8080}
 SECRET=${VNPAY_HASH_SECRET:?can export VNPAY_HASH_SECRET}
 AMOUNT=${AMOUNT:-50000}
 
-echo "== 1. Tao payment URL =="
+echo "1. Tạo payment URL"
 CREATE=$(curl -s -X POST "$BASE/api/payments" -H 'Content-Type: application/json' \
   -d "{\"amount\":$AMOUNT,\"orderInfo\":\"Thanh toan don hang DEMO\",\"bankCode\":\"NCB\"}")
 echo "$CREATE"
@@ -37,14 +37,14 @@ PY
 
 IPN_QUERY=$(sign_ipn "$TXNREF" "$AMOUNT")
 
-echo "== 2. VNPAY goi IPN lan 1 (mong doi RspCode 00) =="
+echo "2. VNPAY gọi IPN lần đầu, chờ RspCode 00"
 curl -s "$BASE/vnpay/ipn?$IPN_QUERY"; echo
 
-echo "== 3. VNPAY retry IPN lan 2 (mong doi 02 - idempotent) =="
+echo "3. VNPAY retry lần hai, chờ 02 vì đơn đã chốt"
 curl -s "$BASE/vnpay/ipn?$IPN_QUERY"; echo
 
-echo "== 4. IPN bi sua so tien (mong doi 97 - sai chu ky) =="
+echo "4. IPN bị sửa số tiền, chờ 97 vì chữ ký hỏng"
 curl -s "$BASE/vnpay/ipn?${IPN_QUERY/vnp_Amount=$((AMOUNT*100))/vnp_Amount=100}"; echo
 
-echo "== 5. Trang thai don hang =="
+echo "5. Trạng thái đơn hàng"
 curl -s "$BASE/api/orders/$TXNREF"; echo

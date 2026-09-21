@@ -16,7 +16,7 @@ import java.util.concurrent.ThreadLocalRandom;
 @Service
 public class PaymentService {
 
-    /** VNPAY doi gio GMT+7 - KHONG dung gio may chu. */
+    /** VNPAY tính giờ GMT+7, đừng lấy giờ máy chủ. */
     public static final ZoneId VN_ZONE = ZoneId.of("Asia/Ho_Chi_Minh");
     public static final DateTimeFormatter VNP_TIME = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
@@ -29,8 +29,8 @@ public class PaymentService {
     }
 
     /**
-     * Tao don hang PENDING + tra ve URL de redirect trinh duyet sang VNPAY.
-     * @param amount so tien VND (vi du 50000), KHONG nhan 100 o day
+     * Lưu đơn ở trạng thái PENDING rồi trả về URL để trình duyệt chuyển sang VNPAY.
+     * @param amount số tiền VND, ví dụ 50000. Việc nhân 100 làm ở trong hàm.
      */
     public Map<String, String> createPayment(long amount, String orderInfo, String bankCode, String clientIp) {
         if (amount < 5_000 || amount >= 1_000_000_000L) {
@@ -46,7 +46,7 @@ public class PaymentService {
         p.put("vnp_Version", "2.1.0");
         p.put("vnp_Command", "pay");
         p.put("vnp_TmnCode", props.getTmnCode());
-        p.put("vnp_Amount", String.valueOf(amount * 100));   // VNPAY tinh theo don vi x100
+        p.put("vnp_Amount", String.valueOf(amount * 100));   // VNPAY tính theo đơn vị nhân 100
         p.put("vnp_CurrCode", "VND");
         p.put("vnp_TxnRef", txnRef);
         p.put("vnp_OrderInfo", orderInfo);
@@ -57,14 +57,14 @@ public class PaymentService {
         p.put("vnp_CreateDate", now.format(VNP_TIME));
         p.put("vnp_ExpireDate", now.plusMinutes(props.getExpireMinutes()).format(VNP_TIME));
         if (bankCode != null && !bankCode.isBlank()) {
-            p.put("vnp_BankCode", bankCode);   // bo trong = de VNPAY hien trang chon ngan hang
+            p.put("vnp_BankCode", bankCode);   // bỏ trống thì VNPAY hiện trang chọn ngân hàng
         }
 
         String url = props.getPayUrl() + "?" + VnpayUtils.signAndBuildQuery(p, props.getHashSecret());
         return Map.of("txnRef", txnRef, "paymentUrl", url);
     }
 
-    /** Duy nhat theo TmnCode trong 24h. Thuc te: dung orderId + so lan retry. */
+    /** Mã đơn phải duy nhất trong 24h theo TmnCode. Thực tế nên ghép orderId với số lần thanh toán lại. */
     private String newTxnRef() {
         return LocalDateTime.now(VN_ZONE).format(VNP_TIME)
                 + ThreadLocalRandom.current().nextInt(100_000, 999_999);

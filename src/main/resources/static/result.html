@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Kết quả thanh toán — VNPAY Shop</title>
+<title>Kết quả thanh toán</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -37,8 +37,9 @@
 
   <div class="note">
     <strong>Vì sao trang này phải hỏi lại server?</strong><br>
-    Các tham số trên URL là do trình duyệt mang về — user sửa được. Trạng thái thật lấy từ
-    <code>GET /api/orders/{txnRef}</code>, và giá trị đó chỉ được ghi sau khi server tự xác thực với VNPAY — qua IPN, hoặc qua API <code>querydr</code> nếu IPN không về.
+    Tham số trên URL là do trình duyệt mang về, khách sửa được. Trạng thái thật lấy từ
+    <code>GET /api/orders/{txnRef}</code>. Giá trị đó chỉ được ghi sau khi server tự xác thực với VNPAY,
+    qua IPN hoặc qua API <code>querydr</code> nếu IPN không về.
   </div>
 </main>
 
@@ -74,7 +75,7 @@ function render(order) {
   return true;
 }
 
-// Poll tối đa ~20s: IPN là cuộc gọi server-to-server nên có thể về sau ReturnURL vài giây.
+// Hỏi lại tối đa 20 giây. Xác nhận là cuộc gọi server sang server nên hay về sau ReturnURL vài giây.
 (async function poll(tries = 0) {
   if (!txnRef) {
     document.getElementById('title').textContent = 'Thiếu mã đơn';

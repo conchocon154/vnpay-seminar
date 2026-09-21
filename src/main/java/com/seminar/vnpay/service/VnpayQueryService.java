@@ -12,8 +12,8 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Doi soat server-to-server (API querydr).
- * Dung khi: IPN khong ve, user dong trinh duyet, hoac job doi soat cuoi ngay.
+ * Gọi API querydr để hỏi VNPAY trạng thái thật của một giao dịch.
+ * Dùng khi IPN không về, khi khách đóng trình duyệt giữa chừng, hoặc cho job đối soát cuối ngày.
  */
 @Service
 public class VnpayQueryService {
@@ -26,8 +26,8 @@ public class VnpayQueryService {
     }
 
     /**
-     * @param txnRef          ma don hang da gui sang VNPAY
-     * @param transactionDate thoi diem tao giao dich, dinh dang yyyyMMddHHmmss
+     * @param txnRef          mã đơn đã gửi sang VNPAY
+     * @param transactionDate thời điểm tạo giao dịch, dạng yyyyMMddHHmmss
      */
     public Map<String, Object> queryTransaction(String txnRef, String transactionDate, String clientIp) {
         String requestId = UUID.randomUUID().toString().replace("-", "").substring(0, 16);
@@ -36,7 +36,7 @@ public class VnpayQueryService {
         String orderInfo = "Truy van GD ma:" + txnRef;
         String createDate = LocalDateTime.now(PaymentService.VN_ZONE).format(PaymentService.VNP_TIME);
 
-        // API querydr KHONG sap xep alphabet - hash la chuoi noi bang '|' theo dung thu tu nay.
+        // querydr không sort alphabet. Hash là chuỗi nối bằng '|' đúng thứ tự dưới đây.
         String hashData = String.join("|",
                 requestId, version, command, props.getTmnCode(),
                 txnRef, transactionDate, createDate, clientIp, orderInfo);
@@ -66,7 +66,7 @@ public class VnpayQueryService {
         return result;
     }
 
-    /** Response cung co chu ky - phai verify truoc khi tin ket qua. */
+    /** Response cũng có chữ ký, verify xong mới được tin kết quả. */
     private boolean isResponseSignatureValid(Map<String, Object> r) {
         String received = str(r.get("vnp_SecureHash"));
         if (received.isEmpty()) {
