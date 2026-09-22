@@ -1,0 +1,24 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
+<body>
+  <div class="eyebrow">TODO 5</div>
+  <h1>Ráp tham số rồi ký</h1>
+  <div class="stack" style="margin-top:44px">
+    <div>
+      <div class="file">ShopStart.java</div>
+      <pre>LocalDateTime now = LocalDateTime.now(VN);
+String createDate = now.format(TIME);
+String txnRef = newTxnRef(createDate);
+ORDERS.put(txnRef, <span class="k">new</span> Order(txnRef, amount, orderInfo, createDate));
+
+Map&lt;String, String&gt; p = <span class="k">new</span> HashMap&lt;&gt;();
+p.put(<span class="s">"vnp_Amount"</span>, String.valueOf(<span class="h">amount * 100</span>));
+p.put(<span class="s">"vnp_TxnRef"</span>, txnRef);
+<span class="c">// ... các tham số còn lại</span>
+
+String query = buildQueryString(p);
+String url = PAY_URL + <span class="s">"?"</span> + query + <span class="s">"&amp;vnp_SecureHash="</span> + hmacSHA512(HASH_SECRET, query);
+<span class="k">return</span> <span class="s">"{\"txnRef\":\""</span> + txnRef + <span class="s">"\",\"paymentUrl\":\""</span> + url + <span class="s">"\"}"</span>;</pre>
+    </div>
+    <p class="lead">Lưu đơn ở trạng thái PENDING trước, rồi mới ký. Chưa trả tiền thì đơn vẫn nằm đó.</p>
+  </div>
+</body></html>

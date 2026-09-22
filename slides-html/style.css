@@ -122,3 +122,16 @@ figcaption { font-size: 22px; color: var(--muted); margin-top: 14px; }
 /* slide mở đầu */
 .title-slide { justify-content: center; }
 .title-slide h1 { font-size: 86px; max-width: 1500px; }
+
+/* bổ sung cho bản chi tiết */
+.step { display:flex; align-items:baseline; gap:20px; }
+.step .num { font-family:'Roboto Mono',monospace; font-weight:700; font-size:28px;
+             color:var(--accent); flex:none; width:52px; }
+.step .body { flex:1; font-size:27px; }
+.step + .step { margin-top:18px; }
+.chk { background:#e8f5ee; border:1px solid #bfe3d0; border-radius:16px; padding:26px 32px; }
+.chk b { display:block; font-size:28px; color:var(--ok); margin-bottom:8px; }
+.chk p { font-size:26px; color:var(--ink2); }
+.two { display:flex; gap:26px; align-items:flex-start; }
+.two > * { flex:1; }
+h1 .dim { color:var(--muted); font-weight:600; }

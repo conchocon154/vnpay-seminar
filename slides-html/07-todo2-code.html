@@ -1,14 +1,14 @@
 <!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
 <body>
-  <div class="eyebrow">Bước 2</div>
+  <div class="eyebrow">TODO 2</div>
   <h1>Hàm hmacSHA512</h1>
   <div class="stack" style="margin-top:44px">
     <div>
-      <div class="file">ShopStart.java · TODO 2</div>
-      <pre><span class="k">static</span> String hmacSHA512(String secretKey, String data) {
+      <div class="file">ShopStart.java</div>
+      <pre><span class="k">static</span> String hmacSHA512(String key, String data) {
     <span class="k">try</span> {
         Mac mac = Mac.getInstance(<span class="s">"HmacSHA512"</span>);
-        mac.init(<span class="k">new</span> SecretKeySpec(secretKey.getBytes(UTF_8), <span class="s">"HmacSHA512"</span>));
+        mac.init(<span class="k">new</span> SecretKeySpec(key.getBytes(UTF_8), <span class="s">"HmacSHA512"</span>));
         <span class="k">byte</span>[] bytes = mac.doFinal(data.getBytes(UTF_8));
 
         StringBuilder hex = <span class="k">new</span> StringBuilder(bytes.length * 2);
@@ -19,6 +19,6 @@
     }
 }</pre>
     </div>
-    <p class="lead">Đầu ra là chuỗi hex 128 ký tự, chữ thường. VNPAY so sánh chuỗi nên hoa thường khác nhau.</p>
+    <p class="lead"><span class="mono">%02x</span> chữ x thường. Dùng <span class="mono">%02X</span> là chữ ký hoa, VNPAY không nhận.</p>
   </div>
 </body></html>

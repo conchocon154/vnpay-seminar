@@ -1,0 +1,19 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
+<body>
+  <div class="eyebrow">TODO 5</div>
+  <h1>Mười ba tham số gửi sang VNPAY</h1>
+  <div class="stack" style="margin-top:40px">
+    <table>
+      <thead><tr><th style="width:28%">Tham số</th><th style="width:34%">Giá trị</th><th>Chú ý</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">vnp_Amount</td><td class="mono">amount * 100</td><td>Nhân 100, số nguyên</td></tr>
+        <tr><td class="mono">vnp_TxnRef</td><td class="mono">newTxnRef(createDate)</td><td>Duy nhất trong 24h</td></tr>
+        <tr><td class="mono">vnp_CreateDate</td><td class="mono">now.format(TIME)</td><td>Giờ Việt Nam</td></tr>
+        <tr><td class="mono">vnp_ExpireDate</td><td class="mono">now.plusMinutes(15)</td><td>Quá hạn là bị từ chối</td></tr>
+        <tr><td class="mono">vnp_ReturnUrl</td><td class="mono">RETURN_URL</td><td>Đổi khi bật ngrok</td></tr>
+        <tr><td class="mono">vnp_BankCode</td><td class="mono">bankCode</td><td>Rỗng thì VNPAY hiện trang chọn</td></tr>
+      </tbody>
+    </table>
+    <p class="lead">Còn lại là hằng số: Version 2.1.0, Command pay, CurrCode VND, OrderType other, Locale vn, TmnCode, IpAddr.</p>
+  </div>
+</body></html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
+<body>
+  <div class="eyebrow">TODO 3</div>
+  <h1>Hàm buildQueryString</h1>
+  <div class="stack" style="margin-top:44px">
+    <div>
+      <div class="file">ShopStart.java</div>
+      <pre><span class="k">static</span> String buildQueryString(Map&lt;String, String&gt; params) {
+    StringBuilder sb = <span class="k">new</span> StringBuilder();
+
+    <span class="k">for</span> (Map.Entry&lt;String, String&gt; e : <span class="h">new TreeMap&lt;&gt;(params)</span>.entrySet()) {
+        <span class="k">if</span> (e.getValue() == <span class="k">null</span> || e.getValue().isEmpty()) <span class="k">continue</span>;
+        <span class="k">if</span> (sb.length() &gt; 0) sb.append(<span class="s">'&amp;'</span>);
+
+        sb.append(URLEncoder.encode(e.getKey(), ASCII)).append(<span class="s">'='</span>)
+          .append(<span class="h">URLEncoder.encode(e.getValue(), ASCII)</span>);
+    }
+    <span class="k">return</span> sb.toString();
+}</pre>
+    </div>
+    <div class="two">
+      <div class="card"><h3>TreeMap</h3><p>Tự sắp khoá theo alphabet, khỏi gọi sort.</p></div>
+      <div class="card"><h3>Bỏ giá trị rỗng</h3><p>VNPAY không tính tham số rỗng vào chữ ký, mình giữ lại là lệch.</p></div>
+    </div>
+  </div>
+</body></html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VNPAY Shop</title>
+<style>
+  body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;max-width:640px;margin:40px auto;
+       padding:0 18px;color:#16181d;line-height:1.55}
+  h2{margin:0 0 4px}
+  .sub{color:#6b7280;margin:0 0 22px;font-size:14px}
+  .row{display:flex;gap:12px;flex-wrap:wrap}
+  .card{flex:1 1 180px;border:1px solid #e5e7eb;border-radius:10px;padding:16px}
+  .price{color:#005baa;font-weight:700;font-size:18px;margin:4px 0 12px}
+  label{display:block;font-size:13px;font-weight:600;margin:14px 0 4px}
+  input,select,button{width:100%;padding:11px;font-size:15px;border-radius:8px;
+       border:1px solid #e5e7eb;box-sizing:border-box}
+  button{background:#005baa;color:#fff;border:0;font-weight:600;cursor:pointer;margin-top:18px}
+  button:disabled{background:#9aa3ad}
+  .note{margin-top:26px;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;
+       padding:13px 15px;font-size:13px}
+  table{width:100%;border-collapse:collapse;font-size:14px;margin-top:18px}
+  th,td{text-align:left;padding:9px 4px;border-bottom:1px solid #eee}
+  th{color:#6b7280;font-weight:500;width:45%}
+  td{font-family:ui-monospace,Menlo,monospace}
+  #msg{font-size:13.5px;margin-top:10px;min-height:20px;color:#b45309}
+  #result{display:none}
+</style>
+</head>
+<body>
+
+<div id="shop">
+  <h2>VNPAY Shop</h2>
+  <p class="sub">Cửa hàng demo.</p>
+
+  <div class="row">
+    <div class="card">
+      <div>Cà phê sữa đá</div><div class="price">25.000đ</div>
+      <button onclick="pick(25000,'Ca phe sua da')" style="margin-top:0">Chọn</button>
+    </div>
+    <div class="card">
+      <div>Sách Spring Boot</div><div class="price">189.000đ</div>
+      <button onclick="pick(189000,'Sach Spring Boot')" style="margin-top:0">Chọn</button>
+    </div>
+  </div>
+
+  <label for="amount">Số tiền (VND)</label>
+  <input id="amount" type="number" value="25000">
+
+  <label for="orderInfo">Nội dung đơn hàng</label>
+  <input id="orderInfo" value="Thanh toan Ca phe sua da">
+
+  <label for="bankCode">Phương thức</label>
+  <select id="bankCode">
+    <option value="NCB" selected>NCB, dùng thẻ test bên dưới</option>
+    <option value="">Để VNPAY hiện trang chọn ngân hàng</option>
+    <option value="VNPAYQR">Quét mã VNPAYQR</option>
+  </select>
+
+  <button id="payBtn" onclick="pay()">Thanh toán</button>
+  <p id="msg"></p>
+
+  <div class="note">
+    <b>Thẻ test NCB:</b> 9704198526191432198 · NGUYEN VAN A · 07/15 · OTP 123456
+  </div>
+</div>
+
+<div id="result">
+  <h2 id="rTitle">Đang xác nhận…</h2>
+  <p class="sub" id="rDesc">Đang hỏi server trạng thái thật của đơn.</p>
+  <table>
+    <tr><th>Mã đơn</th><td id="rRef">—</td></tr>
+    <tr><th>Số tiền</th><td id="rAmount">—</td></tr>
+    <tr><th>Trạng thái</th><td id="rStatus">—</td></tr>
+    <tr><th>Mã GD tại VNPAY</th><td id="rNo">—</td></tr>
+    <tr><th>Chữ ký ReturnURL</th><td id="rSig">—</td></tr>
+  </table>
+  <p style="margin-top:22px"><a href="/">← Mua tiếp</a></p>
+</div>
+
+<script>
+function pick(amount, info) {
+  document.getElementById('amount').value = amount;
+  document.getElementById('orderInfo').value = 'Thanh toan ' + info;
+}
+
+// Gửi số tiền và nội dung sang server, nhận lại URL đã ký rồi chuyển trang.
+async function pay() {
+  const btn = document.getElementById('payBtn');
+  btn.disabled = true;
+  const body = new URLSearchParams({
+    amount:    document.getElementById('amount').value,
+    orderInfo: document.getElementById('orderInfo').value,
+    bankCode:  document.getElementById('bankCode').value
+  });
+  const res  = await fetch('/api/payments', { method: 'POST', body: body });
+  const data = await res.json();
+
+  if (data.error) {
+    document.getElementById('msg').textContent = data.error;
+    btn.disabled = false;
+    return;
+  }
+  window.location.href = data.paymentUrl;
+}
+
+// VNPAY trả người dùng về kèm ?txnRef=. Không đọc kết quả trên URL, hỏi lại server.
+const q = new URLSearchParams(location.search);
+if (q.get('txnRef')) {
+  document.getElementById('shop').style.display = 'none';
+  document.getElementById('result').style.display = 'block';
+  document.getElementById('rRef').textContent = q.get('txnRef');
+  document.getElementById('rSig').textContent = q.get('valid') === 'true' ? 'hợp lệ' : 'KHÔNG hợp lệ';
+  poll(0);
+}
+
+async function poll(tries) {
+  const res = await fetch('/api/orders?txnRef=' + encodeURIComponent(q.get('txnRef')));
+  const o = await res.json();
+  document.getElementById('rAmount').textContent = o.amount;
+  document.getElementById('rStatus').textContent = o.status;
+  document.getElementById('rNo').textContent = o.transactionNo || '—';
+
+  if (o.status === 'PAID') {
+    document.getElementById('rTitle').textContent = 'Thanh toán thành công';
+    document.getElementById('rDesc').textContent = 'Server đã xác thực với VNPAY và ghi nhận đơn.';
+  } else if (o.status === 'FAILED') {
+    document.getElementById('rTitle').textContent = 'Thanh toán thất bại';
+    document.getElementById('rDesc').textContent = 'Giao dịch bị huỷ hoặc ngân hàng từ chối.';
+  } else if (tries < 10) {
+    setTimeout(function () { poll(tries + 1); }, 2000);
+  }
+}
+</script>
+</body>
+</html>

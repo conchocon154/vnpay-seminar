@@ -1,0 +1,20 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
+<body>
+  <div class="eyebrow">ngrok · bước 5</div>
+  <h1>Khai hai URL và chạy lại Java</h1>
+  <div class="stack" style="margin-top:40px">
+    <p class="lead">Vào <span class="mono">sandbox.vnpayment.vn/merchantv2</span>, mục Cấu hình, Thông tin website.</p>
+    <table>
+      <thead><tr><th style="width:36%">Trường</th><th>Điền</th></tr></thead>
+      <tbody>
+        <tr><td>URL trả về</td><td class="mono">https://a1b2-....ngrok-free.app/vnpay/return</td></tr>
+        <tr><td>URL nhận kết quả IPN</td><td class="mono">https://a1b2-....ngrok-free.app/vnpay/ipn</td></tr>
+      </tbody>
+    </table>
+    <div>
+      <div class="file">terminal chạy Java</div>
+      <pre>export VNPAY_RETURN_URL=https://a1b2-....ngrok-free.app/vnpay/return
+java ShopStart.java</pre>
+    </div>
+  </div>
+</body></html>
