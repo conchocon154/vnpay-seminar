@@ -1,0 +1,22 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
+<body>
+  <div class="eyebrow">Bước 9</div>
+  <h1>ReturnURL và đối soát querydr</h1>
+  <div class="stack" style="margin-top:44px">
+    <div>
+      <div class="file">ShopStart.java · TODO 6</div>
+      <pre><span class="c">// ReturnURL: verify chữ ký rồi redirect, không ghi trạng thái</span>
+<span class="k">boolean</span> valid = isValidSignature(params);
+<span class="k">return</span> <span class="s">"/?txnRef="</span> + encode(txnRef) + <span class="s">"&amp;valid="</span> + valid;</pre>
+    </div>
+    <div>
+      <pre><span class="c">// querydr: hash nối bằng '|', không sort alphabet</span>
+String hashData = String.join(<span class="h">"|"</span>, requestId, <span class="s">"2.1.0"</span>, <span class="s">"querydr"</span>, TMN_CODE,
+        txnRef, transactionDate, createDate, ipAddr, orderInfo);
+
+<span class="c">// chỉ ghi PAID khi chữ ký response hợp lệ và số tiền khớp</span>
+order.status = <span class="s">"00"</span>.equals(r.get(<span class="s">"vnp_TransactionStatus"</span>)) ? <span class="s">"PAID"</span> : <span class="s">"FAILED"</span>;</pre>
+    </div>
+    <p class="lead">Khai được IPN thì IPN ghi trạng thái. Không khai được thì <span class="mono">/api/orders</span> gọi querydr khi đơn còn PENDING.</p>
+  </div>
+</body></html>

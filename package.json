@@ -1,0 +1,12 @@
+{
+  "name": "vnpay-seminar-slides",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:slides": "node build-html-pptx.mjs"
+  },
+  "dependencies": {
+    "pptxgenjs": "^4.0.1",
+    "puppeteer": "^25.11.0"
+  }
+}

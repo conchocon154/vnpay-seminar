@@ -1,0 +1,124 @@
+/* Hệ thiết kế dùng chung cho mọi slide. Khổ 1920x1080. */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --ink: #111111;
+  --ink2: #3f454d;
+  --muted: #6b7280;
+  --accent: #0066ff;
+  --bg: #f8f9fa;
+  --card: #ffffff;
+  --line: #e3e6ea;
+  --tint: #ecf2ff;
+  --code-bg: #0c131e;
+  --code-fg: #e6edf7;
+  --code-dim: #7d8ca3;
+  --ok: #0b6b47;
+  --warn: #c42b22;
+}
+
+body {
+  width: 1920px; height: 1080px;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Be Vietnam Pro', -apple-system, 'Segoe UI', sans-serif;
+  font-size: 26px;
+  line-height: 1.5;
+  padding: 72px 104px;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+
+.eyebrow {
+  font-size: 19px; font-weight: 700; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--accent); margin-bottom: 14px;
+}
+h1 { font-size: 66px; font-weight: 700; letter-spacing: -.02em; line-height: 1.1; }
+h1 + .lead { margin-top: 26px; }
+.lead { font-size: 30px; color: var(--ink2); max-width: 1500px; }
+.stack > * + * { margin-top: 30px; }
+.spacer { flex: 1; }
+
+/* code */
+.file { font-family: 'Roboto Mono', monospace; font-size: 20px; color: var(--muted);
+        margin-bottom: 10px; }
+pre {
+  background: var(--code-bg); color: var(--code-fg);
+  border-radius: 16px; padding: 30px 36px;
+  font-family: 'Roboto Mono', monospace; font-size: 25px; line-height: 1.62;
+  white-space: pre; overflow: hidden;
+}
+pre .c { color: var(--code-dim); }
+pre .k { color: #7fc2ff; }
+pre .s { color: #9be3b4; }
+pre .h { color: #ffd479; }
+
+/* bảng */
+table { width: 100%; border-collapse: collapse; background: var(--card);
+        border-radius: 16px; overflow: hidden; font-size: 26px; }
+thead th {
+  background: var(--tint); color: var(--accent); text-align: left;
+  font-size: 21px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+  padding: 20px 26px;
+}
+tbody td { padding: 18px 26px; border-top: 1px solid var(--line); color: var(--ink2); }
+tbody td:first-child { color: var(--ink); font-weight: 500; }
+td code, .mono { font-family: 'Roboto Mono', monospace; font-size: 24px; }
+
+/* card */
+.cards { display: flex; gap: 26px; }
+.card {
+  flex: 1; background: var(--card); border: 1px solid var(--line);
+  border-radius: 16px; padding: 30px 32px;
+}
+.card h3 { font-size: 30px; font-weight: 600; margin-bottom: 12px; }
+.card p { font-size: 25px; color: var(--ink2); }
+
+/* callout */
+.callout {
+  background: var(--card); border: 1px solid var(--line);
+  border-left: 7px solid var(--accent); border-radius: 0 16px 16px 0;
+  padding: 26px 32px;
+}
+.callout.warn { border-left-color: var(--warn); }
+.callout.ok { border-left-color: var(--ok); }
+.callout b { display: block; font-size: 27px; margin-bottom: 8px; color: var(--accent); }
+.callout.warn b { color: var(--warn); }
+.callout.ok b { color: var(--ok); }
+.callout p { font-size: 25px; color: var(--ink2); }
+
+/* kpi */
+.kpis { display: flex; gap: 26px; }
+.kpi { flex: 1; background: var(--card); border: 1px solid var(--line);
+       border-radius: 16px; padding: 26px 30px; }
+.kpi .v { font-family: 'Roboto Mono', monospace; font-size: 46px; font-weight: 600;
+          color: var(--accent); }
+.kpi .l { font-size: 22px; color: var(--muted); margin-top: 4px; }
+
+/* sơ đồ phân tầng */
+.tier { display: flex; align-items: center; gap: 28px;
+        background: var(--card); border: 1px solid var(--line);
+        border-radius: 16px; padding: 22px 28px; }
+.tier + .tier { margin-top: 14px; }
+.tier.on { background: var(--tint); }
+.tier .n { font-family: 'Roboto Mono', monospace; font-weight: 700; font-size: 26px;
+           width: 56px; height: 56px; border-radius: 12px; background: #dde3ea;
+           display: flex; align-items: center; justify-content: center; flex: none; }
+.tier.on .n { background: var(--accent); color: #fff; }
+.tier .lane { font-size: 21px; font-weight: 600; color: var(--muted); width: 270px; flex: none; }
+.tier .txt { font-size: 27px; flex: 1; }
+.pill { font-size: 22px; font-weight: 600; padding: 8px 20px; border-radius: 999px; }
+.pill.ok { background: #def3e8; color: var(--ok); }
+.pill.no { background: #fde8e6; color: var(--warn); }
+
+/* ảnh */
+figure { text-align: center; }
+figure img { max-height: 520px; border: 1px solid var(--line); border-radius: 14px; }
+figcaption { font-size: 22px; color: var(--muted); margin-top: 14px; }
+.ph { border: 2px dashed #c3cbd6; background: #eff2f6; border-radius: 16px;
+      height: 200px; display: flex; align-items: center; justify-content: center;
+      color: var(--muted); font-size: 24px; }
+
+/* slide mở đầu */
+.title-slide { justify-content: center; }
+.title-slide h1 { font-size: 86px; max-width: 1500px; }

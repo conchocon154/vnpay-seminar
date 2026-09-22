@@ -3,3 +3,5 @@ target/
 *.log
 .idea/
 .DS_Store
+node_modules/
+slides-html/render/

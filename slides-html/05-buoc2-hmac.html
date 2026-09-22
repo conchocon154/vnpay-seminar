@@ -1,0 +1,24 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
+<body>
+  <div class="eyebrow">Bước 2</div>
+  <h1>Hàm hmacSHA512</h1>
+  <div class="stack" style="margin-top:44px">
+    <div>
+      <div class="file">ShopStart.java · TODO 2</div>
+      <pre><span class="k">static</span> String hmacSHA512(String secretKey, String data) {
+    <span class="k">try</span> {
+        Mac mac = Mac.getInstance(<span class="s">"HmacSHA512"</span>);
+        mac.init(<span class="k">new</span> SecretKeySpec(secretKey.getBytes(UTF_8), <span class="s">"HmacSHA512"</span>));
+        <span class="k">byte</span>[] bytes = mac.doFinal(data.getBytes(UTF_8));
+
+        StringBuilder hex = <span class="k">new</span> StringBuilder(bytes.length * 2);
+        <span class="k">for</span> (<span class="k">byte</span> b : bytes) hex.append(String.format(<span class="h">"%02x"</span>, b));
+        <span class="k">return</span> hex.toString();
+    } <span class="k">catch</span> (Exception e) {
+        <span class="k">throw new</span> IllegalStateException(<span class="s">"HMAC-SHA512"</span>, e);
+    }
+}</pre>
+    </div>
+    <p class="lead">Đầu ra là chuỗi hex 128 ký tự, chữ thường. VNPAY so sánh chuỗi nên hoa thường khác nhau.</p>
+  </div>
+</body></html>

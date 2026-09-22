@@ -1,0 +1,16 @@
+{
+  "01": "Kết quả cuối buổi: một file ShopStart.java chạy được, sinh URL thanh toán, nhận IPN, chốt trạng thái đơn.\nHỏi ai đã chạy thử file xuất phát chưa.",
+  "02": "Nhấn: trạng thái đơn chỉ ghi ở hai chỗ, IPN và nhánh querydr. ReturnURL không ghi gì.\nNếu lớp hỏi vì sao, trả lời: ReturnURL chạy qua trình duyệt của khách, tham số sửa được.",
+  "03": "Kiểm tra nhanh: ai chưa có TmnCode và HashSecret thì ngồi cùng bạn bên cạnh.\nAi chưa gắn authtoken ngrok thì xử lý ngay, bước 7 sẽ cần.",
+  "04": "Chỉ vào ZoneId. Etc/GMT+7 là UTC trừ 7, giao dịch hết hạn ngay khi tạo.",
+  "05": "Nhắc hex chữ thường. Dùng %02X thì chữ ký không khớp.",
+  "06": "Ba điểm: TreeMap để sort, bỏ tham số rỗng, encode phần giá trị.\nĐây là nơi phát sinh phần lớn lỗi sai chữ ký.",
+  "07": "Nhấn hai dòng remove. Servlet đã decode nên phải encode lại.",
+  "08": "Viết lên bảng: 25.000đ thành 2500000.\nvnp_TxnRef trùng trong 24h thì VNPAY từ chối.",
+  "09": "Nhắc: HashSecret chỉ nằm trên server. JavaScript chỉ nhận paymentUrl.",
+  "10": "Cho lớp 3 phút chạy thử. Đi quanh xem ai kẹt.\nQuá nửa lớp chưa qua được thì gửi bản làm xong rồi đi tiếp.",
+  "11": "Cả lớp mở ngrok ngay lúc này vì id đổi mỗi lần chạy.\nSau khi khai URL nhớ export lại VNPAY_RETURN_URL rồi chạy lại app.",
+  "12": "Đọc to năm mã: 97, 01, 04, 02, 00.\nHỏi lớp: bỏ nhánh 02 thì chuyện gì xảy ra khi VNPAY gọi lại lần hai?",
+  "13": "Nhấn: hash của querydr nối bằng dấu gạch đứng, không sort alphabet. Dùng nhầm buildQueryString ở đây là fail.",
+  "14": "Mở sẵn terminal để chỉ vào dòng log.\nMạng hỏng thì chạy demo-local.sh, tự ký IPN, không cần internet.\n\nBốn câu hay bị hỏi:\n1. IPN không về thì sao? Job quét đơn PENDING quá hạn rồi gọi querydr.\n2. Sao phải ngrok? Cần địa chỉ công khai để VNPAY gọi vào.\n3. Sai chữ ký? In hashData ra so từng ký tự, thường là quên encode.\n4. Chưa có thẻ? Phần ký và verify có unit test chạy offline."
+}

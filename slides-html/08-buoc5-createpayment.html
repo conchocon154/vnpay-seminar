@@ -1,0 +1,22 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
+<body>
+  <div class="eyebrow">Bước 5</div>
+  <h1>Hàm createPayment và bảng tham số</h1>
+  <div class="stack" style="margin-top:40px">
+    <table>
+      <thead><tr><th style="width:24%">Tham số</th><th style="width:30%">Giá trị</th><th>Ràng buộc</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">vnp_Version</td><td class="mono">2.1.0</td><td>Cố định</td></tr>
+        <tr><td class="mono">vnp_Amount</td><td class="mono">amount * 100</td><td>Số nguyên, đơn vị nhân 100</td></tr>
+        <tr><td class="mono">vnp_TxnRef</td><td class="mono">yyyyMMddHHmmss + 6 số</td><td>Duy nhất trong 24h theo TmnCode</td></tr>
+        <tr><td class="mono">vnp_CreateDate</td><td class="mono">now(VN_ZONE)</td><td>Định dạng yyyyMMddHHmmss</td></tr>
+        <tr><td class="mono">vnp_ExpireDate</td><td class="mono">now + 15 phút</td><td>Quá hạn thì VNPAY từ chối</td></tr>
+      </tbody>
+    </table>
+    <div>
+      <div class="file">ShopStart.java · TODO 4</div>
+      <pre>String query = buildQueryString(p);
+String url = PAY_URL + <span class="s">"?"</span> + query + <span class="s">"&amp;vnp_SecureHash="</span> + hmacSHA512(HASH_SECRET, query);</pre>
+    </div>
+  </div>
+</body></html>

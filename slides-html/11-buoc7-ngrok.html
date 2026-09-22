@@ -1,0 +1,19 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
+<body>
+  <div class="eyebrow">Bước 7</div>
+  <h1>Mở ngrok và khai hai URL</h1>
+  <div class="stack" style="margin-top:44px">
+    <pre>ngrok http 8080
+
+Forwarding   <span class="h">https://a1b2-42-115-242-109.ngrok-free.app</span> -&gt; http://localhost:8080</pre>
+    <table>
+      <thead><tr><th style="width:38%">Trường trong merchant portal</th><th>Giá trị</th></tr></thead>
+      <tbody>
+        <tr><td>URL trả về</td><td class="mono">https://&lt;id&gt;.ngrok-free.app/vnpay/return</td></tr>
+        <tr><td>URL nhận kết quả IPN</td><td class="mono">https://&lt;id&gt;.ngrok-free.app/vnpay/ipn</td></tr>
+        <tr><td>Biến môi trường</td><td class="mono">VNPAY_RETURN_URL=https://&lt;id&gt;.ngrok-free.app/vnpay/return</td></tr>
+      </tbody>
+    </table>
+    <p class="lead">Bản ngrok miễn phí cấp id mới mỗi lần chạy, phải khai lại hai URL trên.</p>
+  </div>
+</body></html>

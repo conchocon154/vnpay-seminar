@@ -1,0 +1,22 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
+<body>
+  <div class="eyebrow">Bước 4</div>
+  <h1>Hàm isValidSignature</h1>
+  <div class="stack" style="margin-top:44px">
+    <div>
+      <div class="file">ShopStart.java · TODO 3</div>
+      <pre><span class="k">static boolean</span> isValidSignature(Map&lt;String, String&gt; params) {
+    String received = params.get(<span class="s">"vnp_SecureHash"</span>);
+    <span class="k">if</span> (received == <span class="k">null</span> || received.isBlank()) <span class="k">return false</span>;
+
+    Map&lt;String, String&gt; clone = <span class="k">new</span> TreeMap&lt;&gt;(params);
+    <span class="h">clone.remove("vnp_SecureHash");</span>
+    <span class="h">clone.remove("vnp_SecureHashType");</span>
+
+    String expected = hmacSHA512(HASH_SECRET, buildQueryString(clone));
+    <span class="k">return</span> constantTimeEquals(expected, received);
+}</pre>
+    </div>
+    <p class="lead">Servlet trả về tham số đã URL-decode, nên buildQueryString phải encode lại trước khi băm.</p>
+  </div>
+</body></html>

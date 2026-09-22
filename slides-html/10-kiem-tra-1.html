@@ -1,0 +1,20 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
+<body>
+  <div class="eyebrow">Kiểm tra 1</div>
+  <h1>Sinh URL và mở trang VNPAY</h1>
+  <div class="stack" style="margin-top:44px">
+    <pre>java ShopStart.java
+
+curl -X POST localhost:8080/api/payments \
+     --data-urlencode <span class="s">"amount=25000"</span> --data-urlencode <span class="s">"bankCode=NCB"</span></pre>
+    <table>
+      <thead><tr><th style="width:34%">Kết quả</th><th>Nguyên nhân</th></tr></thead>
+      <tbody>
+        <tr><td>Hiện form nhập thẻ NCB</td><td>Chữ ký hợp lệ, sang bước 7</td></tr>
+        <tr><td>Chữ ký không hợp lệ</td><td>Sai HASH_SECRET, hoặc thiếu URL-encode ở bước 3</td></tr>
+        <tr><td>Website không tồn tại</td><td>Sai TMN_CODE, hoặc vnp_ReturnUrl khác domain đã khai</td></tr>
+      </tbody>
+    </table>
+    <div class="ph">Ảnh chụp trang nhập thẻ NCB</div>
+  </div>
+</body></html>

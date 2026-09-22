@@ -1,0 +1,26 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
+<body>
+  <div class="eyebrow">Bước 3</div>
+  <h1>Hàm buildQueryString</h1>
+  <div class="stack" style="margin-top:44px">
+    <div>
+      <div class="file">ShopStart.java · TODO 2</div>
+      <pre><span class="k">static</span> String buildQueryString(Map&lt;String, String&gt; params) {
+    StringBuilder sb = <span class="k">new</span> StringBuilder();
+
+    <span class="k">for</span> (var e : <span class="h">new TreeMap&lt;&gt;(params)</span>.entrySet()) {          <span class="c">// sort theo alphabet</span>
+        <span class="k">if</span> (e.getValue() == <span class="k">null</span> || e.getValue().isEmpty()) <span class="k">continue</span>;
+        <span class="k">if</span> (sb.length() &gt; 0) sb.append(<span class="s">'&amp;'</span>);
+
+        sb.append(URLEncoder.encode(e.getKey(), US_ASCII)).append(<span class="s">'='</span>)
+          .append(<span class="h">URLEncoder.encode(e.getValue(), US_ASCII)</span>);
+    }
+    <span class="k">return</span> sb.toString();
+}</pre>
+    </div>
+    <div class="cards">
+      <div class="card"><h3>Đầu ra dùng hai nơi</h3><p>Chuỗi này vừa là hashData đem băm, vừa là query string gắn vào URL.</p></div>
+      <div class="card"><h3>Điều kiện để chữ ký khớp</h3><p>Tham số rỗng bị loại. Phần giá trị phải URL-encode, tên tham số thì không bắt buộc.</p></div>
+    </div>
+  </div>
+</body></html>

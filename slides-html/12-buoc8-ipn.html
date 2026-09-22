@@ -1,0 +1,25 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
+<body>
+  <div class="eyebrow">Bước 8</div>
+  <h1>Handler IPN và năm mã trả về</h1>
+  <div class="stack" style="margin-top:40px">
+    <div>
+      <div class="file">ShopStart.java · TODO 5</div>
+      <pre style="font-size:23px"><span class="k">if</span> (!isValidSignature(params))               <span class="k">return</span> rsp(<span class="h">"97"</span>, <span class="s">"Invalid Checksum"</span>);
+
+Order order = ORDERS.get(params.get(<span class="s">"vnp_TxnRef"</span>));
+<span class="k">if</span> (order == <span class="k">null</span>)                           <span class="k">return</span> rsp(<span class="h">"01"</span>, <span class="s">"Order not Found"</span>);
+<span class="k">if</span> (vnpAmount != order.amount * 100)         <span class="k">return</span> rsp(<span class="h">"04"</span>, <span class="s">"Invalid Amount"</span>);
+
+<span class="k">synchronized</span> (order) {
+    <span class="k">if</span> (!<span class="s">"PENDING"</span>.equals(order.status))     <span class="k">return</span> rsp(<span class="h">"02"</span>, <span class="s">"Order already confirmed"</span>);
+
+    <span class="k">boolean</span> paid = <span class="s">"00"</span>.equals(params.get(<span class="s">"vnp_ResponseCode"</span>))
+                && <span class="s">"00"</span>.equals(params.get(<span class="s">"vnp_TransactionStatus"</span>));
+    order.status = paid ? <span class="s">"PAID"</span> : <span class="s">"FAILED"</span>;
+}
+<span class="k">return</span> rsp(<span class="h">"00"</span>, <span class="s">"Confirm Success"</span>);</pre>
+    </div>
+    <p class="lead">VNPAY gửi lại IPN cho tới khi nhận RspCode 00. Nhánh 02 giữ cho đơn chỉ được ghi một lần.</p>
+  </div>
+</body></html>
