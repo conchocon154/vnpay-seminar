@@ -22,6 +22,6 @@ Order order = ORDERS.get(params.get(<span class="s">"vnp_TxnRef"</span>));
 }
 <span class="k">return</span> rsp(<span class="h">"00"</span>, <span class="s">"Confirm Success"</span>);</pre>
     </div>
-    <p class="lead">VNPAY gọi lại nhiều lần cho tới khi nhận <span class="mono">00</span>. Nhánh <span class="mono">02</span> giữ cho đơn chỉ ghi một lần.</p>
+    <p class="lead">VNPAY retry cho tới khi nhận <span class="mono">00</span>. Nhánh <span class="mono">02</span> giữ cho handler idempotent, đơn chỉ ghi một lần.</p>
   </div>
 </body></html>

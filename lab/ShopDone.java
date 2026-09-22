@@ -1,7 +1,5 @@
 /*
- * Chạy:  java ShopStart.java      (JDK 17+, không cần Maven)
- * Mở:    http://localhost:8080
- *
+ * java ShopStart.java   ->   http://localhost:8080
  * Bản đã điền xong sáu chỗ TODO.
  */
 
@@ -40,20 +38,16 @@ public class ShopDone {
     static final DateTimeFormatter TIME = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
     static final int PORT = 8080;
 
-    /* ===== 1. Hai giá trị lấy từ email đăng ký sandbox ===== */
-
+    // TmnCode và HashSecret, lấy trong email sandbox gửi về.
     static final String TMN_CODE    = env("VNPAY_TMN_CODE", "");
     static final String HASH_SECRET = env("VNPAY_HASH_SECRET", "");
 
-    // Khi chưa mở ngrok thì để nguyên localhost.
+    // Đổi khi bật ngrok: export VNPAY_RETURN_URL=https://<id>.ngrok-free.app/vnpay/return
     static final String RETURN_URL = env("VNPAY_RETURN_URL", "http://localhost:" + PORT + "/vnpay/return");
 
 
-    /* ===== 2. Băm chuỗi bằng HMAC-SHA512 =====
-     * key  = HASH_SECRET
-     * data = chuỗi query do buildQueryString ráp ra
-     * trả về chuỗi hex chữ thường, dài 128 ký tự
-     */
+    // Hash HMAC-SHA512, trả về hex lowercase.
+    // key: HASH_SECRET. data: query string do buildQueryString ráp ra.
     static String hmacSHA512(String key, String data) {
         try {
             Mac mac = Mac.getInstance("HmacSHA512");
@@ -69,10 +63,8 @@ public class ShopDone {
     }
 
 
-    /* ===== 3. Ráp map tham số thành chuỗi query =====
-     * params = các tham số vnp_* sắp gửi đi, hoặc nhận được từ VNPAY
-     * sắp theo alphabet, bỏ giá trị rỗng, URL-encode phần giá trị, nối bằng &
-     */
+    // Ráp params thành query string: sort alphabet, bỏ value rỗng, URL-encode value.
+    // params: các tham số vnp_* sắp gửi đi, hoặc vừa nhận từ VNPAY.
     static String buildQueryString(Map<String, String> params) {
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, String> e : new TreeMap<>(params).entrySet()) {
@@ -85,10 +77,8 @@ public class ShopDone {
     }
 
 
-    /* ===== 4. Kiểm tra chữ ký VNPAY gửi kèm =====
-     * params = toàn bộ query param nhận được ở /vnpay/ipn hoặc /vnpay/return
-     * bỏ vnp_SecureHash và vnp_SecureHashType ra, ký lại phần còn lại rồi so
-     */
+    // Verify vnp_SecureHash: bỏ nó ra, ký lại phần còn lại rồi so.
+    // params: query param nhận ở /vnpay/ipn hoặc /vnpay/return.
     static boolean isValidSignature(Map<String, String> params) {
         String received = params.get("vnp_SecureHash");
         if (received == null || received.isBlank()) return false;
@@ -101,12 +91,8 @@ public class ShopDone {
     }
 
 
-    /* ===== 5. Tạo đơn và sinh URL thanh toán =====
-     * amount    = số tiền VND, từ ô nhập trên trang web
-     * orderInfo = nội dung đơn, từ ô nhập trên trang web
-     * bankCode  = mã ngân hàng, từ ô chọn trên trang web, có thể rỗng
-     * trả về JSON {"txnRef":"...","paymentUrl":"..."}
-     */
+    // Lưu đơn PENDING, ráp tham số vnp_*, ký, trả JSON {txnRef, paymentUrl}.
+    // amount, orderInfo, bankCode: ba ô nhập trên index.html. bankCode có thể rỗng.
     static String createPayment(long amount, String orderInfo, String bankCode) {
         LocalDateTime now = LocalDateTime.now(VN);
         String createDate = now.format(TIME);
@@ -135,11 +121,8 @@ public class ShopDone {
     }
 
 
-    /* ===== 6. Nhận IPN, cập nhật trạng thái đơn =====
-     * params = query param VNPAY gửi sang, đã parse sẵn
-     * trả về JSON {"RspCode":"..","Message":".."}
-     * 97 sai chữ ký · 01 không có đơn · 04 sai số tiền · 02 đã xử lý · 00 xong
-     */
+    // Xử lý IPN, cập nhật status đơn, trả JSON {RspCode, Message}.
+    // params: query param VNPAY gửi sang. Mã trả về: 97, 01, 04, 02, 00.
     static String handleIpn(Map<String, String> params) {
         if (!isValidSignature(params)) return rsp("97", "Invalid Checksum");
 
@@ -163,9 +146,9 @@ public class ShopDone {
     }
 
 
-    /* ================= phần dưới không đụng tới ================= */
+    /* ===== phần dưới đã viết sẵn, không đụng tới ===== */
 
-    // Đơn hàng trong bộ nhớ. amount lưu số tiền thật, chưa nhân 100.
+    // Đơn trong bộ nhớ. amount là số tiền thật, chưa nhân 100.
     static class Order {
         final String txnRef, orderInfo, createDate;
         final long amount;
@@ -178,7 +161,7 @@ public class ShopDone {
 
     static final Map<String, Order> ORDERS = new ConcurrentHashMap<>();
 
-    // Mã đơn duy nhất trong 24h: thời điểm tạo ghép 6 số ngẫu nhiên.
+    // txnRef duy nhất trong 24h.
     static String newTxnRef(String createDate) {
         return createDate + ThreadLocalRandom.current().nextInt(100_000, 999_999);
     }
@@ -187,7 +170,7 @@ public class ShopDone {
         return "{\"RspCode\":\"" + code + "\",\"Message\":\"" + message + "\"}";
     }
 
-    // Hỏi thẳng VNPAY trạng thái thật, dùng khi IPN không về. order = đơn còn PENDING.
+    // Gọi API querydr hỏi VNPAY status thật, dùng khi IPN không về.
     static void reconcile(Order order) {
         if (!"PENDING".equals(order.status) || HASH_SECRET.isEmpty()) return;
 
@@ -195,7 +178,7 @@ public class ShopDone {
         String now = LocalDateTime.now(VN).format(TIME);
         String info = "Truy van GD ma:" + order.txnRef;
 
-        // Hash của querydr nối bằng '|', không sắp alphabet.
+        // hashData của querydr nối bằng '|', không sort alphabet.
         String hashData = String.join("|", requestId, "2.1.0", "querydr", TMN_CODE,
                 order.txnRef, order.createDate, now, "127.0.0.1", info);
 
@@ -228,7 +211,7 @@ public class ShopDone {
         }
     }
 
-    // Lấy giá trị một khoá trong JSON phẳng.
+    // Đọc một field trong JSON phẳng.
     static String jsonValue(String json, String key) {
         int i = json.indexOf("\"" + key + "\"");
         if (i < 0) return "";
@@ -240,13 +223,13 @@ public class ShopDone {
     public static void main(String[] args) throws IOException {
         HttpServer server = HttpServer.create(new InetSocketAddress(PORT), 0);
 
-        // Trang web đọc thẳng từ index.html cạnh file này, sửa xong bấm F5 là thấy.
+        // Đọc index.html từ đĩa mỗi lần tải trang, sửa xong bấm F5 là thấy.
         server.createContext("/", ex -> {
             if (!"/".equals(ex.getRequestURI().getPath())) { send(ex, 404, "text/plain", "Not found"); return; }
             send(ex, 200, "text/html; charset=UTF-8", Files.readString(Path.of("index.html")));
         });
 
-        // Trang web gọi vào đây khi bấm Thanh toán.
+        // index.html gọi vào đây khi bấm Thanh toán.
         server.createContext("/api/payments", ex -> {
             Map<String, String> form = parseQuery(new String(ex.getRequestBody().readAllBytes(), UTF_8));
             long amount = Long.parseLong(form.getOrDefault("amount", "0"));
@@ -254,7 +237,7 @@ public class ShopDone {
                     form.getOrDefault("orderInfo", "Thanh toan don hang"), form.get("bankCode")));
         });
 
-        // Trang kết quả hỏi trạng thái đơn. Còn PENDING thì hỏi VNPAY luôn.
+        // Trang kết quả hỏi status. Còn PENDING thì gọi querydr.
         server.createContext("/api/orders", ex -> {
             Order o = ORDERS.get(parseQuery(ex.getRequestURI().getRawQuery()).get("txnRef"));
             if (o == null) { send(ex, 404, "application/json", "{}"); return; }
@@ -264,11 +247,11 @@ public class ShopDone {
                             .formatted(o.txnRef, o.amount, o.status, o.transactionNo));
         });
 
-        // VNPAY gọi server sang server sau khi khách trả tiền.
+        // IPN, VNPAY gọi server to server sau khi khách trả tiền.
         server.createContext("/vnpay/ipn", ex ->
                 send(ex, 200, "application/json", handleIpn(parseQuery(ex.getRequestURI().getRawQuery()))));
 
-        // Trình duyệt khách quay về. Chỉ kiểm chữ ký rồi chuyển sang trang kết quả.
+        // ReturnURL, browser quay về. Chỉ verify rồi redirect, không ghi status.
         server.createContext("/vnpay/return", ex -> {
             Map<String, String> p = parseQuery(ex.getRequestURI().getRawQuery());
             String txnRef = p.getOrDefault("vnp_TxnRef", "");
@@ -289,7 +272,7 @@ public class ShopDone {
         return (v == null || v.isBlank()) ? fallback : v;
     }
 
-    // Tách query string thành map, đã URL-decode giống servlet.
+    // Query string -> map, đã URL-decode.
     static Map<String, String> parseQuery(String raw) {
         Map<String, String> map = new HashMap<>();
         if (raw == null || raw.isBlank()) return map;

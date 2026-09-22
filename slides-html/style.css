@@ -40,12 +40,12 @@ h1 + .lead { margin-top: 26px; }
 .spacer { flex: 1; }
 
 /* code */
-.file { font-family: 'Roboto Mono', monospace; font-size: 20px; color: var(--muted);
+.file { font-family: 'IBM Plex Mono','Roboto Mono',monospace; font-size: 20px; color: var(--muted);
         margin-bottom: 10px; }
 pre {
   background: var(--code-bg); color: var(--code-fg);
   border-radius: 16px; padding: 30px 36px;
-  font-family: 'Roboto Mono', monospace; font-size: 25px; line-height: 1.62;
+  font-family: 'IBM Plex Mono','Roboto Mono',monospace; font-size: 25px; line-height: 1.62;
   white-space: pre; overflow: hidden;
 }
 pre .c { color: var(--code-dim); }
@@ -63,7 +63,7 @@ thead th {
 }
 tbody td { padding: 18px 26px; border-top: 1px solid var(--line); color: var(--ink2); }
 tbody td:first-child { color: var(--ink); font-weight: 500; }
-td code, .mono { font-family: 'Roboto Mono', monospace; font-size: 24px; }
+td code, .mono { font-family: 'IBM Plex Mono','Roboto Mono',monospace; font-size: 24px; }
 
 /* card */
 .cards { display: flex; gap: 26px; }
@@ -91,7 +91,7 @@ td code, .mono { font-family: 'Roboto Mono', monospace; font-size: 24px; }
 .kpis { display: flex; gap: 26px; }
 .kpi { flex: 1; background: var(--card); border: 1px solid var(--line);
        border-radius: 16px; padding: 26px 30px; }
-.kpi .v { font-family: 'Roboto Mono', monospace; font-size: 46px; font-weight: 600;
+.kpi .v { font-family: 'IBM Plex Mono','Roboto Mono',monospace; font-size: 46px; font-weight: 600;
           color: var(--accent); }
 .kpi .l { font-size: 22px; color: var(--muted); margin-top: 4px; }
 
@@ -101,7 +101,7 @@ td code, .mono { font-family: 'Roboto Mono', monospace; font-size: 24px; }
         border-radius: 16px; padding: 22px 28px; }
 .tier + .tier { margin-top: 14px; }
 .tier.on { background: var(--tint); }
-.tier .n { font-family: 'Roboto Mono', monospace; font-weight: 700; font-size: 26px;
+.tier .n { font-family: 'IBM Plex Mono','Roboto Mono',monospace; font-weight: 700; font-size: 26px;
            width: 56px; height: 56px; border-radius: 12px; background: #dde3ea;
            display: flex; align-items: center; justify-content: center; flex: none; }
 .tier.on .n { background: var(--accent); color: #fff; }

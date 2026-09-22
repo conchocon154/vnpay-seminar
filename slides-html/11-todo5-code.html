@@ -13,7 +13,7 @@ ORDERS.put(txnRef, <span class="k">new</span> Order(txnRef, amount, orderInfo, c
 Map&lt;String, String&gt; p = <span class="k">new</span> HashMap&lt;&gt;();
 p.put(<span class="s">"vnp_Amount"</span>, String.valueOf(<span class="h">amount * 100</span>));
 p.put(<span class="s">"vnp_TxnRef"</span>, txnRef);
-<span class="c">// ... các tham số còn lại</span>
+<span class="c">// ... remaining params</span>
 
 String query = buildQueryString(p);
 String url = PAY_URL + <span class="s">"?"</span> + query + <span class="s">"&amp;vnp_SecureHash="</span> + hmacSHA512(HASH_SECRET, query);

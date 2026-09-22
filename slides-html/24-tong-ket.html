@@ -6,12 +6,12 @@
     <table>
       <thead><tr><th style="width:44%">Quy tắc</th><th>Vì sao</th></tr></thead>
       <tbody>
-        <tr><td>Chỉ ghi trạng thái từ IPN và querydr</td><td>Hai kênh server gọi server, có chữ ký</td></tr>
+        <tr><td>Chỉ ghi status từ IPN và querydr</td><td>Hai kênh server to server, có checksum</td></tr>
         <tr><td>So lại số tiền trước khi ghi PAID</td><td>Chặn sửa vnp_Amount trên URL</td></tr>
         <tr><td>Đã xử lý thì trả 02</td><td>VNPAY gọi lại nhiều lần</td></tr>
-        <tr><td>vnp_TxnRef duy nhất trong 24h</td><td>Trả lại phải sinh mã mới</td></tr>
+        <tr><td>vnp_TxnRef duy nhất trong 24h</td><td>Thanh toán lại phải sinh txnRef mới</td></tr>
         <tr><td>Giờ Asia/Ho_Chi_Minh</td><td>Etc/GMT+7 lệch 14 tiếng</td></tr>
-        <tr><td>HashSecret chỉ nằm trên server</td><td>Để trong JavaScript là ai cũng ký được</td></tr>
+        <tr><td>HashSecret chỉ nằm trên server</td><td>Để trong JavaScript thì ai cũng ký được</td></tr>
       </tbody>
     </table>
     <p class="lead">File đã điền xong sáu TODO sẽ nằm trong thư mục Drive sau buổi.</p>

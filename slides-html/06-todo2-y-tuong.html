@@ -1,18 +1,18 @@
 <!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
 <body>
   <div class="eyebrow">TODO 2</div>
-  <h1>Chữ ký là ba bước, không hơn</h1>
+  <h1>Chữ ký chỉ gồm ba bước</h1>
   <div class="stack" style="margin-top:44px">
-    <div class="step"><div class="num">1</div><div class="body">Sắp tham số theo alphabet</div></div>
-    <div class="step"><div class="num">2</div><div class="body">URL-encode phần giá trị, nối bằng dấu <span class="mono">&amp;</span></div></div>
-    <div class="step"><div class="num">3</div><div class="body">Băm HMAC-SHA512 bằng HashSecret, ra hex chữ thường</div></div>
-    <pre style="margin-top:36px"><span class="c">// vào</span>
+    <div class="step"><div class="num">1</div><div class="body">Sort tham số theo alphabet</div></div>
+    <div class="step"><div class="num">2</div><div class="body">URL-encode phần value, nối bằng <span class="mono">&amp;</span></div></div>
+    <div class="step"><div class="num">3</div><div class="body">Hash HMAC-SHA512 bằng HashSecret, ra hex lowercase</div></div>
+    <pre style="margin-top:36px"><span class="c">// input</span>
 {vnp_Amount=2500000, vnp_TxnRef=2026..., vnp_OrderInfo=Thanh toan Ca phe}
 
-<span class="c">// sau bước 1 và 2</span>
+<span class="c">// after step 1 + 2</span>
 vnp_Amount=2500000&amp;vnp_OrderInfo=Thanh+toan+Ca+phe&amp;vnp_TxnRef=2026...
 
-<span class="c">// sau bước 3</span>
-98bbf7a165e10ad8527a34f48b43c45d...  <span class="c">(128 ký tự)</span></pre>
+<span class="c">// after step 3</span>
+98bbf7a165e10ad8527a34f48b43c45d...  <span class="c">(128 chars)</span></pre>
   </div>
 </body></html>

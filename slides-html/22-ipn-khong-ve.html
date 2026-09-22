@@ -6,10 +6,10 @@
     <p class="lead">Portal sandbox đôi khi không cho khai IPN URL. Hàm <span class="mono">reconcile</span> đã viết sẵn trong file, không phải code.</p>
     <div>
       <div class="file">ShopStart.java, phần viết sẵn</div>
-      <pre><span class="c">// hash của querydr nối bằng '|', không sắp alphabet</span>
+      <pre><span class="c">// querydr hashData: join with '|', no alphabet sort</span>
 String hashData = String.join(<span class="h">"|"</span>, requestId, <span class="s">"2.1.0"</span>, <span class="s">"querydr"</span>, TMN_CODE,
         order.txnRef, order.createDate, now, <span class="s">"127.0.0.1"</span>, info);</pre>
     </div>
-    <p class="lead">Trang kết quả gọi <span class="mono">/api/orders</span>, thấy đơn còn PENDING thì hỏi thẳng VNPAY. Vẫn an toàn vì so lại số tiền trước khi ghi PAID.</p>
+    <p class="lead">Trang kết quả gọi <span class="mono">/api/orders</span>, đơn còn PENDING thì gọi querydr hỏi thẳng VNPAY. Vẫn an toàn vì verify checksum của response và so lại số tiền trước khi ghi PAID.</p>
   </div>
 </body></html>
