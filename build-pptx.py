@@ -309,83 +309,64 @@ def kpis(s, items):
 
 ASSETS = __file__.rsplit("/", 1)[0] + "/assets/"
 
-# 1. mở đầu
+# 1
 s = slide()
-tb = s.shapes.add_textbox(MARGIN, Inches(1.9), CW, Inches(2.2))
+tb = s.shapes.add_textbox(MARGIN, Inches(1.75), CW, Inches(2.0))
 tf = _tf(tb)
-_p(tf, "SEMINAR · SPRING BOOT MICROSERVICES", 12, bold=True, color=ACCENT, space=10, first=True)
-_p(tf, "Nhúng VNPAY vào cửa hàng có sẵn", 40, bold=True, color=INK, space=10)
-_p(tf, "Mở ShopStart.java đã tải trước. Hôm nay điền sáu chỗ TODO trong đó.",
-   17, color=INK2, space=0)
-Y = Inches(4.05)
-picture(s, ASSETS + "cua-hang.jpg", 2.5,
-        "Cửa hàng chạy sẵn. Nút Thanh toán chưa nối gì, đó là việc hôm nay.")
+_p(tf, "VNPAY SANDBOX · SPRING BOOT", 12, bold=True, color=ACCENT, space=10, first=True)
+_p(tf, "Kết quả: ShopStart.java xử lý trọn luồng thanh toán", 34, bold=True, color=INK, space=8)
+_p(tf, "Chín bước code, hai lần kiểm tra. JDK 17, không Maven, không thư viện ngoài.",
+   16, color=INK2, space=0)
+Y = Inches(3.95)
+picture(s, ASSETS + "cua-hang.jpg", 2.5)
 
-# 2. vấn đề
+# 2
 s = slide()
-title(s, "Vấn đề", "Tự nhận thẻ là vi phạm PCI-DSS")
-cards(s, [
-    ("Vướng pháp lý",
-     "Lưu số thẻ trên server của mình là vi phạm PCI-DSS. Ngân hàng cũng không cấp API "
-     "trực tiếp cho một đồ án sinh viên."),
-    ("Vướng kỹ thuật",
-     "Việt Nam có hàng chục ngân hàng nội địa, mỗi nơi một giao thức. Tự nối từng cái "
-     "là bất khả thi."),
-    ("Cách VNPAY giải",
-     "Khách nhập thẻ trên trang của VNPAY. Server mình chỉ trao đổi chữ ký, "
-     "không bao giờ thấy số thẻ."),
+title(s, "Kiến trúc", "Bốn endpoint và bốn luồng dữ liệu")
+table(s, ["Endpoint", "Ai gọi", "Nhiệm vụ"], [
+    ["POST /api/payments", "Trình duyệt", "Tạo đơn PENDING, ký tham số, trả paymentUrl"],
+    ["GET /vnpay/ipn", "Server VNPAY", "Verify chữ ký, cập nhật trạng thái đơn"],
+    ["GET /vnpay/return", "Trình duyệt", "Verify chữ ký, redirect sang trang kết quả"],
+    ["GET /api/orders", "Trình duyệt", "Trả trạng thái đơn, gọi querydr nếu còn PENDING"],
+], widths=[3.0, 2.2, 6.0])
+lead(s, "Trạng thái đơn chỉ được ghi ở /vnpay/ipn và ở nhánh querydr trong /api/orders. "
+        "Hai chỗ đó đều xác thực chữ ký trước khi ghi.", size=14)
+
+# 3
+s = slide()
+title(s, "Chuẩn bị", "JDK 17, TmnCode, HashSecret, ngrok")
+table(s, ["Thành phần", "Cách lấy", "Kiểm tra"], [
+    ["JDK 17+", "adoptium.net hoặc brew install openjdk", "`java -version`"],
+    ["TmnCode, HashSecret", "sandbox.vnpayment.vn/devreg", "Email trả về 8 và 32 ký tự"],
+    ["ngrok", "brew install --cask ngrok", "`ngrok config check`"],
+    ["File nguồn", "ShopStart.java trong thư mục Drive", "`java ShopStart.java`"],
+], widths=[2.6, 5.2, 3.4])
+code(s, [
+    "export VNPAY_TMN_CODE=xxxxxxxx",
+    "export VNPAY_HASH_SECRET=xxxxxxxxxxxxxxxx",
 ])
-callout(s, "Câu chốt cho cả buổi",
-        "VNPAY không có SDK. Nó chỉ là redirect cộng một chữ ký HMAC-SHA512. "
-        "Nắm được chữ ký là xong chín phần mười.", "info")
 
-# 3. kiến trúc
+# 4
 s = slide()
-title(s, "Kiến trúc", "Chỉ hai trong bốn đường được phép cộng tiền")
-tiers(s, [
-    ("1", "Browser đến server", "Tạo đơn PENDING, ký tham số, trả về paymentUrl", None),
-    ("2", "VNPAY đến server", "IPN, gọi thẳng vào server mình", ("ok", "Tin được")),
-    ("3", "VNPAY đến browser", "ReturnURL, trình duyệt khách quay về", ("bad", "Không tin")),
-    ("4", "Server đến VNPAY", "querydr, hỏi lại trạng thái thật", ("ok", "Tin được")),
-])
-lead(s, "Đường 2 và 4 là server gọi server, có chữ ký nên tin được. Đường 3 chạy qua "
-        "trình duyệt của khách nên chỉ dùng để vẽ màn hình.", size=14)
-
-# 4. lộ trình
-s = slide()
-title(s, "Lộ trình", "Sáu chỗ trống cần điền trong ShopStart.java")
-table(s, ["Chỗ", "Việc phải làm", "Thời lượng"], [
-    ["TODO 1", "Cấu hình TmnCode và HashSecret", "2 phút"],
-    ["TODO 2", "Hàm ký HMAC-SHA512", "6 phút"],
-    ["TODO 3", "Hàm verify chữ ký", "3 phút"],
-    ["TODO 4", "Tạo URL thanh toán", "5 phút"],
-    ["TODO 5", "Nhận IPN", "5 phút"],
-    ["TODO 6", "ReturnURL và chốt trạng thái đơn", "4 phút"],
-], widths=[1.4, 6, 1.6])
-lead(s, "Đơn hàng, giao diện và server đã viết sẵn trong file, mình không đụng tới. "
-        "Ai gõ không kịp cứ ngồi xem, cuối buổi có bản làm xong.")
-
-# 5. TODO 1
-s = slide()
-title(s, "TODO 1", "Secret nạp từ biến môi trường, không hardcode")
+title(s, "Bước 1", "Khai báo cấu hình từ biến môi trường")
 code(s, [
     'static final String TMN_CODE    = env("VNPAY_TMN_CODE", "CHANGE_ME");',
     'static final String HASH_SECRET = env("VNPAY_HASH_SECRET", "CHANGE_ME");',
     'static final String RETURN_URL  = env("VNPAY_RETURN_URL",',
     '                                      "http://localhost:8080/vnpay/return");',
-], path="ShopStart.java")
-code(s, [
-    "export VNPAY_TMN_CODE=xxxxxxxx",
-    "export VNPAY_HASH_SECRET=xxxxxxxxxxxxxxxx",
-    "java ShopStart.java",
-])
-callout(s, "Đừng hardcode secret rồi push lên GitHub",
-        "Ai clone repo cũng ký được đơn thay bạn, và GitHub có bot quét chuyện này.")
+    'static final String PAY_URL = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";',
+    'static final String API_URL = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";',
+    "",
+    'static final ZoneId VN_ZONE = ZoneId.of("Asia/Ho_Chi_Minh");',
+    'static final DateTimeFormatter VNP_TIME = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");',
+], path="ShopStart.java · TODO 1")
+callout(s, "Ràng buộc",
+        "Etc/GMT+7 theo chuẩn POSIX là UTC trừ 7, lệch 14 tiếng so với giờ Việt Nam. "
+        "vnp_CreateDate và vnp_ExpireDate sinh từ ZoneId Asia/Ho_Chi_Minh.", "info")
 
-# 6. TODO 2a
+# 5
 s = slide()
-title(s, "TODO 2", "Chữ ký chỉ gồm ba bước")
-lead(s, "Sắp tham số theo alphabet, URL-encode phần giá trị, rồi băm HMAC-SHA512 ra hex chữ thường.")
+title(s, "Bước 2", "Hàm hmacSHA512")
 code(s, [
     "static String hmacSHA512(String secretKey, String data) {",
     "    try {",
@@ -397,19 +378,21 @@ code(s, [
     '        for (byte b : bytes) hex.append(String.format("%02x", b));',
     "        return hex.toString();",
     "    } catch (Exception e) {",
-    '        throw new IllegalStateException("Không tạo được HMAC-SHA512", e);',
+    '        throw new IllegalStateException("HMAC-SHA512", e);',
     "    }",
     "}",
-], path="ShopStart.java")
+], path="ShopStart.java · TODO 2")
+lead(s, "Đầu ra là chuỗi hex 128 ký tự, chữ thường. VNPAY so sánh chuỗi nên hoa thường khác nhau.",
+     size=14)
 
-# 7. TODO 2b
+# 6
 s = slide()
-title(s, "TODO 2", "Encode giá trị trước khi đem băm")
+title(s, "Bước 3", "Hàm buildQueryString")
 code(s, [
     "static String buildQueryString(Map<String, String> params) {",
     "    StringBuilder sb = new StringBuilder();",
     "",
-    "    for (var e : new TreeMap<>(params).entrySet()) {",
+    "    for (var e : new TreeMap<>(params).entrySet()) {      // sort theo alphabet",
     "        if (e.getValue() == null || e.getValue().isEmpty()) continue;",
     "        if (sb.length() > 0) sb.append('&');",
     "",
@@ -418,17 +401,17 @@ code(s, [
     "    }",
     "    return sb.toString();",
     "}",
-], path="ShopStart.java")
+], path="ShopStart.java · TODO 2")
 cards(s, [
-    ("Lỗi thứ nhất",
-     "Quên encode phần giá trị. vnp_OrderInfo có dấu cách là chữ ký lệch ngay."),
-    ("Lỗi thứ hai",
-     "Để lọt tham số rỗng vào chuỗi. VNPAY bỏ qua chúng, mình giữ lại là sai."),
+    ("Đầu ra dùng hai nơi",
+     "Chuỗi này vừa là hashData đem băm, vừa là query string gắn vào URL."),
+    ("Điều kiện để chữ ký khớp",
+     "Tham số rỗng bị loại. Phần giá trị phải URL-encode, tên tham số thì không bắt buộc."),
 ])
 
-# 8. TODO 3
+# 7
 s = slide()
-title(s, "TODO 3", "Verify là ký lại rồi đem so")
+title(s, "Bước 4", "Hàm isValidSignature")
 code(s, [
     "static boolean isValidSignature(Map<String, String> params) {",
     '    String received = params.get("vnp_SecureHash");',
@@ -441,233 +424,162 @@ code(s, [
     "    String expected = hmacSHA512(HASH_SECRET, buildQueryString(clone));",
     "    return constantTimeEquals(expected, received);",
     "}",
-], path="ShopStart.java")
-callout(s, "Cách debug khi chữ ký không khớp",
-        "In buildQueryString(clone) ra rồi so từng ký tự với query string trên thanh địa chỉ. "
-        "Gần như luôn lòi ra một trong hai lỗi ở slide trước.", "info")
+], path="ShopStart.java · TODO 3")
+lead(s, "Servlet trả về tham số đã URL-decode, nên buildQueryString phải encode lại trước khi băm.",
+     size=14)
 
-# 9. TODO 4
+# 8
 s = slide()
-title(s, "TODO 4", "Số tiền nhân 100, giờ theo GMT+7")
-table(s, ["Tham số", "Giá trị mẫu", "Chỗ dễ sai"], [
-    ["vnp_Amount", "`2500000`", "Nhân 100 và là số nguyên. 25.000đ thành 2500000"],
-    ["vnp_TxnRef", "`20260920125606777443`", "Duy nhất trong 24h theo TmnCode"],
-    ["vnp_CreateDate", "`20260920125606`", "Giờ GMT+7, không phải giờ máy chủ"],
-    ["vnp_BankCode", "`NCB`", "Bỏ trống thì VNPAY hiện trang chọn ngân hàng"],
-], widths=[2.2, 3.4, 5.6])
+title(s, "Bước 5", "Hàm createPayment và bảng tham số")
+table(s, ["Tham số", "Giá trị", "Ràng buộc"], [
+    ["vnp_Version", "`2.1.0`", "Cố định"],
+    ["vnp_Amount", "`amount * 100`", "Số nguyên, đơn vị nhân 100"],
+    ["vnp_TxnRef", "`yyyyMMddHHmmss + 6 số`", "Duy nhất trong 24h theo TmnCode"],
+    ["vnp_CreateDate", "`now(VN_ZONE)`", "Định dạng yyyyMMddHHmmss"],
+    ["vnp_ExpireDate", "`now + 15 phút`", "Quá hạn thì VNPAY từ chối"],
+], widths=[2.8, 3.6, 4.8])
 code(s, [
-    'p.put("vnp_Amount", String.valueOf(amount * 100));',
     "String query = buildQueryString(p);",
     'String url = PAY_URL + "?" + query + "&vnp_SecureHash=" + hmacSHA512(HASH_SECRET, query);',
-])
-callout(s, "Cái bẫy nằm ngay trong code mẫu của chính VNPAY",
-        'Demo của họ dùng Etc/GMT+7, mà theo POSIX nó là UTC trừ 7, lệch 14 tiếng, '
-        'giao dịch hết hạn ngay lúc vừa tạo. Dùng ZoneId.of("Asia/Ho_Chi_Minh").')
+], path="ShopStart.java · TODO 4")
 
-# 10. checkpoint
+# 9
 s = slide()
-title(s, "Kiểm tra", "Chạy thử trước khi viết tiếp")
+title(s, "Bước 6", "Endpoint POST /api/payments")
 code(s, [
-    "export VNPAY_TMN_CODE=... VNPAY_HASH_SECRET=...",
+    'server.createContext("/api/payments", ex -> {',
+    "    Map<String, String> form = parseQuery(",
+    "            new String(ex.getRequestBody().readAllBytes(), UTF_8));",
+    "",
+    '    long amount = Long.parseLong(form.getOrDefault("amount", "0"));',
+    '    String info = form.getOrDefault("orderInfo", "Thanh toan don hang");',
+    "",
+    '    send(ex, 200, "application/json",',
+    '         createPayment(amount, info, form.get("bankCode"), "127.0.0.1"));',
+    "});",
+], path="ShopStart.java · TODO 4")
+lead(s, "Trình duyệt nhận paymentUrl rồi gán vào window.location.href. HashSecret không rời khỏi server.",
+     size=14)
+
+# 10
+s = slide()
+title(s, "Kiểm tra 1", "Sinh URL và mở trang VNPAY")
+code(s, [
     "java ShopStart.java",
     "",
-    "# mở http://localhost:8080, bấm Mua ngay rồi Thanh toán",
+    "curl -X POST localhost:8080/api/payments \\",
+    '     --data-urlencode "amount=25000" --data-urlencode "bankCode=NCB"',
 ])
-cards(s, [
-    ("Hiện form nhập thẻ NCB", "Chữ ký đúng rồi, đi tiếp phần ngrok."),
-    ("Báo chữ ký không hợp lệ", "Sai HashSecret, hoặc quên encode ở TODO 2."),
-    ("Báo website không tồn tại", "Sai TmnCode, hoặc vnp_ReturnUrl không khớp domain đã khai."),
-])
-placeholder(s, "Chèn ảnh chụp trang nhập thẻ NCB của VNPAY vào ô này", 1.75)
+table(s, ["Kết quả", "Nguyên nhân"], [
+    ["Hiện form nhập thẻ NCB", "Chữ ký hợp lệ, sang bước 7"],
+    ["Chữ ký không hợp lệ", "Sai HASH_SECRET, hoặc thiếu URL-encode ở bước 3"],
+    ["Website không tồn tại", "Sai TMN_CODE, hoặc vnp_ReturnUrl khác domain đã khai"],
+], widths=[4.0, 7.2])
+placeholder(s, "Ảnh chụp trang nhập thẻ NCB", 1.5)
 
-# 11. ngrok
+# 11
 s = slide()
-title(s, "Bắt buộc", "ngrok mở đường cho VNPAY gọi về máy")
-lead(s, "IPN là cuộc gọi từ server VNPAY vào server mình. Máy ở localhost thì "
-        "từ internet không ai thấy.")
+title(s, "Bước 7", "Mở ngrok và khai hai URL")
 code(s, [
     "ngrok http 8080",
     "",
     "Forwarding   https://a1b2-42-115-242-109.ngrok-free.app -> http://localhost:8080",
 ])
-table(s, ["Khai vào merchant portal", "Giá trị"], [
-    ["URL trả về", "`https://a1b2-....ngrok-free.app/vnpay/return`"],
-    ["URL nhận kết quả IPN", "`https://a1b2-....ngrok-free.app/vnpay/ipn`"],
-], widths=[3.4, 7.8])
-callout(s, "Hai chuyện của bản ngrok miễn phí",
-        "Địa chỉ đổi mỗi lần chạy lại nên phải khai lại trong portal, làm sát giờ demo. "
-        "Lần đầu mở bằng trình duyệt sẽ gặp trang cảnh báo, bấm Visit Site là qua.")
+table(s, ["Trường trong merchant portal", "Giá trị"], [
+    ["URL trả về", "`https://<id>.ngrok-free.app/vnpay/return`"],
+    ["URL nhận kết quả IPN", "`https://<id>.ngrok-free.app/vnpay/ipn`"],
+    ["Biến môi trường", "`VNPAY_RETURN_URL=https://<id>.ngrok-free.app/vnpay/return`"],
+], widths=[4.2, 7.0])
+lead(s, "Bản ngrok miễn phí cấp id mới mỗi lần chạy, phải khai lại hai URL trên.", size=14)
 
-# 12. TODO 5
+# 12
 s = slide()
-title(s, "TODO 5", "IPN là nơi duy nhất được cộng tiền")
-lead(s, "VNPAY retry tới khi nhận RspCode 00, nên hàm này gọi mấy lần cũng chỉ ghi nhận một lần.")
+title(s, "Bước 8", "Handler IPN và năm mã trả về")
 code(s, [
-    "if (!isValidSignature(params))",
-    '    return rsp("97", "Invalid Checksum");',
+    'if (!isValidSignature(params))               return rsp("97", "Invalid Checksum");',
     "",
     'Order order = ORDERS.get(params.get("vnp_TxnRef"));',
-    'if (order == null)              return rsp("01", "Order not Found");',
+    'if (order == null)                           return rsp("01", "Order not Found");',
+    'if (vnpAmount != order.amount * 100)         return rsp("04", "Invalid Amount");',
     "",
-    'if (Long.parseLong(params.get("vnp_Amount")) != order.amount * 100)',
-    '    return rsp("04", "Invalid Amount");',
     "synchronized (order) {",
-    '    if (!"PENDING".equals(order.status))',
-    '        return rsp("02", "Order already confirmed");',
+    '    if (!"PENDING".equals(order.status))     return rsp("02", "Order already confirmed");',
     "",
     '    boolean paid = "00".equals(params.get("vnp_ResponseCode"))',
     '                && "00".equals(params.get("vnp_TransactionStatus"));',
     '    order.status = paid ? "PAID" : "FAILED";',
     "}",
     'return rsp("00", "Confirm Success");',
-], size=12, path="ShopStart.java")
-
-# 13. TODO 6
-s = slide()
-title(s, "TODO 6", "ReturnURL chỉ dùng để vẽ màn hình")
-code(s, [
-    "static String handleReturn(Map<String, String> params) {",
-    "    boolean valid = isValidSignature(params);",
-    '    String txnRef = params.getOrDefault("vnp_TxnRef", "");',
-    "",
-    '    return "/?txnRef=" + encode(txnRef) + "&valid=" + valid;',
-    "}",
-], path="ShopStart.java")
-code(s, [
-    "// không đọc kết quả từ URL, hỏi lại server cho chắc",
-    "const res   = await fetch('/api/orders?txnRef=' + txnRef);",
-    "const order = await res.json();",
-    "if (order.status === 'PAID') showSuccess(order);",
-], path="trang kết quả, phía trình duyệt")
-callout(s, "Để ý cái không có ở đây",
-        "Không một dòng nào đổi trạng thái đơn hàng. Tham số trên trình duyệt là dữ liệu "
-        "do khách mang về, không phải sự thật.")
-
-# 14. querydr
-s = slide()
-title(s, "Tình huống thật", "querydr cứu khi IPN không bao giờ về")
-callout(s, "Chuyện xảy ra lúc dựng bài này",
-        "Portal sandbox không cho khai IPN URL. Danh sách website trống trơn, Cài đặt thông báo "
-        "báo lỗi kết nối. Code đúng hết mà IPN không tới. Chỉ biết mỗi IPN thì demo chết tại chỗ.")
-lead(s, "Đường lùi là gọi querydr để server tự hỏi VNPAY. Vẫn an toàn như IPN vì hỏi thẳng VNPAY, "
-        "verify chữ ký của response, rồi so lại số tiền.")
-code(s, [
-    "// hash của querydr không sort alphabet, nối bằng '|' đúng thứ tự tài liệu",
-    'String hashData = String.join("|",',
-    '        requestId, "2.1.0", "querydr", TMN_CODE,',
-    "        txnRef, transactionDate, createDate, ipAddr, orderInfo);",
-])
-
-# 15. demo
-s = slide()
-title(s, "Demo", "Giao dịch thật đã chốt PAID bằng querydr")
-kpis(s, [("25.000đ", "Số tiền"), ("15683165", "Mã GD tại VNPAY"),
-          ("PAID", "Trạng thái đơn"), ("querydr", "Nguồn chốt đơn")])
-picture(s, ASSETS + "ket-qua.jpg", 2.25)
-code(s, ["Chot bang querydr: txnRef=20260920125606777443 status=PAID transactionNo=15683165"],
-     size=11.5)
-
-# 16. microservice
-s = slide()
-title(s, "Đưa vào đồ án", "Tách payment-service, secret để ngoài mã nguồn")
-cards(s, [
-    ("Ranh giới service",
-     "payment-service đứng riêng. Service khác không gọi VNPAY, chúng nghe event OrderPaid."),
-    ("Cấu hình và secret",
-     "Dùng @ConfigurationProperties. HashSecret nạp từ Vault hoặc K8s Secret."),
-])
-cards(s, [
-    ("Chống trùng ở tầng DB",
-     "Bảng payment_transaction có UNIQUE(txn_ref) và optimistic lock. "
-     "Demo dùng synchronized, chạy nhiều instance là không đủ."),
-    ("Nhiều cổng thanh toán",
-     "MoMo và ZaloPay mỗi bên ký một kiểu. Cần nhiều cổng thì bọc sau interface PaymentGateway."),
-])
-lead(s, "Đồ án nào dùng được: bán hàng online, đặt vé, đặt sân, đóng học phí, ví điện tử, quyên góp. "
-        "Việc phải làm chỉ là thay chỗ lưu đơn hàng bằng repository của mình.", size=14)
-
-# 17. quy tắc
-s = slide()
-title(s, "Tổng kết", "Sáu quy tắc giữ cho tiền không thất thoát")
-table(s, ["Quy tắc", "Vì sao"], [
-    ["Chỉ tin IPN và querydr", "Hai kênh server gọi server, có chữ ký"],
-    ["So lại số tiền với DB", "Chặn trò sửa vnp_Amount trên URL"],
-    ["Idempotent bằng trạng thái đơn", "VNPAY retry nhiều lần, đã xử lý thì trả 02"],
-    ["vnp_TxnRef duy nhất trong 24h", "Thanh toán lại phải sinh mã mới"],
-    ["Giờ Asia/Ho_Chi_Minh", "Etc/GMT+7 lệch 14 tiếng, đơn hết hạn ngay"],
-    ["Không log secret và chữ ký", "Lộ HashSecret là mất quyền ký"],
-], widths=[4.2, 7])
-lead(s, "Giới hạn phải biết trước: bắt buộc redirect nên app mobile phải nhúng WebView, "
-        "hoàn tiền phải gọi API refund rồi đối soát tay, và ngrok free đổi địa chỉ mỗi lần chạy.",
+], size=12, path="ShopStart.java · TODO 5")
+lead(s, "VNPAY gửi lại IPN cho tới khi nhận RspCode 00. Nhánh 02 giữ cho đơn chỉ được ghi một lần.",
      size=14)
 
-# 18. hỏi đáp
+# 13
 s = slide()
-tb = s.shapes.add_textbox(MARGIN, Inches(2.7), CW, Inches(2.0))
-tf = _tf(tb)
-_p(tf, "HỎI ĐÁP", 12, bold=True, color=ACCENT, space=12, first=True)
-_p(tf, "Còn thắc mắc gì không?", 40, bold=True, color=INK, space=0)
-
-# 19. bàn giao
-s = slide()
-title(s, "Bàn giao", "Ba bước để đưa vào đồ án của bạn")
-tiers(s, [
-    ("1", "Copy", "Mang hai hàm hmacSHA512 và buildQueryString sang project", None),
-    ("2", "Thay", "Đổi chỗ lưu đơn hàng sang repository sẵn có của bạn", None),
-    ("3", "Cấu hình", "Nạp TmnCode và HashSecret từ biến môi trường", None),
+title(s, "Bước 9", "ReturnURL và đối soát querydr")
+code(s, [
+    "// ReturnURL: verify chữ ký rồi redirect, không ghi trạng thái",
+    "boolean valid = isValidSignature(params);",
+    'return "/?txnRef=" + encode(txnRef) + "&valid=" + valid;',
+], path="ShopStart.java · TODO 6")
+code(s, [
+    "// querydr: hash nối bằng '|', không sort alphabet",
+    'String hashData = String.join("|", requestId, "2.1.0", "querydr", TMN_CODE,',
+    "        txnRef, transactionDate, createDate, ipAddr, orderInfo);",
+    "",
+    "// chỉ ghi PAID khi chữ ký response hợp lệ và số tiền khớp",
+    'order.status = "00".equals(r.get("vnp_TransactionStatus")) ? "PAID" : "FAILED";',
 ])
-callout(s, "Sau buổi hôm nay",
-        "Mình bỏ VnpayDemo.java, tức bản đã điền xong sáu TODO, vào đúng thư mục Drive lúc nãy. "
-        "Có gì không chạy cứ nhắn mình.", "ok")
+lead(s, "Khai được IPN thì IPN ghi trạng thái. Không khai được thì /api/orders gọi querydr khi đơn "
+        "còn PENDING.", size=14)
 
-# Ghi chú người thuyết trình. Phần này chỉ mình nhìn thấy trong chế độ trình chiếu,
-# khán giả không thấy trên màn hình.
+# 14
+s = slide()
+title(s, "Kiểm tra 2", "Thẻ test và trạng thái PAID")
+table(s, ["Trường", "Giá trị"], [
+    ["Số thẻ", "`9704198526191432198`"],
+    ["Tên chủ thẻ", "`NGUYEN VAN A`"],
+    ["Ngày phát hành", "`07/15`"],
+    ["OTP", "`123456`"],
+], widths=[3.0, 8.2])
+code(s, [
+    "Chot bang querydr: txnRef=20260920125606777443 status=PAID transactionNo=15683165",
+    "",
+    '{"txnRef":"20260920125606777443","amount":25000,"status":"PAID",'
+    '"transactionNo":"15683165","bankCode":"NCB"}',
+], size=11.5)
+kpis(s, [("9", "Bước code"), ("6", "Hàm phải viết"),
+         ("4", "Endpoint"), ("0", "Thư viện ngoài")])
+
 NOTES = {
- 1: "Hỏi xem ai đã tải file và chạy thử chưa. Ai chưa có thì lấy trong thư mục Drive.\n"
-    "Nhắc: cần JDK 17 trở lên, không cần Maven.",
- 2: "Nhấn một câu thôi: VNPAY không có SDK, chỉ là redirect cộng một chữ ký.\n"
-    "Nếu lớp hỏi PCI-DSS là gì thì nói ngắn: bộ chuẩn bảo mật cho ai chạm vào dữ liệu thẻ, "
-    "tự lưu số thẻ là phải tuân thủ, rất tốn kém.",
- 3: "Ném câu hỏi này cho lớp trước khi sang slide sau:\n"
-    "  Sao không cộng tiền luôn ở ReturnURL cho nhanh?\n\n"
-    "Câu trả lời: đó là URL trên trình duyệt của khách, sửa vnp_ResponseCode=00 là mua hàng "
-    "miễn phí. Thêm nữa, khách tắt tab ngay sau khi trả tiền thì ReturnURL không bao giờ về, "
-    "mình mất đơn đã thu tiền. IPN là kênh server gọi server và có retry.",
- 4: "Nói rõ nhịp: mỗi TODO vài phút, ai gõ không kịp cứ xem, cuối buổi có bản làm xong.\n"
-    "Bảo cả lớp mở file ra ngay bây giờ, tìm chữ TODO 1.",
- 5: "Hỏi lớp đã có TmnCode và HashSecret trong email chưa. Ai chưa có thì ngồi xem cùng bạn bên cạnh.",
- 6: "Đây là phần dừng lâu nhất. Đọc chậm ba bước rồi mới chiếu code.\n"
-    "Nếu ai hỏi vì sao phải hex chữ thường: vì VNPAY so chuỗi, hoa thường khác nhau.",
- 7: "Chỉ tay vào hai dòng URLEncoder. Nhấn: encode phần giá trị, không phải tên tham số.\n"
-    "Hỏi lớp: nội dung đơn hàng có dấu cách thì chuyện gì xảy ra nếu quên encode?",
- 8: "Nhấn chỗ remove vnp_SecureHash. Nhiều người quên và ngồi tìm bug cả buổi.\n"
-    "Nói thêm: servlet đã decode sẵn nên lúc verify phải encode lại.",
- 9: "Nhắc lại con số 100. Viết lên bảng: 25.000đ thành 2500000.\n"
-    "Chuyện Etc/GMT+7 nên kể như một câu chuyện, vì nó nằm trong code mẫu của chính VNPAY.",
-10: "Cho lớp 3 phút tự chạy. Đi quanh lớp xem ai kẹt.\n"
-    "Quá nửa lớp không sang được trang VNPAY thì gửi luôn bản làm xong vào group rồi đi tiếp.",
-11: "Bảo cả lớp mở ngrok ngay lúc này, vì địa chỉ đổi mỗi lần chạy lại.\n"
-    "Ai chưa gắn authtoken thì giờ mới lòi ra, xử lý luôn.",
-12: "Nhấn hai chữ idempotent. Hỏi lớp: nếu VNPAY gọi lại lần hai mà mình cộng tiền tiếp thì sao?\n"
-    "Mã trả về nên đọc to từng cái: 97, 01, 04, 02, 00.",
-13: "Chỉ vào chỗ không có dòng nào đổi trạng thái đơn. Đó mới là ý chính của slide.",
-14: "Kể thật chuyện portal sandbox hỏng lúc mình dựng bài. Phần này lớp nhớ lâu nhất.\n"
-    "Nhắc: hash của querydr nối bằng dấu gạch đứng, không sort alphabet. Copy nhầm hàm ký là fail.",
-15: "Mở sẵn cửa sổ terminal trước khi chiếu slide này để chỉ vào dòng log thật.\n"
-    "Mạng trục trặc thì chạy demo-local.sh, diễn được cả ba ca mà không cần internet.",
-16: "Phần này nói nhanh, chủ yếu để lớp biết đường mang về đồ án.",
-17: "Đọc lướt sáu dòng, dừng lại ở dòng so số tiền và dòng idempotent.",
-18: "Bốn câu hay bị hỏi, chuẩn bị sẵn:\n\n"
-    "1. IPN không về thì đơn treo mãi à?\n"
-    "   Không. Job quét đơn PENDING quá hạn rồi gọi querydr để chốt. Bài này đã phải dùng đường đó.\n\n"
-    "2. Sao phải cài ngrok, không có cách nào khác?\n"
-    "   Cần một địa chỉ công khai để VNPAY gọi vào. Deploy lên server thật cũng được nhưng chậm hơn.\n\n"
-    "3. Báo sai chữ ký mà không hiểu vì sao?\n"
-    "   In hashData ra rồi so từng ký tự. Gần như luôn là quên encode, hoặc quên bỏ vnp_SecureHash.\n\n"
-    "4. Chưa có thẻ, chưa có mạng thì test kiểu gì?\n"
-    "   Phần ký và verify có unit test chạy offline hoàn toàn.",
-19: "Nhắc lớp là bản làm xong sẽ nằm trong thư mục Drive ngay sau buổi.\n"
-    "Cảm ơn và kết thúc.",
+ 1: "Kết quả cuối buổi: một file ShopStart.java chạy được, sinh URL thanh toán, nhận IPN, "
+    "chốt trạng thái đơn.\nHỏi ai đã chạy thử file xuất phát chưa.",
+ 2: "Nhấn: trạng thái đơn chỉ ghi ở hai chỗ, IPN và nhánh querydr. ReturnURL không ghi gì.\n"
+    "Nếu lớp hỏi vì sao, trả lời: ReturnURL chạy qua trình duyệt của khách, tham số sửa được.",
+ 3: "Kiểm tra nhanh: ai chưa có TmnCode và HashSecret thì ngồi cùng bạn bên cạnh.\n"
+    "Ai chưa gắn authtoken ngrok thì xử lý ngay lúc này, bước 7 sẽ cần.",
+ 4: "Chỉ vào ZoneId. Etc/GMT+7 là UTC trừ 7, giao dịch hết hạn ngay khi tạo.",
+ 5: "Nhắc hex chữ thường. Nếu ai dùng %02X thì chữ ký không khớp.",
+ 6: "Ba điểm: TreeMap để sort, bỏ tham số rỗng, encode phần giá trị.\n"
+    "Đây là nơi phát sinh phần lớn lỗi sai chữ ký.",
+ 7: "Nhấn hai dòng remove. Servlet đã decode nên phải encode lại.",
+ 8: "Viết lên bảng: 25.000đ thành 2500000.\nvnp_TxnRef trùng trong 24h thì VNPAY từ chối.",
+ 9: "Nhắc: HashSecret chỉ nằm trên server. JavaScript chỉ nhận paymentUrl.",
+10: "Cho lớp 3 phút chạy thử. Đi quanh xem ai kẹt.\n"
+    "Quá nửa lớp chưa qua được thì gửi bản làm xong rồi đi tiếp.",
+11: "Cả lớp mở ngrok ngay lúc này vì id đổi mỗi lần chạy.\n"
+    "Sau khi khai URL nhớ export lại VNPAY_RETURN_URL rồi chạy lại app.",
+12: "Đọc to năm mã: 97, 01, 04, 02, 00.\n"
+    "Hỏi lớp: nếu bỏ nhánh 02 thì chuyện gì xảy ra khi VNPAY gọi lại lần hai?",
+13: "Nhấn: hash của querydr nối bằng dấu gạch đứng, không sort alphabet. "
+    "Dùng nhầm buildQueryString ở đây là fail.",
+14: "Mở sẵn terminal để chỉ vào dòng log.\n"
+    "Mạng hỏng thì chạy demo-local.sh, tự ký IPN, không cần internet.\n\n"
+    "Bốn câu hay bị hỏi:\n"
+    "1. IPN không về thì sao? Job quét đơn PENDING quá hạn rồi gọi querydr.\n"
+    "2. Sao phải ngrok? Cần địa chỉ công khai để VNPAY gọi vào.\n"
+    "3. Sai chữ ký? In hashData ra so từng ký tự, thường là quên encode.\n"
+    "4. Chưa có thẻ? Phần ký và verify có unit test chạy offline.",
 }
 for idx, sl in enumerate(prs.slides, 1):
     if idx in NOTES:
@@ -675,4 +587,4 @@ for idx, sl in enumerate(prs.slides, 1):
 
 out = __file__.rsplit("/", 1)[0] + "/VNPAY-seminar.pptx"
 prs.save(out)
-print("đã lưu", len(prs.slides._sldIdLst), "slide:", out)
+print("đã lưu", len(prs.slides._sldIdLst), "slide")
