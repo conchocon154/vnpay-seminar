@@ -1,26 +1,49 @@
 {
-  "01": "Hỏi ai đã tải hai file và chạy thử chưa. Ai chưa có thì lấy trong thư mục Drive.",
-  "02": "Bảo cả lớp mở thư mục lab lên, kiểm tra có đúng hai file cạnh nhau không.",
-  "03": "Cho cả lớp chạy ngay. Ai báo lỗi cổng 8080 thì tắt terminal cũ. Chờ tới khi đa số thấy cửa hàng.",
-  "04": "Nhấn: chỉ đường 2 và 4 được ghi trạng thái. Đường 3 chạy qua trình duyệt của khách nên không tin.",
-  "05": "Chờ cả lớp dán xong hai giá trị. Nhắc kiểm tra độ dài 8 và 32 ký tự.",
-  "06": "Đọc chậm ba bước rồi mới chiếu code ở slide sau. Chỉ vào ví dụ chuỗi trước và sau.",
-  "07": "Gõ cùng cả lớp. Nhấn %02x chữ thường.",
-  "08": "Hai chỗ dễ sai: TreeMap và encode giá trị. Hỏi lớp: nội dung đơn có dấu cách thì sao nếu quên encode.",
-  "09": "Nhấn hai dòng remove. Giải thích vì sao: VNPAY ký phần còn lại, không ký chính chữ ký.",
-  "10": "Không cần đọc hết bảng, chỉ dừng ở Amount nhân 100 và TxnRef duy nhất.",
-  "11": "Gõ cùng cả lớp. Nhắc lưu đơn PENDING trước khi ký.",
-  "12": "Chỗ dừng. Cho 3 phút, đi quanh lớp. Dùng bảng lỗi để chữa nhanh.",
-  "13": "Cho cả lớp quẹt thẻ test. Chỉ ra đơn vẫn PENDING và giải thích vì sao, dẫn sang ngrok.",
-  "14": "Vẽ lên bảng ba dòng trong khối code nếu lớp chưa hình dung được.",
-  "15": "Cho cả lớp đăng ký. Nhắc mỗi người một tài khoản, bản free chỉ một tunnel.",
-  "16": "Chia lớp theo hệ điều hành. Ai Windows thì nhắc chép ngrok.exe vào cùng thư mục cho khỏi sửa PATH.",
-  "17": "Đây là chỗ tắc nhiều nhất. Đi kiểm tra từng người bằng lệnh ngrok config check.",
-  "18": "Nhắc mở terminal thứ hai. Cửa sổ ngrok để yên, không tắt.",
-  "19": "Đi chậm. Mỗi người dán địa chỉ của chính mình, không dùng chung. Sau khi export nhớ chạy lại Java.",
-  "20": "Đọc to năm mã. Hỏi lớp: bỏ nhánh 02 thì chuyện gì xảy ra khi VNPAY gọi lại.",
-  "21": "Chỗ dừng cuối. Mở sẵn terminal để chỉ vào dòng log IPN.",
-  "22": "Chỉ nói khi có người không khai được IPN. Nhấn: hash querydr nối bằng dấu gạch đứng.",
-  "23": "Để slide này mở trong lúc cả lớp tự sửa. Không cần đọc.",
-  "24": "Nhắc file đáp án sẽ nằm trong Drive sau buổi. Cảm ơn và kết thúc."
+  "01": "Hỏi ai đã tải hai file và chạy thử chưa. Ai chưa có thì lấy trong thư mục Drive.\n\nHỏi: Sao không tự viết chức năng thanh toán cho nhanh?\nĐáp: Lưu số thẻ trên server mình là vi phạm PCI-DSS, và ngân hàng không cấp API trực tiếp cho đồ án. VNPAY đứng giữa, khách nhập thẻ trên trang của họ.\n\nHỏi: Sandbox có mất tiền thật không?\nĐáp: Không. Thẻ test là thẻ giả, không có tiền nào chạy.",
+
+  "02": "Bảo cả lớp mở thư mục lên, kiểm tra có đúng hai file cạnh nhau không.\n\nHỏi: Sao không nhét luôn HTML vào file Java?\nĐáp: Tách ra thì sửa giao diện khỏi phải chạy lại server. Server đọc index.html từ đĩa mỗi lần load, bấm F5 là thấy.\n\nHỏi: Đổi tên file được không?\nĐáp: index.html thì không, vì trong code đang đọc đúng tên đó. Tên file Java đổi được nhưng phải đổi cả tên class.",
+
+  "03": "Cho cả lớp chạy ngay. Ai báo lỗi port 8080 thì tắt terminal cũ. Chờ tới khi đa số thấy cửa hàng.\n\nHỏi: Sao chạy java thẳng mà không cần javac?\nĐáp: Từ JDK 11, java chạy được file nguồn đơn lẻ, nó tự biên dịch trong bộ nhớ.\n\nHỏi: Báo Address already in use là sao?\nĐáp: Port 8080 còn app cũ đang giữ. Tắt terminal cũ hoặc đổi PORT trong code.",
+
+  "04": "Nhấn: chỉ luồng 2 và 4 được ghi status. Luồng 3 chạy qua browser của khách.\n\nHỏi: Sao ReturnURL không được ghi status?\nĐáp: Nó là URL trên browser của khách, ai cũng sửa được vnp_ResponseCode=00. Thêm nữa khách tắt tab là ReturnURL không bao giờ về.\n\nHỏi: IPN với querydr khác nhau chỗ nào?\nĐáp: IPN là VNPAY chủ động gọi mình. querydr là mình chủ động hỏi VNPAY. Cả hai đều server to server và đều có checksum.",
+
+  "05": "Chờ cả lớp dán xong hai giá trị. Nhắc kiểm tra độ dài 8 và 32 ký tự.\n\nHỏi: TmnCode có phải giữ bí mật không?\nĐáp: Không. Nó nằm ngay trên URL thanh toán, ai cũng thấy. HashSecret mới là thứ phải giấu, lộ ra là người khác ký đơn giả được.\n\nHỏi: Hardcode vào code có sao không?\nĐáp: Với bài tập thì được. Đồ án nộp lên GitHub thì phải đọc từ biến môi trường, GitHub có bot quét secret.",
+
+  "06": "Đọc chậm ba bước rồi mới chiếu code ở slide sau. Chỉ vào ví dụ chuỗi trước và sau.\n\nHỏi: Sao phải sort theo alphabet?\nĐáp: Mình và VNPAY phải ráp ra cùng một chuỗi thì hash mới giống nhau. Sort là quy ước để hai bên thống nhất thứ tự.\n\nHỏi: HMAC khác hash thường chỗ nào?\nĐáp: Hash thường ai cũng tính được. HMAC cần thêm HashSecret nên chỉ mình và VNPAY tính ra đúng chuỗi đó.",
+
+  "07": "Gõ cùng cả lớp. Nhấn %02x chữ thường.\n\nHỏi: %02x và %02X khác gì?\nĐáp: Chữ thường và chữ hoa của hex. VNPAY so chuỗi nên lệch là sai, trừ khi so bằng equalsIgnoreCase.\n\nHỏi: Sao chữ ký luôn dài 128 ký tự?\nĐáp: SHA-512 ra 64 byte, mỗi byte in thành 2 ký tự hex.",
+
+  "08": "Hai chỗ dễ sai: TreeMap và encode value. Hỏi lớp trước khi gõ.\n\nHỏi: Encode key hay encode value?\nĐáp: Bắt buộc là value. Key toàn chữ ASCII nên encode hay không cũng ra như cũ.\n\nHỏi: Sao phải bỏ param rỗng?\nĐáp: Vì VNPAY không đưa param rỗng vào chuỗi ký. Mình giữ lại là chuỗi dài hơn của họ, checksum lệch ngay.",
+
+  "09": "Nhấn hai dòng remove. Giải thích vì sao trước khi gõ.\n\nHỏi: Sao phải remove vnp_SecureHash rồi mới ký?\nĐáp: Lúc VNPAY ký, chữ ký chưa tồn tại. Muốn ra cùng kết quả thì mình phải ký đúng phần họ đã ký, không tính chính chữ ký vào.\n\nHỏi: vnp_SecureHashType là gì mà cũng phải bỏ?\nĐáp: Trường cũ ghi loại thuật toán. VNPAY không tính nó vào checksum nên bỏ luôn cho chắc.",
+
+  "10": "Không cần đọc hết bảng, dừng ở Amount và TxnRef.\n\nHỏi: Sao Amount phải nhân 100?\nĐáp: VNPAY tính theo đơn vị nhỏ nhất để tránh số thập phân. 25.000đ gửi đi là 2500000.\n\nHỏi: TxnRef trùng thì sao?\nĐáp: VNPAY từ chối vì mã phải duy nhất trong 24h theo TmnCode. Khách trả lại lần hai phải sinh mã mới.",
+
+  "11": "Gõ cùng cả lớp. Nhắc thứ tự: lưu đơn trước, ký sau.\n\nHỏi: Sao phải lưu đơn PENDING trước khi ký?\nĐáp: Để khi IPN về còn tra ra đơn theo txnRef. Không có đơn trong bộ nhớ thì handler trả 01.\n\nHỏi: vnp_ExpireDate để 15 phút có ít quá không?\nĐáp: Đủ cho một lần quẹt thẻ. Quá hạn thì VNPAY từ chối và khách tạo đơn mới.",
+
+  "12": "Chỗ dừng. Cho 3 phút, đi quanh lớp. Dùng bảng lỗi để chữa nhanh.\n\nHỏi: Sang được trang VNPAY nghĩa là đã xong chưa?\nĐáp: Mới xong phần ký. TmnCode đúng, checksum đúng. Phần nhận kết quả vẫn chưa có.\n\nHỏi: Báo sai chữ ký mà không biết sai ở đâu?\nĐáp: In chuỗi query ra trước khi hash, so từng ký tự với URL thật. Gần như luôn là quên encode value hoặc HashSecret dính khoảng trắng.",
+
+  "13": "Cho cả lớp quẹt thẻ test. Chỉ ra đơn vẫn PENDING rồi dẫn sang ngrok.\n\nHỏi: Tiền trừ rồi mà đơn vẫn PENDING, có mất tiền không?\nĐáp: Sandbox không có tiền thật. Và trạng thái thật vẫn nằm bên VNPAY, lát nữa querydr hỏi là ra.\n\nHỏi: Sao VNPAY không gọi về được?\nĐáp: Server mình đang ở localhost, chỉ máy mình thấy. VNPAY ở ngoài internet không có đường vào.",
+
+  "14": "Vẽ lên bảng ba dòng trong khối code nếu lớp chưa hình dung được.\n\nHỏi: Có cách nào khác ngoài ngrok không?\nĐáp: Deploy lên server có IP public, hoặc dùng Cloudflare Tunnel. Với đồ án thì ngrok nhanh nhất.\n\nHỏi: Máy mình có bị lộ ra internet không?\nĐáp: Chỉ đúng port 8080 và chỉ trong lúc ngrok chạy. Tắt là hết.",
+
+  "15": "Cho cả lớp đăng ký. Nhắc mỗi người một tài khoản.\n\nHỏi: Dùng chung một tài khoản ngrok được không?\nĐáp: Không. Bản free chỉ cho một tunnel chạy cùng lúc, người thứ hai bật là người đầu bị ngắt.\n\nHỏi: Có tốn tiền không?\nĐáp: Không. Bản free đủ dùng, chỉ khác là URL đổi mỗi lần chạy.",
+
+  "16": "Chia lớp theo hệ điều hành. Ai Windows thì nhắc chép ngrok.exe vào cùng thư mục.\n\nHỏi: Windows không có brew thì làm sao?\nĐáp: Tải zip ở ngrok.com/download, giải nén ra ngrok.exe, chép vào cùng thư mục với ShopStart.java rồi gọi .\\ngrok.exe.\n\nHỏi: Gõ ngrok mà báo command not found?\nĐáp: File chưa nằm trong PATH. Hoặc thêm vào PATH, hoặc cd vào đúng thư mục chứa nó.",
+
+  "17": "Đây là chỗ tắc nhiều nhất. Đi kiểm tra từng người bằng ngrok config check.\n\nHỏi: Authtoken lưu ở đâu, có phải gắn lại mỗi lần không?\nĐáp: Lưu trong file ngrok.yml ở thư mục cấu hình. Gắn một lần là xong, không phải làm lại.\n\nHỏi: Báo no such file nghĩa là gì?\nĐáp: Chưa có file cấu hình, tức là lệnh add-authtoken chưa chạy thành công. Copy lại dòng lệnh từ dashboard.",
+
+  "18": "Nhắc mở terminal thứ hai. Cửa sổ ngrok để yên, không tắt.\n\nHỏi: Đóng cửa sổ ngrok thì sao?\nĐáp: URL chết ngay. Mở lại sẽ ra URL khác và phải khai lại vào portal.\n\nHỏi: Sao phải hai terminal?\nĐáp: Một chạy ngrok, một chạy Java. Cả hai đều phải sống cùng lúc.",
+
+  "19": "Đi chậm. Mỗi người dán URL của chính mình. Sau khi export nhớ chạy lại Java.\n\nHỏi: Export xong mà không chạy lại Java có được không?\nĐáp: Không. RETURN_URL đọc lúc khởi động, app đang chạy vẫn giữ giá trị cũ.\n\nHỏi: Khai sai URL thì hiện tượng gì?\nĐáp: Trả tiền xong browser không quay về được, hoặc IPN không bao giờ tới. Log terminal sẽ im lặng.",
+
+  "20": "Đọc to năm mã. Hỏi lớp trước khi gõ.\n\nHỏi: Bỏ nhánh 02 đi thì chuyện gì xảy ra?\nĐáp: VNPAY retry nhiều lần, đơn bị ghi nhận nhiều lần. Trong hệ thống thật là cộng tiền cho khách nhiều lần.\n\nHỏi: Sao phải so lại số tiền, VNPAY gửi sang là đúng rồi mà?\nĐáp: Đây là lớp bảo vệ cuối. Nếu số tiền không khớp đơn trong DB thì có chuyện, không ghi PAID.",
+
+  "21": "Chỗ dừng cuối. Mở sẵn terminal để chỉ vào dòng log IPN.\n\nHỏi: Sao trang kết quả phải hỏi lại server, đọc trên URL cho nhanh?\nĐáp: Tham số trên URL do browser mang về, khách sửa được. Status thật chỉ lấy từ server.\n\nHỏi: Xong rồi thì trong đồ án làm gì tiếp?\nĐáp: Ở chỗ ghi PAID, thêm việc của mình: trừ kho, gửi mail, mở khoá đơn hàng.",
+
+  "22": "Chỉ nói khi có người không khai được IPN. Nhấn hashData nối bằng dấu gạch đứng.\n\nHỏi: querydr thay hẳn IPN được không?\nĐáp: Demo thì được. Thật thì IPN vẫn là chính vì nó tới ngay, querydr chỉ để đối soát và vá lỗ hổng khi IPN thất lạc.\n\nHỏi: Sao hash của querydr lại khác?\nĐáp: Nó là API riêng, tài liệu quy định nối chuỗi theo thứ tự cố định. Dùng nhầm buildQueryString ở đây là fail.",
+
+  "23": "Để slide này mở trong lúc cả lớp tự sửa. Không cần đọc.\n\nHỏi: Làm sao biết IPN có về hay không?\nĐáp: Nhìn log terminal chạy Java. Hoặc mở http://127.0.0.1:4040, đó là bảng theo dõi của ngrok, thấy hết mọi request đi vào.\n\nHỏi: Sửa code xong mà không thấy gì đổi?\nĐáp: Quên chạy lại Java. Riêng index.html thì chỉ cần F5.",
+
+  "24": "Nhắc file đáp án sẽ nằm trong Drive sau buổi. Cảm ơn và kết thúc.\n\nHỏi: Mang code này vào đồ án Spring Boot thế nào?\nĐáp: Hai hàm hmacSHA512 và buildQueryString bê nguyên. ORDERS đổi thành repository. HttpServer đổi thành @RestController.\n\nHỏi: Muốn thêm MoMo hay ZaloPay thì sao?\nĐáp: Mỗi cổng một kiểu ký riêng. Bọc sau một interface PaymentGateway rồi viết từng bản cài đặt."
 }
