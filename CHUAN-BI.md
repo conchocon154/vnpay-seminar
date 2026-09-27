@@ -1,121 +1,89 @@
-# Chuẩn bị trước buổi seminar VNPAY
+# Cài trước khi lên lớp
 
-Nhờ mọi người làm 4 việc dưới đây trước hôm seminar. Việc 1 và việc 3 đều phải chờ email nên làm sớm giùm mình.
+Hôm seminar cả lớp sẽ gõ code cùng mình, nên mỗi người cần sẵn một tài khoản sandbox VNPAY, JDK và ngrok. Cái nào cũng dễ, nhưng tài khoản VNPAY với ngrok đều phải chờ email xác nhận. Làm trước một hai hôm cho khỏi cuống.
 
-## 1. Đăng ký tài khoản sandbox VNPAY
+## Tài khoản sandbox VNPAY
 
-Vào https://sandbox.vnpayment.vn/devreg/ và điền:
+Vào https://sandbox.vnpayment.vn/devreg/ rồi điền form. Tên website ghi gì cũng được, mình để `VNPAY Shop Demo`. Email là email của bạn, mật khẩu từ 6 tới 15 ký tự.
 
-- Tên website: `VNPAY Shop Demo`
-- Địa chỉ URL: một tên miền không trùng ai, ví dụ `https://vnpay-demo-<mssv>.com`
-- Email đăng ký: email của bạn
-- Mật khẩu: 6 đến 15 ký tự
+Ô Địa chỉ URL là chỗ hay kẹt. Form này bắt phải có đuôi tên miền, nên `http://localhost:8080` bị từ chối. Còn điền mấy tên quen như `github.com` thì nó báo "Website đã được đăng ký", vì có người lấy rồi. Cách đơn giản nhất là gắn MSSV vào, kiểu `https://vnpay-demo-520k0108.com`. Tên miền này không cần có thật, sandbox chỉ xét định dạng.
 
-Hai lỗi hay dính ở ô Địa chỉ URL:
+Vài phút sau VNPAY gửi email có `vnp_TmnCode` (8 ký tự) và `HashSecret` (32 ký tự). Hai cái này dùng ngay ở TODO đầu tiên, giữ email lại.
 
-- Điền `http://localhost:8080` sẽ trượt, form bắt buộc phải có đuôi tên miền 2 đến 10 chữ cái.
-- Điền tên miền phổ biến kiểu `github.com` thì báo "Website đã được đăng ký" vì người khác đăng ký trước rồi. Gắn mã số sinh viên vào cho chắc.
+## JDK 17
 
-Không cần sở hữu tên miền đó thật, sandbox chỉ kiểm tra định dạng thôi.
+Mở terminal gõ `java -version`. Ra 17, 21 hay mới hơn là xong phần này.
 
-Email trả về 2 giá trị, nhớ giữ lại: `vnp_TmnCode` (8 ký tự) và `HashSecret` (32 ký tự).
+Chưa có thì trên macOS gõ `brew install openjdk`, còn Windows với Linux tải ở https://adoptium.net. Code chỉ có một file Java, chạy thẳng bằng lệnh `java`, không cần Maven hay IntelliJ.
 
-## 2. Cài JDK 17 trở lên
+## ngrok
 
-Gõ `java -version`, thấy 17 trở lên là được. Chưa có thì:
+Giảng viên yêu cầu buổi này phải có ngrok, và thật ra không có cũng không được. Khách thanh toán xong, VNPAY sẽ gọi một request về server mình để báo kết quả, request đó gọi là IPN. Server chạy ở `localhost` thì bên VNPAY không gọi tới được. ngrok mở cho máy mình một địa chỉ `https` công khai để nhận request đó.
 
-- macOS: `brew install openjdk`
-- Windows hoặc Linux: tải ở https://adoptium.net
+Mỗi người tự đăng ký một tài khoản nhé. Bản free chỉ mở được một tunnel mỗi lúc, xài chung là đá nhau.
 
-Không cần Maven, không cần IntelliJ, không cần cài thư viện gì thêm.
+### Đăng ký
 
-## 3. Đăng ký và cài ngrok
+Vào https://dashboard.ngrok.com/signup, đăng ký bằng email hoặc bấm đăng nhập Google cho nhanh. Đăng ký bằng email thì nhớ mở hộp thư bấm link kích hoạt.
 
-Buổi này bắt buộc dùng ngrok. Lý do: sau khi khách trả tiền xong, VNPAY gọi ngược về server của mình để báo kết quả (gọi là IPN). Máy mình chạy ở `localhost` thì VNPAY ở ngoài internet không với tới được, nên cần ngrok tạo một địa chỉ công khai trỏ về máy mình.
-
-Mỗi người phải có tài khoản riêng, bản miễn phí chỉ cho mở 1 tunnel một lúc nên không dùng chung được.
-
-### 3.1. Tạo tài khoản
-
-1. Vào https://dashboard.ngrok.com/signup
-2. Đăng ký bằng email, hoặc bấm nút đăng nhập bằng Google / GitHub cho nhanh
-3. Mở email xác nhận rồi bấm vào link kích hoạt
-
-### 3.2. Cài ngrok
+### Cài
 
 macOS:
 
-```
+```bash
 brew install --cask ngrok
 ```
 
-Windows:
-
-1. Tải file zip ở https://ngrok.com/download (chọn Windows)
-2. Giải nén ra được `ngrok.exe`
-3. Bỏ `ngrok.exe` vào cùng thư mục với `ShopStart.java` cho tiện, hoặc thêm thư mục đó vào PATH
-
 Linux:
 
-```
+```bash
 sudo snap install ngrok
 ```
 
-Kiểm tra: gõ `ngrok version`, ra số phiên bản là được. Trên Windows nếu chưa thêm PATH thì gõ `.\ngrok.exe version`.
+Windows thì tải zip ở https://ngrok.com/download, giải nén ra `ngrok.exe`. Bỏ nó chung thư mục với `ShopStart.java` là dùng được, lúc chạy gõ `.\ngrok.exe` thay cho `ngrok`. Ai quen thì thêm vào PATH.
 
-### 3.3. Gắn authtoken
+Gõ `ngrok version` thấy số phiên bản là cài xong.
 
-Đây là bước hay quên nhất. Không có authtoken thì ngrok không chạy.
+### Gắn authtoken
 
-1. Vào https://dashboard.ngrok.com/get-started/your-authtoken
-2. Ở khung "Command line" có sẵn dòng `ngrok config add-authtoken ...`, bấm icon copy bên phải, nó copy kèm token thật của bạn
-3. Dán vào terminal rồi Enter
+Bước này hay bị bỏ qua nhất. Thiếu authtoken thì ngrok không chạy.
 
-Kiểm tra bằng `ngrok config check`, phải ra `Valid configuration file at ...`. Còn báo `no such file` là chưa gắn được token.
+Vào https://dashboard.ngrok.com/get-started/your-authtoken. Trong khung Command line có sẵn một dòng `ngrok config add-authtoken ...` đã kèm token của bạn. Bấm nút copy bên phải, dán vào terminal, Enter.
 
-### 3.4. Chạy thử tunnel
+Gõ `ngrok config check` để kiểm. Ra `Valid configuration file at ...` là được.
 
-```
+### Chạy thử
+
+```bash
 ngrok http 8080
 ```
 
-Màn hình sẽ hiện dòng kiểu:
+Nhìn dòng Forwarding, sẽ có một địa chỉ dạng `https://a1b2-42-115-242-109.ngrok-free.app`. Đó là địa chỉ công khai của máy bạn lúc này.
 
+Địa chỉ đó đổi mỗi lần chạy lại ngrok. Vậy nên đừng đem nó khai vào VNPAY từ ở nhà, lên lớp chạy ngrok xong mình khai chung một lượt.
+
+Lần đầu mở địa chỉ này bằng trình duyệt, ngrok chặn lại một trang "You are about to visit...". Bấm Visit Site là qua. IPN không bị chặn vì VNPAY gọi thẳng từ server, không qua trình duyệt.
+
+Thử xong thì `Ctrl+C` để tắt.
+
+## Chạy thử code
+
+Tải `ShopStart.java` với `index.html` trên Drive về, để chung một thư mục. Mở terminal ngay thư mục đó:
+
+```bash
+java ShopStart.java
 ```
-Forwarding   https://a1b2-42-115-242-109.ngrok-free.app -> http://localhost:8080
-```
 
-Cái địa chỉ `https://....ngrok-free.app` đó là địa chỉ công khai của máy bạn. Nhớ 2 điều:
+Vào http://localhost:8080 sẽ thấy cửa hàng. Bấm Thanh toán ra chữ "Chưa làm TODO 5" là đúng, phần đó lên lớp mới code.
 
-- Địa chỉ này **đổi mỗi lần chạy lại ngrok**, nên hôm seminar chạy xong mới đi khai vào VNPAY, đừng khai từ hôm trước.
-- Lần đầu mở bằng trình duyệt nó chặn một trang cảnh báo "You are about to visit...", bấm **Visit Site** là qua. IPN không dính trang này vì không phải trình duyệt.
+Đừng double-click mở `index.html`. Trang này gọi API của server Java, mở kiểu file thì không có server nào trả lời, bấm nút sẽ không ra gì.
 
-Bấm `Ctrl+C` để tắt tunnel.
-
-### 3.5. Khai 2 URL vào VNPAY
-
-Việc này làm tại lớp, ghi ra đây để biết trước. Đăng nhập https://sandbox.vnpayment.vn/merchantv2/, vào Cấu hình, Thông tin website, rồi điền:
-
-- URL trả về: `https://<địa-chỉ-ngrok>/vnpay/return`
-- URL nhận kết quả (IPN): `https://<địa-chỉ-ngrok>/vnpay/ipn`
-
-Lưu ý thật: portal sandbox thỉnh thoảng lỗi, mục Danh sách website trống trơn hoặc Cài đặt thông báo báo "Kết nối hệ thống tạm thời bị gián đoạn". Gặp vậy thì khỏi lo, code vẫn chốt được đơn bằng API querydr, trong buổi mình sẽ nói kỹ chỗ này.
-
-## 4. Chạy thử code xuất phát
-
-Tải 2 file trong thư mục này:
-
-- `index.html`: double-click là mở. Cửa hàng HTML thuần, chưa có server.
-- `ShopStart.java`: chạy `java ShopStart.java` rồi mở http://localhost:8080
-
-Cả hai đều hiện được cửa hàng, bấm Thanh toán thì báo "Chưa nối VNPAY". Đúng rồi đấy, phần còn thiếu chính là nội dung buổi seminar.
-
-## Trước khi vào lớp, kiểm lại
+## Kiểm lại trước khi đi
 
 1. Có email VNPAY chứa TmnCode và HashSecret
 2. `java -version` ra 17 trở lên
 3. `ngrok config check` ra `Valid configuration file`
-4. `ngrok http 8080` chạy được, hiện ra địa chỉ `.ngrok-free.app`
-5. `java ShopStart.java` chạy được, mở http://localhost:8080 thấy cửa hàng
+4. `ngrok http 8080` hiện được địa chỉ `.ngrok-free.app`
+5. `java ShopStart.java` chạy, vào localhost:8080 thấy cửa hàng
 
-Đủ 5 cái này là code theo được từ đầu tới cuối.
+Qua được năm cái này là lên lớp theo kịp. Kẹt chỗ nào cứ nhắn mình trước.
