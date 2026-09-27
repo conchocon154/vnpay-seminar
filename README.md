@@ -1,6 +1,6 @@
 # Tích hợp VNPAY Sandbox
 
-Tạo yêu cầu thanh toán, nhận callback, đối soát giao dịch. Có hai bản: một file Java cho buổi seminar và một project Spring Boot đầy đủ.
+Tạo yêu cầu thanh toán, nhận callback, đối soát giao dịch. Có hai bản: một file Java (`lab/`) cho buổi seminar và một project Spring Boot (`src/`).
 
 ## Các file
 
@@ -8,34 +8,28 @@ Tạo yêu cầu thanh toán, nhận callback, đối soát giao dịch. Có hai
 |---|---|
 | `lab/ShopStart.java` + `lab/index.html` | Code xuất phát, 6 TODO |
 | `lab/ShopDone.java` | Đáp án |
-| `VnpayDemo.java` | Toàn bộ demo trong một file, HTML nhúng sẵn |
 | `src/` | Bản Spring Boot |
 | `CHUAN-BI.md` | Cài đặt trước buổi seminar |
 | `SEMINAR.md` | Thứ tự trong buổi |
+| `slides-html/` + `build-html-pptx.mjs` | Nguồn slide, build bằng `npm run build:slides` |
 
 ## Bước 1. Lấy TmnCode và HashSecret
 
 1. Đăng ký ở https://sandbox.vnpayment.vn/devreg/
-2. Copy `.env.example` thành `.env`
-3. Điền `VNPAY_TMN_CODE` và `VNPAY_HASH_SECRET` từ email
+2. Email trả về `vnp_TmnCode` (8 ký tự) và `HashSecret` (32 ký tự)
 
 ## Bước 2. Chạy bản một file
 
 Cần JDK 17+.
 
-- Có ngrok, nhận IPN thật:
+```bash
+cd lab
+export VNPAY_TMN_CODE=xxxxxxxx
+export VNPAY_HASH_SECRET=xxxxxxxxxxxxxxxx
+java ShopDone.java
+```
 
-  ```bash
-  ./run-ngrok.sh
-  ```
-
-- Không có ngrok, chốt đơn bằng `querydr`:
-
-  ```bash
-  ./run-local.sh
-  ```
-
-`run-ngrok.sh` tự đọc URL ngrok ở cổng 4040 và in ra 2 URL cần khai trong merchant portal.
+Mở http://localhost:8080. Có ngrok thì thêm `export VNPAY_RETURN_URL=https://<id>.ngrok-free.app/vnpay/return` trước khi chạy.
 
 ## Bước 3. Chạy bản Spring Boot
 
