@@ -1,6 +1,6 @@
 # Seminar VNPAY Sandbox: thứ tự trong buổi
 
-Slide ở `VNPAY-seminar.pptx`, 25 slide. Ghi chú mỗi slide có phần NÓI, LÀM và 2 câu hỏi kèm đáp án.
+Slide ở `VNPAY-seminar.pptx`, 25 slide. Ghi chú mỗi slide có phần Nói, Làm và 2 câu hỏi kèm đáp án.
 
 ## Bước 1. Mở đầu (slide 1–4)
 

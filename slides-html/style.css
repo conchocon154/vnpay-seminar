@@ -28,10 +28,7 @@ body {
   overflow: hidden;
 }
 
-.eyebrow {
-  font-size: 20px; font-weight: 700; letter-spacing: .14em;
-  text-transform: uppercase; color: var(--accent); margin-bottom: 12px;
-}
+.eyebrow { font-size: 22px; font-weight: 600; color: var(--accent); margin-bottom: 8px; }
 h1 { font-size: 60px; font-weight: 700; letter-spacing: -.02em; line-height: 1.12; }
 .content { margin-top: 40px; flex: 1; display: flex; flex-direction: column; gap: 28px; min-height: 0; }
 .lead { font-size: 30px; color: var(--ink2); }
@@ -130,3 +127,17 @@ table.sm { font-size: 23px; } table.sm tbody td { padding: 12px 22px; }
 .title-slide .lead { margin-top: 28px; max-width: 1300px; }
 .title-slide .who { margin-top: 64px; font-size: 26px; color: var(--muted); }
 pre.lg { font-size: 30px; }
+
+/* gạch đầu dòng */
+.list { list-style: none; display: flex; flex-direction: column; gap: 14px; font-size: 28px; color: var(--ink2); }
+.list li { position: relative; padding-left: 34px; }
+.list li::before { content: ''; position: absolute; left: 6px; top: .62em; width: 10px; height: 10px;
+                   border-radius: 50%; background: var(--accent); }
+.list.num { counter-reset: n; }
+.list.num li { counter-increment: n; padding-left: 48px; }
+.list.num li::before { content: counter(n) "."; width: auto; height: auto; background: none; top: 0; left: 0;
+                       font-weight: 700; color: var(--accent); }
+.side .list { font-size: 25px; }
+.note { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 22px 26px; }
+.note b { display: block; font-size: 24px; color: var(--accent); margin-bottom: 10px; }
+.note .list { font-size: 24px; gap: 10px; }

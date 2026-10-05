@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
 <body class="">
-<div class="eyebrow">Luồng thanh toán</div>
-<h1>Bốn request, chỉ hai cái được ghi status</h1>
-<div class="content"><div class="tier"><div class="n">1</div><div class="lane">Web → server</div><div class="txt"><span class="mono">POST /api/payments</span> tạo đơn, ký, trả URL</div></div><div class="tier on"><div class="n">2</div><div class="lane">VNPAY → server</div><div class="txt"><span class="mono">GET /vnpay/ipn</span> báo kết quả</div><div class="pill ok">Ghi status</div></div><div class="tier"><div class="n">3</div><div class="lane">VNPAY → browser</div><div class="txt"><span class="mono">GET /vnpay/return</span> đưa khách quay về</div><div class="pill no">Chỉ hiển thị</div></div><div class="tier on"><div class="n">4</div><div class="lane">Server → VNPAY</div><div class="txt"><span class="mono">querydr</span> hỏi lại status thật</div><div class="pill ok">Ghi status</div></div></div>
-<div class="foot"><span>VNPAY Sandbox</span><span>3 / 25</span></div>
+<div class="eyebrow">Giới thiệu</div>
+<h1>Luồng thanh toán của VNPAY</h1>
+<div class="content"><div class="tier"><div class="n">1</div><div class="lane">Web → Server</div><div class="txt"><span class="mono">POST /api/payments</span>: tạo đơn, ký rồi trả link thanh toán</div></div><div class="tier on"><div class="n">2</div><div class="lane">VNPAY → Server</div><div class="txt"><span class="mono">GET /vnpay/ipn</span>: VNPAY báo kết quả</div><div class="pill ok">Cập nhật đơn</div></div><div class="tier"><div class="n">3</div><div class="lane">VNPAY → Browser</div><div class="txt"><span class="mono">GET /vnpay/return</span>: đưa khách quay lại web</div><div class="pill no">Chỉ hiển thị</div></div><div class="tier on"><div class="n">4</div><div class="lane">Server → VNPAY</div><div class="txt"><span class="mono">querydr</span>: server hỏi lại VNPAY</div><div class="pill ok">Cập nhật đơn</div></div></div>
+<div class="foot"><span>Seminar VNPAY Sandbox – Lê Minh Đăng</span><span>3</span></div>
 </body></html>

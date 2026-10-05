@@ -74,12 +74,12 @@ for (const { png, key } of images) {
 }
 
 // pptxgenjs ghi cả ghi chú vào một đoạn, PowerPoint không xuống dòng theo \n.
-// Tách mỗi dòng thành một đoạn riêng, in đậm NÓI, LÀM và dòng Hỏi.
+// Tách mỗi dòng thành một đoạn riêng, in đậm dòng Nói, Làm và dòng Hỏi.
 const zip = await JSZip.loadAsync(await pptx.write({ outputType: 'nodebuffer' }));
 const para = line => {
-  const bold = /^(NÓI|LÀM)$/.test(line) || line.startsWith('Hỏi:');
+  const bold = /^(Nói|Làm)$/.test(line) || line.startsWith('Hỏi:');
   if (!line) return '<a:p><a:endParaRPr lang="vi-VN"/></a:p>';
-  return `<a:p><a:r><a:rPr lang="vi-VN"${bold ? ' b="1"' : ''} dirty="0"/><a:t>${line}</a:t></a:r></a:p>`;
+  return `<a:p><a:r><a:rPr lang="vi-VN" sz="1600"${bold ? ' b="1"' : ''} dirty="0"/><a:t>${line}</a:t></a:r></a:p>`;
 };
 for (const name of Object.keys(zip.files).filter(n => /^ppt\/notesSlides\/notesSlide\d+\.xml$/.test(n))) {
   const xml = await zip.file(name).async('string');

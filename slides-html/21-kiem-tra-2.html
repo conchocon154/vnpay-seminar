@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
 <body class="">
-<div class="eyebrow">Kiểm tra 2</div>
-<h1>Quẹt thẻ lần nữa: log có IPN, đơn PAID</h1>
-<div class="content"><div class="split"><div class="main" style="width:820px;display:flex;flex-direction:column;gap:24px"><div><div class="file">terminal chạy Java</div><pre class="sm"><span class="ln">[10:21:40] IPN 20261005102118733051</span><span class="ln"><span class="h">           -&gt; PAID 15900123</span></span></pre></div><div class="chk"><b>Xong sản phẩm</b><p>Status do VNPAY báo qua IPN. Khách tắt tab đơn vẫn PAID.</p></div><div class="tip"><b>127.0.0.1:4040</b><p>Bảng của ngrok, xem được mọi request VNPAY gọi vào.</p></div></div><div class="side"><img class="shot" src="paid.jpg" style="width:100%"></div></div></div>
-<div class="foot"><span>IPN</span><div class="dots"><i class="done"></i><i class="done"></i><i class="done"></i><i class="done"></i><i class="done"></i><i class="done"></i></div><span>21 / 25</span></div>
+<div class="eyebrow">Phần 4 – IPN</div>
+<h1>Test lần 2: nhận được IPN</h1>
+<div class="content"><div class="split"><div class="main" style="width:820px;display:flex;flex-direction:column;gap:24px"><div><div class="file">Terminal sẽ hiện</div><pre class=""><span class="ln">[10:21:40] IPN 20261005102118733051</span><span class="ln"><span class="h">           -&gt; PAID 15900123</span></span></pre></div><ul class="list "><li>Lần này log ghi IPN, tức là VNPAY đã tự gọi về server</li><li>Khách có tắt tab thì đơn vẫn PAID</li><li>Mở <span class="mono">127.0.0.1:4040</span> để xem các request gọi qua ngrok</li></ul></div><div class="side"><img class="shot" src="paid.jpg" style="width:100%"></div></div></div>
+<div class="foot"><span>Seminar VNPAY Sandbox – Lê Minh Đăng</span><span>21</span></div>
 </body></html>

@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
 <body class="">
-<div class="eyebrow">Tra cứu</div>
-<h1>Lỗi thường gặp và cách sửa</h1>
-<div class="content"><table><thead><tr><th style="width:40%">Hiện tượng</th><th>Sửa</th></tr></thead><tbody><tr><td>Address already in use</td><td>Port 8080 còn app cũ, tắt terminal cũ</td></tr><tr><td>VNPAY báo sai chữ ký</td><td>HashSecret sai, hoặc quên encode value</td></tr><tr><td>Sửa code mà không đổi gì</td><td>Quên Ctrl+C rồi chạy lại Java</td></tr><tr><td>Log không có dòng IPN</td><td>Chưa khai URL IPN, hoặc ngrok đã đổi URL</td></tr><tr><td>IPN trả 97</td><td>HashSecret trong code khác trên portal</td></tr><tr><td>Trả tiền xong không quay về</td><td>Quên set VNPAY_RETURN_URL rồi chạy lại</td></tr></tbody></table></div>
-<div class="foot"><span>Tổng kết</span><span>23 / 25</span></div>
+<div class="eyebrow">Phần 5 – Thêm</div>
+<h1>Một số lỗi hay gặp</h1>
+<div class="content"><table><thead><tr><th style="width:40%">Lỗi</th><th>Cách sửa</th></tr></thead><tbody><tr><td>Address already in use</td><td>Port 8080 đang bị chiếm, tắt terminal cũ</td></tr><tr><td>VNPAY báo sai chữ ký</td><td>Kiểm tra HashSecret, xem có encode value chưa</td></tr><tr><td>Sửa code mà không thấy đổi</td><td>Chưa Ctrl+C rồi chạy lại Java</td></tr><tr><td>Không thấy dòng IPN</td><td>Chưa khai URL IPN, hoặc link ngrok đã đổi</td></tr><tr><td>IPN trả về 97</td><td>HashSecret trong code khác trên VNPAY</td></tr><tr><td>Thanh toán xong không quay về web</td><td>Chưa set VNPAY_RETURN_URL rồi chạy lại</td></tr></tbody></table></div>
+<div class="foot"><span>Seminar VNPAY Sandbox – Lê Minh Đăng</span><span>23</span></div>
 </body></html>
