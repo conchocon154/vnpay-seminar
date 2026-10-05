@@ -74,10 +74,10 @@ for (const { png, key } of images) {
 }
 
 // pptxgenjs ghi cả ghi chú vào một đoạn, PowerPoint không xuống dòng theo \n.
-// Tách mỗi dòng thành một đoạn riêng, in đậm dòng Nói, Làm và dòng Hỏi.
+// Tách mỗi dòng thành một đoạn riêng, in đậm dòng Nói, Làm, Gõ theo thứ tự và dòng Hỏi.
 const zip = await JSZip.loadAsync(await pptx.write({ outputType: 'nodebuffer' }));
 const para = line => {
-  const bold = /^(Nói|Làm)$/.test(line) || line.startsWith('Hỏi:');
+  const bold = /^(Nói|Làm|Gõ theo thứ tự)$/.test(line) || line.startsWith('Hỏi:');
   if (!line) return '<a:p><a:endParaRPr lang="vi-VN"/></a:p>';
   return `<a:p><a:r><a:rPr lang="vi-VN" sz="1600"${bold ? ' b="1"' : ''} dirty="0"/><a:t>${line}</a:t></a:r></a:p>`;
 };
