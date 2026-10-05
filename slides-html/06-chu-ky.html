@@ -1,0 +1,7 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
+<body class="">
+<div class="eyebrow">TODO 2 – 4 · ý tưởng</div>
+<h1>Chữ ký VNPAY gồm ba bước</h1>
+<div class="content"><div class="steps"><div class="step"><div class="num">1</div><div>Sort tham số theo alphabet, bỏ value rỗng</div></div><div class="step"><div class="num">2</div><div>URL-encode value, nối thành <span class="mono">key=value&amp;key=value</span></div></div><div class="step"><div class="num">3</div><div>HMAC-SHA512 bằng HashSecret, ra hex lowercase</div></div></div><pre class="sm"><span class="ln"><span class="c">// input</span></span><span class="ln">{vnp_TxnRef=2026..., vnp_Amount=2500000, vnp_OrderInfo=Thanh toan Ca phe}</span><span class="ln"> </span><span class="ln"><span class="c">// bước 1 + 2</span></span><span class="ln hl">vnp_Amount=2500000&amp;vnp_OrderInfo=Thanh+toan+Ca+phe&amp;vnp_TxnRef=2026...</span><span class="ln"> </span><span class="ln"><span class="c">// bước 3</span></span><span class="ln hl">98bbf7a165e10ad8527a34f48b43c45d...   (128 ký tự)</span></pre></div>
+<div class="foot"><span>Ký và verify</span><div class="dots"><i class="done"></i><i class="now"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></div><span>6 / 25</span></div>
+</body></html>

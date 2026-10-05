@@ -1,19 +1,7 @@
 <!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
-<body>
-  <div class="eyebrow">Tổng kết</div>
-  <h1>Sáu điều mang về đồ án</h1>
-  <div class="stack" style="margin-top:40px">
-    <table>
-      <thead><tr><th style="width:44%">Quy tắc</th><th>Vì sao</th></tr></thead>
-      <tbody>
-        <tr><td>Chỉ ghi status từ IPN và querydr</td><td>Hai kênh server to server, có checksum</td></tr>
-        <tr><td>So lại số tiền trước khi ghi PAID</td><td>Chặn sửa vnp_Amount trên URL</td></tr>
-        <tr><td>Đã xử lý thì trả 02</td><td>VNPAY gọi lại nhiều lần</td></tr>
-        <tr><td>vnp_TxnRef duy nhất trong 24h</td><td>Thanh toán lại phải sinh txnRef mới</td></tr>
-        <tr><td>Giờ Asia/Ho_Chi_Minh</td><td>Etc/GMT+7 lệch 14 tiếng</td></tr>
-        <tr><td>HashSecret chỉ nằm trên server</td><td>Để trong JavaScript thì ai cũng ký được</td></tr>
-      </tbody>
-    </table>
-    <p class="lead">File đã điền xong sáu TODO sẽ nằm trong thư mục Drive sau buổi.</p>
-  </div>
+<body class="">
+<div class="eyebrow">Tổng kết</div>
+<h1>Sáu quy tắc mang về đồ án</h1>
+<div class="content"><table class="sm"><thead><tr><th style="width:46%">Quy tắc</th><th>Vì sao</th></tr></thead><tbody><tr><td>Chỉ ghi status từ IPN và querydr</td><td>Server to server, có checksum</td></tr><tr><td>So số tiền trước khi ghi PAID</td><td>Chặn sửa vnp_Amount</td></tr><tr><td>Đã xử lý thì trả 02</td><td>VNPAY gọi lại nhiều lần</td></tr><tr><td>vnp_TxnRef duy nhất trong 24h</td><td>Trả lại phải sinh mã mới</td></tr><tr><td>Giờ Asia/Ho_Chi_Minh</td><td>Etc/GMT+7 là UTC−7, lệch 14 tiếng</td></tr><tr><td>HashSecret chỉ nằm trên server</td><td>Nằm trong JavaScript là ai cũng ký được</td></tr></tbody></table><div class="cards"><div class="card"><h3>Sang Spring Boot</h3><p><span class="mono">hmacSHA512</span>, <span class="mono">buildQueryString</span> giữ nguyên. <span class="mono">ORDERS</span> → Repository. <span class="mono">HttpServer</span> → <span class="mono">@RestController</span>.</p></div></div></div>
+<div class="foot"><span>Tổng kết</span><span>24 / 25</span></div>
 </body></html>

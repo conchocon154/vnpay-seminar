@@ -1,20 +1,7 @@
 <!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
-<body>
-  <div class="eyebrow">ngrok · bước 5</div>
-  <h1>Khai hai URL và chạy lại Java</h1>
-  <div class="stack" style="margin-top:40px">
-    <p class="lead">Vào <span class="mono">sandbox.vnpayment.vn/merchantv2</span>, mục Cấu hình, Thông tin website.</p>
-    <table>
-      <thead><tr><th style="width:36%">Trường</th><th>Điền</th></tr></thead>
-      <tbody>
-        <tr><td>URL trả về</td><td class="mono">https://a1b2-....ngrok-free.app/vnpay/return</td></tr>
-        <tr><td>URL nhận kết quả IPN</td><td class="mono">https://a1b2-....ngrok-free.app/vnpay/ipn</td></tr>
-      </tbody>
-    </table>
-    <div>
-      <div class="file">terminal chạy Java</div>
-      <pre>export VNPAY_RETURN_URL=https://a1b2-....ngrok-free.app/vnpay/return
-java ShopStart.java</pre>
-    </div>
-  </div>
+<body class="">
+<div class="eyebrow">ngrok · bước 5 / 5</div>
+<h1>Khai hai URL rồi chạy lại Java</h1>
+<div class="content"><p class="lead">Vào <span class="mono">sandbox.vnpayment.vn/merchantv2</span> → Cấu hình → Thông tin website</p><table class="sm"><thead><tr><th style="width:30%">Ô</th><th>Điền</th></tr></thead><tbody><tr><td>URL trả về</td><td class="mono">https://&lt;id&gt;.ngrok-free.app/vnpay/return</td></tr><tr><td>URL nhận kết quả IPN</td><td class="mono">https://&lt;id&gt;.ngrok-free.app/vnpay/ipn</td></tr></tbody></table><div><div class="file">macOS, Linux</div><pre class="sm"><span class="ln hl">export VNPAY_RETURN_URL=https://&lt;id&gt;.ngrok-free.app/vnpay/return</span><span class="ln">java ShopStart.java</span></pre></div><div><div class="file">Windows PowerShell</div><pre class="sm"><span class="ln hl">$env:VNPAY_RETURN_URL="https://&lt;id&gt;.ngrok-free.app/vnpay/return"</span><span class="ln">java ShopStart.java</span></pre></div></div>
+<div class="foot"><span>ngrok</span><span>19 / 25</span></div>
 </body></html>

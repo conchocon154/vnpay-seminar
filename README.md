@@ -11,7 +11,7 @@ Tạo yêu cầu thanh toán, nhận callback, đối soát giao dịch. Có hai
 | `src/` | Bản Spring Boot |
 | `CHUAN-BI.md` | Cài đặt trước buổi seminar |
 | `SEMINAR.md` | Thứ tự trong buổi |
-| `slides-html/` + `build-html-pptx.mjs` | Nguồn slide, build bằng `npm run build:slides` |
+| `slides-html/` + `build-html-pptx.mjs` | Nguồn slide và ghi chú (`notes.json`), build bằng `npm install && npm run build:slides` |
 
 ## Bước 1. Lấy TmnCode và HashSecret
 

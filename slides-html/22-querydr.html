@@ -1,0 +1,7 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
+<body class="">
+<div class="eyebrow">Viết sẵn trong file</div>
+<h1>querydr: hàm reconcile đã có sẵn</h1>
+<div class="content"><div><div class="file">ShopStart.java, phần dưới</div><pre class="sm"><span class="ln"><span class="c">// hashData của querydr nối bằng '|', không sort alphabet</span></span><span class="ln hl">String hashData = String.join(<span class="s">"|"</span>, requestId, <span class="s">"2.1.0"</span>, <span class="s">"querydr"</span>, TMN_CODE,</span><span class="ln hl">        order.txnRef, order.createDate, now, <span class="s">"127.0.0.1"</span>, info);</span></pre></div><div class="cards"><div class="card"><h3>Khi nào chạy</h3><p>Trang kết quả gọi <span class="mono">/api/orders</span>, đơn còn PENDING thì hỏi VNPAY.</p></div><div class="card"><h3>Vẫn an toàn</h3><p>Hỏi thẳng VNPAY, so lại số tiền rồi mới ghi PAID.</p></div><div class="card"><h3>Ký khác pay</h3><p>Nối bằng <span class="mono">|</span> theo thứ tự cố định. Dùng buildQueryString ở đây là sai.</p></div></div></div>
+<div class="foot"><span>Đối soát</span><span>22 / 25</span></div>
+</body></html>

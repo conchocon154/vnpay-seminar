@@ -8,7 +8,8 @@
  */
 import puppeteer from 'puppeteer';
 import PptxGenJS from 'pptxgenjs';
-import { readdir, mkdir, readFile } from 'fs/promises';
+import JSZip from 'jszip';
+import { readdir, mkdir, readFile, writeFile } from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -34,11 +35,24 @@ for (const f of files) {
   await page.evaluateHandle('document.fonts.ready');
 
   // Cảnh báo nếu nội dung vượt quá khổ slide, vì phần thừa sẽ bị cắt mất
+  // Cảnh báo luôn khi khối code bị cắt ngang hoặc nội dung đè lên chân trang
   const over = await page.evaluate(() => {
     const d = document.documentElement, b = document.body;
-    return Math.max(d.scrollHeight, b.scrollHeight) - 1080;
+    const issues = [];
+    const h = Math.max(d.scrollHeight, b.scrollHeight) - 1080;
+    if (h > 2) issues.push('cao hơn ' + h + 'px');
+    document.querySelectorAll('pre').forEach(p => {
+      if (p.scrollWidth > p.clientWidth + 1) issues.push('code rộng hơn ' + (p.scrollWidth - p.clientWidth) + 'px');
+    });
+    const foot = document.querySelector('.foot');
+    const content = document.querySelector('.content');
+    if (foot && content) {
+      const bottom = Math.max(...[...content.querySelectorAll('*')].map(e => e.getBoundingClientRect().bottom));
+      if (bottom > foot.getBoundingClientRect().top - 8) issues.push('đè chân trang');
+    }
+    return issues;
   });
-  if (over > 2) { console.log('  TRÀN', over + 'px:', f); overflow.push(f); }
+  if (over.length) { console.log('  TRÀN', f + ':', over.join(', ')); overflow.push(f); }
 
   const png = path.join(OUT_IMG, f.replace('.html', '.png'));
   await page.screenshot({ path: png, clip: { x: 0, y: 0, width: W, height: H } });
@@ -59,7 +73,22 @@ for (const { png, key } of images) {
   if (notes[key]) slide.addNotes(notes[key]);
 }
 
-await pptx.writeFile({ fileName: OUT_PPTX });
+// pptxgenjs ghi cả ghi chú vào một đoạn, PowerPoint không xuống dòng theo \n.
+// Tách mỗi dòng thành một đoạn riêng, in đậm NÓI, LÀM và dòng Hỏi.
+const zip = await JSZip.loadAsync(await pptx.write({ outputType: 'nodebuffer' }));
+const para = line => {
+  const bold = /^(NÓI|LÀM)$/.test(line) || line.startsWith('Hỏi:');
+  if (!line) return '<a:p><a:endParaRPr lang="vi-VN"/></a:p>';
+  return `<a:p><a:r><a:rPr lang="vi-VN"${bold ? ' b="1"' : ''} dirty="0"/><a:t>${line}</a:t></a:r></a:p>`;
+};
+for (const name of Object.keys(zip.files).filter(n => /^ppt\/notesSlides\/notesSlide\d+\.xml$/.test(n))) {
+  const xml = await zip.file(name).async('string');
+  const fixed = xml.replace(
+    /<a:p><a:r><a:rPr lang="en-US" dirty="0"\/><a:t>([\s\S]*?)<\/a:t><\/a:r><a:endParaRPr lang="en-US" dirty="0"\/><\/a:p>/,
+    (_, text) => text.split(/\r?\n/).map(para).join(''));
+  zip.file(name, fixed);
+}
+await writeFile(OUT_PPTX, await zip.generateAsync({ type: 'nodebuffer', compression: 'DEFLATE' }));
 console.log('đã ghi', OUT_PPTX, '|', images.length, 'slide');
 if (overflow.length) {
   console.log('CẢNH BÁO, slide bị cắt:', overflow.join(', '));

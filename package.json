@@ -6,6 +6,7 @@
     "build:slides": "node build-html-pptx.mjs"
   },
   "dependencies": {
+    "jszip": "^3.10.1",
     "pptxgenjs": "^4.0.1",
     "puppeteer": "^25.11.0"
   }

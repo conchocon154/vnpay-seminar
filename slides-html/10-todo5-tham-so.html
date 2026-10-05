@@ -1,19 +1,7 @@
 <!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
-<body>
-  <div class="eyebrow">TODO 5</div>
-  <h1>Mười ba tham số gửi sang VNPAY</h1>
-  <div class="stack" style="margin-top:40px">
-    <table>
-      <thead><tr><th style="width:28%">Tham số</th><th style="width:34%">Giá trị</th><th>Chú ý</th></tr></thead>
-      <tbody>
-        <tr><td class="mono">vnp_Amount</td><td class="mono">amount * 100</td><td>Nhân 100, số nguyên</td></tr>
-        <tr><td class="mono">vnp_TxnRef</td><td class="mono">newTxnRef(createDate)</td><td>Duy nhất trong 24h</td></tr>
-        <tr><td class="mono">vnp_CreateDate</td><td class="mono">now.format(TIME)</td><td>Giờ Việt Nam</td></tr>
-        <tr><td class="mono">vnp_ExpireDate</td><td class="mono">now.plusMinutes(15)</td><td>Quá hạn là bị từ chối</td></tr>
-        <tr><td class="mono">vnp_ReturnUrl</td><td class="mono">RETURN_URL</td><td>Đổi khi bật ngrok</td></tr>
-        <tr><td class="mono">vnp_BankCode</td><td class="mono">bankCode</td><td>Rỗng thì VNPAY hiện trang chọn</td></tr>
-      </tbody>
-    </table>
-    <p class="lead">Còn lại là hằng số: Version 2.1.0, Command pay, CurrCode VND, OrderType other, Locale vn, TmnCode, IpAddr.</p>
-  </div>
+<body class="">
+<div class="eyebrow">TODO 5 / 6 · phần 1</div>
+<h1>createPayment: lưu đơn, ráp tham số</h1>
+<div class="content"><div class="split"><div class="main"><div class="file">ShopStart.java</div><pre class="xs"><span class="ln"><span class="k">static</span> String createPayment(<span class="k">long</span> amount, String orderInfo, String bankCode) {</span><span class="ln">    LocalDateTime now = LocalDateTime.now(VN);</span><span class="ln">    String createDate = now.format(TIME);</span><span class="ln">    String txnRef = newTxnRef(createDate);</span><span class="ln hl">    ORDERS.put(txnRef, <span class="k">new</span> Order(txnRef, amount, orderInfo, createDate));</span><span class="ln"> </span><span class="ln">    Map&lt;String, String&gt; p = <span class="k">new</span> HashMap&lt;&gt;();</span><span class="ln">    p.put(<span class="s">"vnp_Version"</span>, <span class="s">"2.1.0"</span>);</span><span class="ln">    p.put(<span class="s">"vnp_Command"</span>, <span class="s">"pay"</span>);</span><span class="ln">    p.put(<span class="s">"vnp_TmnCode"</span>, TMN_CODE);</span><span class="ln hl">    p.put(<span class="s">"vnp_Amount"</span>, String.valueOf(amount * 100));</span><span class="ln">    p.put(<span class="s">"vnp_CurrCode"</span>, <span class="s">"VND"</span>);</span><span class="ln hl">    p.put(<span class="s">"vnp_TxnRef"</span>, txnRef);</span><span class="ln">    p.put(<span class="s">"vnp_OrderInfo"</span>, orderInfo);</span><span class="ln">    p.put(<span class="s">"vnp_OrderType"</span>, <span class="s">"other"</span>);</span><span class="ln">    p.put(<span class="s">"vnp_Locale"</span>, <span class="s">"vn"</span>);</span><span class="ln hl">    p.put(<span class="s">"vnp_ReturnUrl"</span>, RETURN_URL);</span><span class="ln">    p.put(<span class="s">"vnp_IpAddr"</span>, <span class="s">"127.0.0.1"</span>);</span><span class="ln">    p.put(<span class="s">"vnp_CreateDate"</span>, createDate);</span><span class="ln hl">    p.put(<span class="s">"vnp_ExpireDate"</span>, now.plusMinutes(15).format(TIME));</span><span class="ln">    <span class="k">if</span> (bankCode != <span class="k">null</span> &amp;&amp; !bankCode.isBlank()) p.put(<span class="s">"vnp_BankCode"</span>, bankCode);</span></pre></div><div class="side"><div class="tip"><b>ORDERS.put</b><p>Lưu đơn PENDING trước, IPN về còn có cái để tra.</p></div><div class="tip"><b>amount * 100</b><p>25.000đ gửi đi là 2500000.</p></div><div class="tip"><b>txnRef</b><p>Duy nhất trong 24h. Trả lại thì sinh mã mới.</p></div><div class="tip"><b>RETURN_URL</b><p>Đổi sang URL ngrok ở bước sau.</p></div><div class="tip"><b>+15 phút</b><p>Quá hạn VNPAY từ chối.</p></div></div></div></div>
+<div class="foot"><span>Tạo URL thanh toán</span><div class="dots"><i class="done"></i><i class="done"></i><i class="done"></i><i class="done"></i><i class="now"></i><i class=""></i></div><span>10 / 25</span></div>
 </body></html>

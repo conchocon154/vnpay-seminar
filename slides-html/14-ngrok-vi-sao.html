@@ -1,12 +1,7 @@
 <!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
-<body>
-  <div class="eyebrow">ngrok · vì sao</div>
-  <h1>VNPAY cần gọi ngược về máy mình</h1>
-  <div class="stack" style="margin-top:44px">
-    <pre>Máy mình        http://localhost:8080      <span class="c">// only your machine</span>
-Server VNPAY    ở đâu đó trên Internet     <span class="c">// cannot reach localhost</span>
-
-ngrok  →  https://abc123.ngrok-free.app  →  localhost:8080</pre>
-    <p class="lead">ngrok cấp một public URL, ai gọi vào đó thì nó forward về máy mình. Bốn bước dưới đây, mỗi người tự làm trên máy của mình.</p>
-  </div>
+<body class="">
+<div class="eyebrow">ngrok · vì sao</div>
+<h1>Khách tắt tab là đơn kẹt PENDING</h1>
+<div class="content"><div class="cards"><div class="card"><h3>Hiện tại</h3><p>querydr chỉ chạy khi trang kết quả mở. Không ai mở thì không ai hỏi.</p></div><div class="card"><h3>Cần thêm</h3><p>IPN: VNPAY tự gọi về server ngay khi khách trả tiền, có retry.</p></div></div><pre class="lg"><span class="ln">Server VNPAY  ---X---&gt;  localhost:8080</span><span class="ln"> </span><span class="ln hl">Server VNPAY  ------&gt;  https://a1b2.ngrok-free.app  ------&gt;  localhost:8080</span></pre><p class="lead">ngrok cấp một URL public và chuyển mọi request về máy mình. Năm bước sau, mỗi người tự làm.</p></div>
+<div class="foot"><span>ngrok</span><span>14 / 25</span></div>
 </body></html>
