@@ -45,8 +45,8 @@ Mỗi người một tài khoản riêng, bản free chỉ mở được 1 tunne
 
 ## Bước 4. Chạy thử code
 
-1. Tải `ShopStart.java` và `index.html` trên Drive, để chung một thư mục
-2. Mở terminal tại thư mục đó:
+1. Giải nén file zip, giữ `ShopStart.java` và `index.html` chung một thư mục
+2. Mở thư mục đó bằng VSCode, mở terminal (Terminal → New Terminal) rồi chạy:
 
    ```bash
    java ShopStart.java
