@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
 <body class="">
 <div class="eyebrow">Tổng kết</div>
-<h1>Lưu ý khi làm đồ án</h1>
+<h1>Mấy điều nên nhớ khi tích hợp VNPAY</h1>
 <div class="content"><ul class="list "><li>Chỉ cập nhật trạng thái đơn từ IPN hoặc querydr, không dùng ReturnURL</li><li>So lại số tiền với đơn trong DB trước khi cập nhật PAID</li><li>Đơn đã xử lý rồi thì trả 02, vì VNPAY có thể gọi IPN nhiều lần</li><li><span class="mono">vnp_TxnRef</span> không được trùng, thanh toán lại thì tạo mã mới</li><li>Dùng múi giờ <span class="mono">Asia/Ho_Chi_Minh</span>, đừng dùng <span class="mono">Etc/GMT+7</span> (bị lệch 14 tiếng)</li><li>HashSecret chỉ để ở server</li></ul><div class="note"><b>Chuyển sang Spring Boot</b><ul class="list "><li>Hai hàm <span class="mono">hmacSHA512</span> và <span class="mono">buildQueryString</span> dùng lại được</li><li><span class="mono">ORDERS</span> đổi thành Repository, <span class="mono">HttpServer</span> đổi thành <span class="mono">@RestController</span></li></ul></div></div>
 <div class="foot"><span>Seminar VNPAY Sandbox – Lê Minh Đăng</span><span>24</span></div>
 </body></html>

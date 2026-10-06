@@ -133,7 +133,7 @@ Mã hay gặp: `24` khách hủy, `51` không đủ số dư, `11` hết hạn, 
 | Bị sửa số tiền | So `vnp_Amount` với DB trước khi PAID |
 | VNPAY từ chối ReturnUrl | `vnp_ReturnUrl` phải khớp domain đã đăng ký |
 
-## Đưa vào đồ án
+## Đưa vào project của bạn
 
 1. Copy `util/VnpayUtils.java` sang project
 2. Thay `OrderStore` bằng repository của bạn

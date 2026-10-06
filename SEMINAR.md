@@ -49,5 +49,5 @@ Slide ở `VNPAY-seminar.pptx`, 25 slide. Ghi chú mỗi slide có phần Nói, 
 
 1. Slide 22: hàm `reconcile` gọi querydr, ký nối bằng `|`, không sort
 2. Slide 23: lỗi thường gặp
-3. Slide 24: sáu quy tắc mang về đồ án, cách chuyển sang Spring Boot
+3. Slide 24: mấy điều nên nhớ khi tích hợp VNPAY, cách chuyển sang Spring Boot
 4. Slide 25: hỏi đáp, gửi `ShopDone.java` cho lớp
