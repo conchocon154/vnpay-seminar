@@ -15,13 +15,13 @@
   --code-dim: #7d8ca3;
   --ok: #0b6b47;
   --warn: #c42b22;
-  --mono: 'IBM Plex Mono', monospace;
+  --mono: 'Courier New', monospace;
 }
 
 body {
   width: 1920px; height: 1080px; position: relative;
   background: var(--bg); color: var(--ink);
-  font-family: 'Be Vietnam Pro', -apple-system, 'Segoe UI', sans-serif;
+  font-family: Arial, sans-serif;
   font-size: 26px; line-height: 1.5;
   padding: 64px 104px 96px;
   display: flex; flex-direction: column;
