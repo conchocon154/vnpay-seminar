@@ -169,9 +169,11 @@ public class ShopDone {
                     HttpResponse.BodyHandlers.ofString()).body();
             if (!"00".equals(jsonValue(json, "vnp_ResponseCode"))) return;
             if (!String.valueOf(order.amount * 100).equals(jsonValue(json, "vnp_Amount"))) return;
+            String st = jsonValue(json, "vnp_TransactionStatus");   // 00 thành công, 02 lỗi, 01 chưa xong
+            if (!"00".equals(st) && !"02".equals(st)) return;          // chưa có kết quả cuối thì để PENDING
             synchronized (order) {
                 if (!"PENDING".equals(order.status)) return;
-                order.status = "00".equals(jsonValue(json, "vnp_TransactionStatus")) ? "PAID" : "FAILED";
+                order.status = "00".equals(st) ? "PAID" : "FAILED";
                 order.transactionNo = jsonValue(json, "vnp_TransactionNo");
                 order.bankCode = jsonValue(json, "vnp_BankCode");
                 log("querydr " + order.txnRef + " -> " + order.status + " " + order.transactionNo);

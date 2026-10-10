@@ -1,0 +1,7 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
+<body class="">
+<div class="eyebrow">Kiến trúc hướng dịch vụ</div>
+<h1>VNPAY là dịch vụ bên ngoài, hợp đồng do VNPAY đặt</h1>
+<div class="content"><div class="split"><div class="main" style="width:820px"><div class="file">VNPAY quy định, mình phải làm theo</div><ul class="list "><li>Địa chỉ gọi tới và phương thức HTTP (GET, POST)</li><li>Tên và định dạng từng tham số <span class="mono">vnp_*</span></li><li>Cách ký: sắp xếp, encode, HMAC-SHA512</li><li>Mã trả về cho IPN: 00, 01, 02, 04, 97, 99</li><li>Thời gian theo giờ Việt Nam GMT+7</li></ul></div><div class="side"><div class="file">Mình tự quyết</div><ul class="list "><li>Payment Service chia hàm thế nào</li><li>Lưu đơn ở đâu (hôm nay là Map trong bộ nhớ)</li><li>API giữa web và Payment Service</li><li>Khi nào gọi querydr để hỏi lại</li><li>Xử lý hai request tới cùng lúc</li></ul></div></div><blockquote><div>Tài liệu dùng trong bài: VNPAY API v2.1.0, mục Thanh toán PAY và Truy vấn, hoàn tiền</div><div class="src">sandbox.vnpayment.vn/apis/docs</div></blockquote></div>
+<div class="foot"><span>Seminar VNPAY Sandbox – Lê Minh Đăng</span><span>4</span></div>
+</body></html>

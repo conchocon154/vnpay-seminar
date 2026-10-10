@@ -1,0 +1,7 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
+<body class="">
+<div class="eyebrow">Mở endpoint ra internet</div>
+<h1>IPN cần một URL public, nên cần ngrok</h1>
+<div class="content"><div class="why"><div class="row"><div class="tag v">VNPAY yêu cầu</div><div class="t">IPN URL phải gọi được từ internet và dùng HTTPS</div></div><div class="row"><div class="tag m">Mình chọn</div><div class="t">Lúc dev dùng ngrok tạo link HTTPS public trỏ về <span class="mono">localhost:8080</span></div></div><div class="row"><div class="tag m">Mình chọn</div><div class="t">Hệ thống thật: IPN đi qua API Gateway hoặc Ingress, có domain và chứng chỉ riêng</div></div></div><pre class="lg"><span class="ln">VNPAY  ---X---&gt;  localhost:8080</span><span class="ln"> </span><span class="ln hl">VNPAY  ------&gt;  https://a1b2.ngrok-free.app  ------&gt;  localhost:8080</span></pre></div>
+<div class="foot"><span>Seminar VNPAY Sandbox – Lê Minh Đăng</span><span>19</span></div>
+</body></html>

@@ -1,0 +1,7 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
+<body class="">
+<div class="eyebrow">Tổng kết</div>
+<h1>Tóm lại</h1>
+<div class="content"><ul class="list num"><li>Payment Service là chỗ duy nhất nói chuyện với VNPAY</li><li>Giao tiếp qua 4 kênh: redirect GET, ReturnURL GET, IPN GET (webhook), querydr POST JSON</li><li>Chỉ IPN và querydr được cập nhật trạng thái đơn</li><li>Chữ ký HMAC-SHA512 và định dạng tham số là VNPAY bắt, làm sai là bị từ chối</li><li>Cách lưu đơn, khoá, phát event là mình chọn, đổi theo hệ thống của mình</li></ul><div class="note"><b>Chuyển sang Spring Boot</b><ul class="list "><li>Hai hàm <span class="mono">hmacSHA512</span>, <span class="mono">buildQueryString</span> và logic IPN dùng lại được</li><li><span class="mono">ORDERS</span> đổi thành Repository, <span class="mono">HttpServer</span> đổi thành <span class="mono">@RestController</span></li></ul></div></div>
+<div class="foot"><span>Seminar VNPAY Sandbox – Lê Minh Đăng</span><span>28</span></div>
+</body></html>

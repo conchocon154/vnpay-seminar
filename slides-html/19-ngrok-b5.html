@@ -1,7 +1,0 @@
-<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
-<body class="">
-<div class="eyebrow">Phần 3 – ngrok</div>
-<h1>Bước 5: Khai URL trên VNPAY và chạy lại</h1>
-<div class="content"><p class="lead">Vào <span class="mono">sandbox.vnpayment.vn/merchantv2</span> → Cấu hình → Thông tin website</p><table class="sm"><thead><tr><th style="width:30%">Mục</th><th>Điền</th></tr></thead><tbody><tr><td>URL trả về</td><td class="mono">https://&lt;id&gt;.ngrok-free.app/vnpay/return</td></tr><tr><td>URL nhận kết quả IPN</td><td class="mono">https://&lt;id&gt;.ngrok-free.app/vnpay/ipn</td></tr></tbody></table><div><div class="file">macOS, Linux</div><pre class="sm"><span class="ln hl">export VNPAY_RETURN_URL=https://&lt;id&gt;.ngrok-free.app/vnpay/return</span><span class="ln">java ShopStart.java</span></pre></div><div><div class="file">Windows (PowerShell)</div><pre class="sm"><span class="ln hl">$env:VNPAY_RETURN_URL="https://&lt;id&gt;.ngrok-free.app/vnpay/return"</span><span class="ln">java ShopStart.java</span></pre></div></div>
-<div class="foot"><span>Seminar VNPAY Sandbox – Lê Minh Đăng</span><span>19</span></div>
-</body></html>

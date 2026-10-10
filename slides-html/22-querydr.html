@@ -1,7 +1,0 @@
-<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
-<body class="">
-<div class="eyebrow">Phần 5 – Thêm</div>
-<h1>API querydr (đã có sẵn trong code)</h1>
-<div class="content"><div><div class="file">ShopStart.java, hàm reconcile</div><pre class=""><span class="ln"><span class="c">// hashData của querydr nối bằng '|', không sắp xếp alphabet</span></span><span class="ln hl">String hashData = String.join(<span class="s">"|"</span>, requestId, <span class="s">"2.1.0"</span>, <span class="s">"querydr"</span>, TMN_CODE,</span><span class="ln hl">        order.txnRef, order.createDate, now, <span class="s">"127.0.0.1"</span>, info);</span></pre></div><ul class="list "><li>Chạy khi trang kết quả gọi <span class="mono">/api/orders</span> mà đơn vẫn còn PENDING</li><li>Vẫn an toàn vì hỏi thẳng VNPAY và có so lại số tiền</li><li>Cách ký khác với lúc tạo link: nối bằng dấu <span class="mono">|</span> theo thứ tự cố định, không dùng buildQueryString</li></ul></div>
-<div class="foot"><span>Seminar VNPAY Sandbox – Lê Minh Đăng</span><span>22</span></div>
-</body></html>

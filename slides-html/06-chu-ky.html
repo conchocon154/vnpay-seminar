@@ -1,7 +1,0 @@
-<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
-<body class="">
-<div class="eyebrow">Phần 1 – Chữ ký</div>
-<h1>Cách VNPAY tạo chữ ký</h1>
-<div class="content"><ul class="list num"><li>Sắp xếp tham số theo thứ tự alphabet, bỏ mấy tham số rỗng</li><li>URL-encode giá trị, nối lại thành <span class="mono">key=value&amp;key=value</span></li><li>Băm HMAC-SHA512 với HashSecret, ra chuỗi hex chữ thường</li></ul><pre class="sm"><span class="ln"><span class="c">// dữ liệu ban đầu</span></span><span class="ln">{vnp_TxnRef=2026..., vnp_Amount=2500000, vnp_OrderInfo=Thanh toan Ca phe}</span><span class="ln"> </span><span class="ln"><span class="c">// sau bước 1, 2</span></span><span class="ln hl">vnp_Amount=2500000&amp;vnp_OrderInfo=Thanh+toan+Ca+phe&amp;vnp_TxnRef=2026...</span><span class="ln"> </span><span class="ln"><span class="c">// sau bước 3</span></span><span class="ln hl">98bbf7a165e10ad8527a34f48b43c45d...   (128 ký tự)</span></pre></div>
-<div class="foot"><span>Seminar VNPAY Sandbox – Lê Minh Đăng</span><span>6</span></div>
-</body></html>

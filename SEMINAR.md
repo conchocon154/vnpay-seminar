@@ -1,53 +1,37 @@
-# Seminar VNPAY Sandbox: thứ tự trong buổi
+# Seminar VNPAY trong kiến trúc microservice: thứ tự trong buổi
 
-Slide ở `VNPAY-seminar.pptx`, 25 slide. Ghi chú mỗi slide có phần Nói, Làm và 2 câu hỏi kèm đáp án.
+Slide ở `VNPAY-seminar.pptx`, 29 slide. Ghi chú mỗi slide có phần Nói, Làm, các bước gõ code và câu hỏi kèm đáp án. Bằng chứng cho từng ý nằm ở `CHUNG-MINH.md`.
 
-## Bước 1. Mở đầu (slide 1–4)
+## Phần 1. Bức tranh chung và chứng minh (slide 1–9)
 
-1. Slide 2: cho xem kết quả cuối buổi, đơn chuyển sang PAID
-2. Slide 3: 4 request. Chỉ IPN và querydr được ghi status, ReturnURL chỉ để hiển thị
-3. Slide 4: để `ShopStart.java` và `index.html` chung một thư mục, chạy `java ShopStart.java`, mở http://localhost:8080
+1. Slide 2: hôm nay làm gì, hai nhãn "VNPAY yêu cầu" và "Mình chọn"
+2. Slide 3: Payment Service là chỗ duy nhất nói chuyện với VNPAY, phát event `OrderPaid`
+3. Slide 4: VNPAY là dịch vụ bên ngoài, hợp đồng API do VNPAY đặt
+4. Slide 5–6: 4 kênh giao tiếp: redirect GET, ReturnURL GET, IPN GET (webhook), querydr POST JSON
+5. Slide 7: vì sao redirect + query string, ảnh trang thanh toán thật
+6. Slide 8: vì sao IPN là kênh chính, trích tài liệu, VNPAY gọi lại 10 lần
+7. Slide 9: thử chữ ký trên sandbox: sửa tiền, không sắp xếp, không encode đều bị từ chối
 
-## Bước 2. Ký và verify (slide 5–9)
+## Phần 2. Code Payment Service (slide 10–18)
 
-1. TODO 1: điền `TMN_CODE` (8 ký tự) và `HASH_SECRET` (32 ký tự)
-2. TODO 2: `hmacSHA512` trả hex lowercase, 128 ký tự
-3. TODO 3: `buildQueryString`: sort alphabet, bỏ value rỗng, URL-encode value
-4. TODO 4: `isValidSignature`: bỏ `vnp_SecureHash`, ký lại phần còn lại, so sánh
+1. Slide 10: chạy code ban đầu
+2. TODO 1–4 (slide 11–14): key, `hmacSHA512`, `buildQueryString`, `isValidSignature`
+3. TODO 5 (slide 15–16): `createPayment`, 13 tham số, trả `{txnRef, paymentUrl}`
+4. Slide 17–18: test lần 1, thanh toán thẻ test, đơn PAID nhờ querydr
 
-## Bước 3. Tạo URL thanh toán (slide 10–13)
+## Phần 3. Mở endpoint ra internet (slide 19–21)
 
-1. TODO 5 phần 1: lưu đơn PENDING, ráp 13 tham số `vnp_*`
-2. TODO 5 phần 2: ký, trả `{txnRef, paymentUrl}`
-3. Kiểm tra 1: bấm Thanh toán, chuyển sang trang VNPAY
-4. Quẹt thẻ NCB `9704198526191432198` / `NGUYEN VAN A` / `07/15` / OTP `123456`. Đơn PAID nhờ querydr, log chưa có IPN
+1. IPN cần URL HTTPS public, dev dùng ngrok, thật dùng API Gateway hoặc Ingress
+2. `ngrok http 8080`, khai URL trả về và URL IPN, set `VNPAY_RETURN_URL` rồi chạy lại Java
 
-## Bước 4. ngrok (slide 14–19)
+## Phần 4. IPN và querydr (slide 22–24)
 
-1. Slide 14: khách tắt tab thì không ai gọi querydr, đơn kẹt PENDING. Cần IPN, nên cần ngrok
-2. Tạo tài khoản, cài ngrok, gắn authtoken
-3. `ngrok http 8080`, giữ nguyên cửa sổ đó
-4. Copy URL `https` ở dòng Forwarding
-5. Khai URL trả về và URL IPN trong merchant portal
-6. Set `VNPAY_RETURN_URL` (macOS: `export`, Windows: `$env:`) rồi chạy lại Java
+1. TODO 6: `handleIpn` trả 97, 01, 04, 02, 00
+2. Test lần 2: log có dòng IPN
+3. querydr: request và response thật gọi lên sandbox
 
-## Bước 5. IPN (slide 20–21)
+## Phần 5. Nhìn lại theo microservice (slide 25–29)
 
-1. TODO 6: `handleIpn` trả `RspCode`:
-
-   | RspCode | Khi nào |
-   |---|---|
-   | `97` | Sai chữ ký |
-   | `01` | Không có đơn |
-   | `04` | Sai số tiền |
-   | `02` | Đơn đã xử lý |
-   | `00` | Ghi nhận xong |
-
-2. Kiểm tra 2: thanh toán lại, log có dòng IPN, đơn PAID
-
-## Bước 6. Kết thúc (slide 22–25)
-
-1. Slide 22: hàm `reconcile` gọi querydr, ký nối bằng `|`, không sort
-2. Slide 23: lỗi thường gặp
-3. Slide 24: mấy điều nên nhớ khi tích hợp VNPAY, cách chuyển sang Spring Boot
-4. Slide 25: hỏi đáp, gửi `ShopDone.java` cho lớp
+1. Các pattern: gateway cho dịch vụ ngoài, webhook, retry + idempotency, eventual consistency, reconciliation, message authentication
+2. Từ demo lên hệ thống thật: DB, transaction, outbox, job định kỳ, API Gateway, Secret Manager
+3. Lỗi hay gặp, tóm tắt, hỏi đáp, gửi `ShopDone.java` cho lớp

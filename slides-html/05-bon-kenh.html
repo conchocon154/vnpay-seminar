@@ -1,0 +1,7 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
+<body class="">
+<div class="eyebrow">Giao tiếp với VNPAY</div>
+<h1>Bốn kênh giao tiếp, mỗi kênh một kiểu</h1>
+<div class="content"><table class="sm"><thead><tr><th style="width:4%">#</th><th style="width:17%">Kênh</th><th style="width:25%">Ai gọi ai</th><th style="width:9%">HTTP</th><th style="width:22%">Dữ liệu</th><th>Kiểu</th></tr></thead><tbody><tr><td>1</td><td>Tạo thanh toán</td><td>Trình duyệt → VNPAY</td><td class="mono">GET</td><td>Query string + chữ ký</td><td>Chuyển trang (redirect)</td></tr><tr><td>2</td><td>ReturnURL</td><td>VNPAY → trình duyệt → server</td><td class="mono">GET</td><td>Query string + chữ ký</td><td>Chuyển trang, chỉ để hiển thị</td></tr><tr><td>3</td><td>IPN</td><td>Server VNPAY → Payment Service</td><td class="mono">GET</td><td>Query string, mình trả JSON</td><td>Webhook, bất đồng bộ</td></tr><tr><td>4</td><td>querydr</td><td>Payment Service → API VNPAY</td><td class="mono">POST</td><td>JSON cả hai chiều</td><td>Request/response, đồng bộ</td></tr></tbody></table><div class="why"><div class="row"><div class="tag v">VNPAY yêu cầu</div><div class="t">Cả 4 kênh, phương thức HTTP và định dạng dữ liệu đều theo tài liệu VNPAY</div></div><div class="row"><div class="tag m">Mình chọn</div><div class="t">Kênh 4 không bắt buộc. Mình dùng để hỏi lại khi IPN chưa về</div></div></div></div>
+<div class="foot"><span>Seminar VNPAY Sandbox – Lê Minh Đăng</span><span>5</span></div>
+</body></html>

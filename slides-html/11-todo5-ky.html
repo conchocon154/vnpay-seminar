@@ -1,7 +1,0 @@
-<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
-<body class="">
-<div class="eyebrow">Phần 2 – Tạo link thanh toán</div>
-<h1>TODO 5 – Hàm createPayment (2/2)</h1>
-<div class="content"><div><div class="file">ShopStart.java (viết tiếp phần trên)</div><pre class=""><span class="ln hl">    String query = buildQueryString(p);</span><span class="ln hl">    String url = PAY_URL + <span class="s">"?"</span> + query + <span class="s">"&amp;vnp_SecureHash="</span> + hmacSHA512(HASH_SECRET, query);</span><span class="ln">    <span class="k">return</span> <span class="s">"{\"txnRef\":\""</span> + txnRef + <span class="s">"\",\"paymentUrl\":\""</span> + url + <span class="s">"\"}"</span>;</span><span class="ln">}</span></pre></div><div><div class="file">Link thanh toán sẽ có dạng</div><pre class=""><span class="ln">https://sandbox.vnpayment.vn/paymentv2/vpcpay.html</span><span class="ln">  ?vnp_Amount=2500000&amp;vnp_Command=pay&amp;...&amp;vnp_TxnRef=20261005101433482913</span><span class="ln"><span class="h">  &amp;vnp_SecureHash=98bbf7a165e10ad8527a34f48b43c45d...</span></span></pre></div><ul class="list "><li>Chữ ký gắn ở cuối link, không nằm trong chuỗi đem đi ký</li><li>Việc ký làm ở server, trang HTML không giữ HashSecret</li></ul></div>
-<div class="foot"><span>Seminar VNPAY Sandbox – Lê Minh Đăng</span><span>11</span></div>
-</body></html>

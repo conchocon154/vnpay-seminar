@@ -103,7 +103,7 @@ function extract() {
     }
     const kids = [...el.childNodes];
     const hasText = kids.some(n => n.nodeType === 3 && n.textContent.trim());
-    const allInline = kids.every(n => n.nodeType !== 1 || (INLINE.has(n.tagName) && getComputedStyle(n).display.startsWith('inline')));
+    const allInline = kids.every(n => n.nodeType !== 1 || (INLINE.has(n.tagName) && getComputedStyle(n).display === 'inline'));
     if (el !== document.body && (hasText || allInline) && el.textContent.trim()) {
       const pre = cs.whiteSpace.startsWith('pre');
       const runs = runsOf(el, pre, false);

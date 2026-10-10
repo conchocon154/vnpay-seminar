@@ -141,3 +141,31 @@ pre.lg { font-size: 30px; }
 .note { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 22px 26px; }
 .note b { display: block; font-size: 24px; color: var(--accent); margin-bottom: 10px; }
 .note .list { font-size: 24px; gap: 10px; }
+
+/* nhãn ai quy định: VNPAY yêu cầu / Mình chọn */
+.why { display: flex; flex-direction: column; gap: 12px; }
+.why .row { display: flex; gap: 16px; align-items: flex-start; background: var(--card);
+            border: 1px solid var(--line); border-radius: 12px; padding: 14px 18px; }
+.tag { flex: none; font-size: 18px; font-weight: 700; padding: 3px 12px; border-radius: 999px; white-space: nowrap; }
+.tag.v { background: #fde8e6; color: #b42318; }
+.tag.m { background: #def3e8; color: #0b6b47; }
+.why .t { font-size: 22px; color: var(--ink2); line-height: 1.4; }
+.legend { display: flex; gap: 28px; align-items: center; font-size: 22px; color: var(--ink2); }
+.legend > div { display: flex; gap: 10px; align-items: center; }
+
+/* sơ đồ kiến trúc */
+.arch { display: flex; gap: 22px; align-items: center; }
+.node { background: var(--card); border: 2px solid var(--line); border-radius: 14px; padding: 16px 20px;
+        text-align: center; font-size: 22px; font-weight: 700; color: var(--ink); }
+.node .s { font-size: 17px; font-weight: 400; color: var(--muted); margin-top: 4px; }
+.node.hi { border-color: var(--accent); background: var(--tint); }
+.node.ext { border-color: #b42318; background: #fff5f4; }
+.arrow { font-size: 22px; color: var(--muted); text-align: center; }
+.col { display: flex; flex-direction: column; gap: 14px; }
+blockquote { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 20px;
+             font-size: 22px; color: var(--ink2); }
+blockquote .src { display: block; font-size: 17px; color: var(--muted); margin-top: 6px; }
+.arch .node { font-size: 26px; padding: 20px 26px; }
+.arch .node .s { font-size: 19px; }
+.arch .arrow { font-size: 34px; }
+.arch .col { gap: 16px; }

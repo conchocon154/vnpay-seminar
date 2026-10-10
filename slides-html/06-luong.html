@@ -1,0 +1,7 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
+<body class="">
+<div class="eyebrow">Giao tiếp với VNPAY</div>
+<h1>Một lần thanh toán đi qua những đâu</h1>
+<div class="content"><div class="tier"><div class="n">1</div><div class="lane">Web → Payment</div><div class="txt"><span class="mono">POST /api/payments</span>: lưu đơn PENDING, ký, trả link</div><div class="pill ok">Mình chọn</div></div><div class="tier"><div class="n">2</div><div class="lane">Trình duyệt → VNPAY</div><div class="txt"><span class="mono">GET vpcpay.html?vnp_...</span>: khách nhập thẻ trên trang VNPAY</div><div class="pill no">VNPAY</div></div><div class="tier on"><div class="n">3</div><div class="lane">VNPAY → Payment</div><div class="txt"><span class="mono">GET /vnpay/ipn?vnp_...</span>: cập nhật PAID, trả JSON</div><div class="pill no">VNPAY</div></div><div class="tier"><div class="n">4</div><div class="lane">VNPAY → trình duyệt</div><div class="txt"><span class="mono">GET /vnpay/return?vnp_...</span>: chỉ hiển thị kết quả</div><div class="pill no">VNPAY</div></div><div class="tier on"><div class="n">5</div><div class="lane">Payment → VNPAY</div><div class="txt"><span class="mono">POST querydr</span> (JSON): hỏi lại nếu IPN chưa về</div><div class="pill ok">Mình chọn</div></div></div>
+<div class="foot"><span>Seminar VNPAY Sandbox – Lê Minh Đăng</span><span>6</span></div>
+</body></html>
