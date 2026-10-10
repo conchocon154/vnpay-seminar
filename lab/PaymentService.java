@@ -1,5 +1,6 @@
-// Đáp án đủ 6 TODO. Chạy: java ShopDone.java   rồi mở http://localhost:8080
-// TmnCode và HashSecret đọc từ biến môi trường VNPAY_TMN_CODE, VNPAY_HASH_SECRET.
+// Payment Service tích hợp VNPAY Sandbox, bản hoàn chỉnh. Để chung thư mục với index.html.
+// Chạy: đặt biến môi trường VNPAY_TMN_CODE, VNPAY_HASH_SECRET rồi java PaymentService.java
+// Mở http://localhost:8080
 
 import com.sun.net.httpserver.*;
 import javax.crypto.Mac;
@@ -14,7 +15,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.*;
 
-public class ShopDone {
+public class PaymentService {
 
     static final Charset UTF_8 = StandardCharsets.UTF_8, ASCII = StandardCharsets.US_ASCII;
     static final String PAY_URL = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
@@ -23,11 +24,11 @@ public class ShopDone {
     static final DateTimeFormatter TIME = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
     static final int PORT = 8080;
 
-    // Điền TmnCode và HashSecret trong email VNPAY gửi về.
+    // TmnCode và HashSecret VNPAY gửi qua email. Đọc từ biến môi trường để key không nằm trong code.
     static final String TMN_CODE    = env("VNPAY_TMN_CODE", "");
     static final String HASH_SECRET = env("VNPAY_HASH_SECRET", "");
 
-    // Bật ngrok thì set biến VNPAY_RETURN_URL=https://<id>.ngrok-free.app/vnpay/return
+    // Chạy với ngrok thì đặt VNPAY_RETURN_URL=https://<id>.ngrok-free.app/vnpay/return
     static final String RETURN_URL = env("VNPAY_RETURN_URL", "http://localhost:" + PORT + "/vnpay/return");
 
 
@@ -127,7 +128,7 @@ public class ShopDone {
     }
 
 
-    /* ===== Phần dưới viết sẵn, không cần sửa ===== */
+    /* ===== Lưu đơn, gọi querydr, server HTTP ===== */
 
     static class Order {
         final String txnRef, orderInfo, createDate;
@@ -220,7 +221,7 @@ public class ShopDone {
 
         server.start();
         log("http://localhost:" + PORT);
-        log(TMN_CODE.isEmpty() ? "Chưa điền TMN_CODE và HASH_SECRET, xem TODO 1." : "TmnCode " + TMN_CODE);
+        log(TMN_CODE.isEmpty() ? "Chưa có VNPAY_TMN_CODE và VNPAY_HASH_SECRET, xem HUONG-DAN.md" : "TmnCode " + TMN_CODE);
         log("ReturnUrl " + RETURN_URL);
     }
 

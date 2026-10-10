@@ -1,0 +1,7 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
+<body class="">
+<div class="eyebrow">Kênh 3 – IPN</div>
+<h1>Thứ tự kiểm tra và ý nghĩa mã trả về</h1>
+<div class="content"><table class="sm"><thead><tr><th style="width:10%">Thứ tự</th><th style="width:42%">Kiểm tra</th><th style="width:16%">Sai thì trả</th><th>VNPAY xử lý tiếp</th></tr></thead><tbody><tr><td>1</td><td>Chữ ký đúng</td><td><span class="mono">97</span></td><td>Gọi lại</td></tr><tr><td>2</td><td>Có đơn với vnp_TxnRef</td><td><span class="mono">01</span></td><td>Gọi lại</td></tr><tr><td>3</td><td>vnp_Amount bằng số tiền đơn × 100</td><td><span class="mono">04</span></td><td>Gọi lại</td></tr><tr><td>4</td><td>Đơn còn PENDING</td><td><span class="mono">02</span></td><td>Dừng</td></tr><tr><td>5</td><td>Cập nhật PAID hoặc FAILED</td><td><span class="mono">00</span></td><td>Dừng</td></tr></tbody></table><div class="why"><div class="row"><div class="tag v">VNPAY yêu cầu</div><div class="t">Mã trả về và cách VNPAY xử lý theo tài liệu</div></div><div class="row"><div class="tag m">Mình chọn</div><div class="t">Kiểm tra chữ ký đầu tiên: chưa xác thực thì không đọc dữ liệu để tra đơn</div></div><div class="row"><div class="tag m">Mình chọn</div><div class="t">Mã 02 giúp xử lý idempotent: VNPAY gọi lại nhiều lần thì đơn vẫn chỉ cập nhật một lần</div></div></div></div>
+<div class="foot"><span>Seminar VNPAY Sandbox – Lê Minh Đăng</span><span>16</span></div>
+</body></html>

@@ -1,0 +1,7 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
+<body class="">
+<div class="eyebrow">Chạy demo</div>
+<h1>Chạy demo và đọc log theo từng kênh</h1>
+<div class="content"><div class="split"><div class="main" style="width:900px"><div class="file">Lệnh chạy (macOS, Linux)</div><pre class="xs"><span class="ln">ngrok http 8080                                     <span class="c"># terminal 1</span></span><span class="ln">export VNPAY_TMN_CODE=...  VNPAY_HASH_SECRET=...    <span class="c"># terminal 2</span></span><span class="ln">export VNPAY_RETURN_URL=https://&lt;id&gt;.ngrok-free.app/vnpay/return</span><span class="ln">java PaymentService.java</span></pre><div class="file">Log của Payment Service</div><pre class="xs"><span class="ln">[10:20:01] http://localhost:8080</span><span class="ln">[10:20:01] TmnCode ABCD1234</span><span class="ln"><span class="h">[10:21:40] IPN 20261010102118733051 -&gt; PAID 15900123</span></span></pre></div><div class="side"><ul class="list "><li>Bấm Thanh toán: kênh 1, trình duyệt mở trang VNPAY</li><li>Thanh toán bằng thẻ test NCB</li><li>Dòng <span class="mono">IPN</span> trong log: kênh 3</li><li>Trang kết quả: kênh 2</li><li>Mở <span class="mono">127.0.0.1:4040</span> xem request IPN là GET, tham số trên query string</li></ul></div></div></div>
+<div class="foot"><span>Seminar VNPAY Sandbox – Lê Minh Đăng</span><span>28</span></div>
+</body></html>

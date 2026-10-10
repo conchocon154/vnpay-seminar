@@ -1,0 +1,7 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
+<body class="">
+<div class="eyebrow">Nhìn lại theo microservice</div>
+<h1>Các pattern microservice trong bài</h1>
+<div class="content"><table class="sm"><thead><tr><th style="width:26%">Pattern</th><th style="width:34%">Ở đâu trong bài</th><th>Để làm gì</th></tr></thead><tbody><tr><td>Gateway cho dịch vụ ngoài</td><td>Chỉ Payment Service giao tiếp với VNPAY</td><td>Đổi cổng thanh toán chỉ sửa một service</td></tr><tr><td>Webhook</td><td>IPN, kênh 3</td><td>Bên ngoài báo kết quả, không cần hỏi liên tục</td></tr><tr><td>Retry + idempotency</td><td>VNPAY gọi lại 10 lần, mình trả 02</td><td>Không mất kết quả, không cập nhật hai lần</td></tr><tr><td>Eventual consistency</td><td>Đơn PENDING rồi mới PAID</td><td>Trạng thái đúng sau một khoảng thời gian</td></tr><tr><td>Reconciliation</td><td>querydr, kênh 4</td><td>Hỏi lại khi webhook bị mất</td></tr><tr><td>Message authentication</td><td>HMAC-SHA512 với HashSecret</td><td>Xác thực dữ liệu đến đúng từ VNPAY, không bị sửa</td></tr></tbody></table></div>
+<div class="foot"><span>Seminar VNPAY Sandbox – Lê Minh Đăng</span><span>29</span></div>
+</body></html>

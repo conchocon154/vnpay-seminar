@@ -1,7 +1,0 @@
-<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
-<body class="">
-<div class="eyebrow">Chứng minh – kênh 3 và 4</div>
-<h1>Vì sao IPN là kênh chính, ReturnURL chỉ hiển thị</h1>
-<div class="content"><blockquote><div>ReturnURL: “Không cập nhật kết quả giao dịch tại địa chỉ này.”</div><div class="src">Tài liệu VNPAY, mục Thanh toán PAY</div></blockquote><blockquote><div>IPN: “Thao tác cập nhật/xử lý kết quả sau khi thanh toán được thực hiện tại URL này.”</div><div class="src">Tài liệu VNPAY, mục Thanh toán PAY</div></blockquote><div class="why"><div class="row"><div class="tag v">VNPAY yêu cầu</div><div class="t">IPN gọi bằng <span class="mono">GET</span>, server to server, URL phải là HTTPS public</div></div><div class="row"><div class="tag v">VNPAY yêu cầu</div><div class="t">Mình trả <span class="mono">00</span> hoặc <span class="mono">02</span> thì VNPAY dừng. Trả mã khác hoặc quá thời gian thì VNPAY gọi lại, tối đa 10 lần, mỗi lần cách 5 phút</div></div><div class="row"><div class="tag m">Mình chọn</div><div class="t">Lý do kỹ thuật: ReturnURL đi qua trình duyệt, khách sửa được <span class="mono">vnp_ResponseCode=00</span> hoặc tắt tab là không về</div></div></div></div>
-<div class="foot"><span>Seminar VNPAY Sandbox – Lê Minh Đăng</span><span>8</span></div>
-</body></html>

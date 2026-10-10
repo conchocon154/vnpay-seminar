@@ -1,0 +1,7 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
+<body class="">
+<div class="eyebrow">Tham số</div>
+<h1>Vì sao bắt buộc: định danh và giao dịch</h1>
+<div class="content"><table class="sm"><thead><tr><th style="width:26%">Tham số</th><th>Vì sao cần</th></tr></thead><tbody><tr><td><span class="mono">vnp_Version</span></td><td>VNPAY có nhiều phiên bản API, mỗi phiên bản đọc tham số và kiểm tra chữ ký khác nhau</td></tr><tr><td><span class="mono">vnp_Command</span></td><td>Cùng hệ thống VNPAY nhận nhiều lệnh: pay, querydr, refund. Tham số này cho biết request dùng để làm gì</td></tr><tr><td><span class="mono">vnp_TmnCode</span></td><td>Cho VNPAY biết website nào gửi, từ đó lấy đúng HashSecret của website đó để kiểm tra chữ ký</td></tr><tr><td><span class="mono">vnp_TxnRef</span></td><td>Nối giao dịch bên VNPAY với đơn bên mình, IPN và querydr đều trả lại mã này. Không trùng trong ngày</td></tr><tr><td><span class="mono">vnp_Amount</span></td><td>Số nguyên ở đơn vị nhỏ nhất (× 100), không có dấu phẩy hay số thập phân khi truyền qua chuỗi</td></tr><tr><td><span class="mono">vnp_CurrCode</span></td><td>Loại tiền của giao dịch. Tài liệu ghi hiện chỉ hỗ trợ VND</td></tr></tbody></table></div>
+<div class="foot"><span>Seminar VNPAY Sandbox – Lê Minh Đăng</span><span>8</span></div>
+</body></html>

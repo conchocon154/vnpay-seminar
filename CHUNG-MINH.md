@@ -62,7 +62,7 @@ HTTP 200  application/json; charset=utf-8
 
 ## 4. Thử IPN trên máy mình
 
-Chạy `ShopDone.java` với key giả, tự ký request IPN rồi gọi bằng GET:
+Chạy `PaymentService.java` với key giả, tự ký request IPN rồi gọi bằng GET:
 
 | Gửi | Trả về |
 |---|---|
@@ -71,3 +71,14 @@ Chạy `ShopDone.java` với key giả, tự ký request IPN rồi gọi bằng 
 | Sửa số tiền, giữ chữ ký cũ | `{"RspCode":"97","Message":"Invalid Checksum"}` |
 | Ký đúng nhưng mã đơn không có | `{"RspCode":"01","Message":"Order not Found"}` |
 | Ký đúng nhưng số tiền lệch | `{"RspCode":"04","Message":"Invalid Amount"}` |
+
+## 5. Thiếu tham số bắt buộc
+
+Tạo link đúng chữ ký nhưng bỏ một tham số:
+
+| Bỏ tham số | VNPAY trả về |
+|---|---|
+| `vnp_IpAddr` | `Payment/Error.html?code=03` (dữ liệu không đúng định dạng) |
+| `vnp_OrderInfo` | code=03 |
+| `vnp_ReturnUrl` | code=03 |
+| `vnp_ExpireDate` | Vẫn mở trang thanh toán. Tài liệu ghi bắt buộc nên code vẫn gửi |

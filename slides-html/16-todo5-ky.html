@@ -1,7 +1,0 @@
-<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
-<body class="">
-<div class="eyebrow">Code – tạo thanh toán</div>
-<h1>TODO 5 – Hàm createPayment (2/2)</h1>
-<div class="content"><div><div class="file">ShopStart.java (viết tiếp phần trên)</div><pre class="sm"><span class="ln hl">    String query = buildQueryString(p);</span><span class="ln hl">    String url = PAY_URL + <span class="s">"?"</span> + query + <span class="s">"&amp;vnp_SecureHash="</span> + hmacSHA512(HASH_SECRET, query);</span><span class="ln">    <span class="k">return</span> <span class="s">"{\"txnRef\":\""</span> + txnRef + <span class="s">"\",\"paymentUrl\":\""</span> + url + <span class="s">"\"}"</span>;</span><span class="ln">}</span></pre></div><div class="why"><div class="row"><div class="tag v">VNPAY yêu cầu</div><div class="t">Gắn <span class="mono">vnp_SecureHash</span> vào cuối link, link trỏ tới <span class="mono">vpcpay.html</span></div></div><div class="row"><div class="tag m">Mình chọn</div><div class="t">Payment Service trả JSON <span class="mono">{txnRef, paymentUrl}</span> cho web. Đây là API nội bộ giữa hai bên, VNPAY không quan tâm</div></div><div class="row"><div class="tag m">Mình chọn</div><div class="t">Web không giữ HashSecret, chỉ nhận link đã ký rồi chuyển trang</div></div></div></div>
-<div class="foot"><span>Seminar VNPAY Sandbox – Lê Minh Đăng</span><span>16</span></div>
-</body></html>

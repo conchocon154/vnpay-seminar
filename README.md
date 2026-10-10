@@ -6,10 +6,9 @@ Tạo yêu cầu thanh toán, nhận callback, đối soát giao dịch. Có hai
 
 | File | Dùng để |
 |---|---|
-| `lab/ShopStart.java` + `lab/index.html` | Code xuất phát, 6 TODO |
-| `lab/ShopDone.java` | Đáp án |
+| `lab/PaymentService.java` + `lab/index.html` | Payment Service bản hoàn chỉnh, 1 file |
 | `src/` | Bản Spring Boot |
-| `CHUAN-BI.md` | Cài đặt trước buổi seminar |
+| `HUONG-DAN.md` | Cài đặt và chạy `PaymentService.java` |
 | `SEMINAR.md` | Thứ tự trong buổi |
 | `CHUNG-MINH.md` | Thử nghiệm trên sandbox chứng minh cách giao tiếp với VNPAY |
 | `slides-html/` + `build-html-pptx.mjs` | Nguồn slide và ghi chú (`notes.json`), build bằng `npm install && npm run build:slides` |
@@ -27,7 +26,7 @@ Cần JDK 17+.
 cd lab
 export VNPAY_TMN_CODE=xxxxxxxx
 export VNPAY_HASH_SECRET=xxxxxxxxxxxxxxxx
-java ShopDone.java
+java PaymentService.java
 ```
 
 Mở http://localhost:8080. Có ngrok thì thêm `export VNPAY_RETURN_URL=https://<id>.ngrok-free.app/vnpay/return` trước khi chạy.

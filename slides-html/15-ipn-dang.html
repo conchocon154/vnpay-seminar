@@ -1,0 +1,7 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
+<body class="">
+<div class="eyebrow">Kênh 3 – IPN</div>
+<h1>IPN: VNPAY gửi gì, Payment Service trả gì</h1>
+<div class="content"><div class="file">VNPAY gửi (GET, server to server)</div><pre class="xs"><span class="ln">GET /vnpay/ipn?vnp_Amount=2500000&amp;vnp_BankCode=NCB&amp;vnp_ResponseCode=00</span><span class="ln">    &amp;vnp_TransactionNo=15683165&amp;vnp_TransactionStatus=00&amp;vnp_TxnRef=...&amp;vnp_SecureHash=...</span></pre><div class="file">Payment Service trả (HTTP 200)</div><pre class="sm"><span class="ln">{"RspCode":"00","Message":"Confirm Success"}</span></pre><div class="why"><div class="row"><div class="tag v">VNPAY yêu cầu</div><div class="t">IPN dùng cùng định dạng query string và cùng cách ký với link thanh toán, nên dùng lại được hàm ký</div></div><div class="row"><div class="tag v">VNPAY yêu cầu</div><div class="t">Kết quả giao dịch được cập nhật tại IPN, không cập nhật tại ReturnURL</div></div><div class="row"><div class="tag v">VNPAY yêu cầu</div><div class="t">Trả JSON có <span class="mono">RspCode</span> để VNPAY biết đã nhận chưa: 00 hoặc 02 thì dừng, mã khác thì gọi lại tối đa 10 lần, cách 5 phút</div></div></div></div>
+<div class="foot"><span>Seminar VNPAY Sandbox – Lê Minh Đăng</span><span>15</span></div>
+</body></html>

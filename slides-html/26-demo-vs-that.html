@@ -1,7 +1,0 @@
-<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
-<body class="">
-<div class="eyebrow">Nhìn lại theo microservice</div>
-<h1>Từ demo hôm nay lên hệ thống thật</h1>
-<div class="content"><table class="sm"><thead><tr><th style="width:36%">Hôm nay (1 file Java)</th><th>Hệ thống microservice thật</th></tr></thead><tbody><tr><td>Map ORDERS trong bộ nhớ</td><td>Database riêng của Payment Service, <span class="mono">UNIQUE(txn_ref)</span></td></tr><tr><td>synchronized</td><td>Transaction hoặc optimistic lock của DB</td></tr><tr><td>Ghi log khi PAID</td><td>Phát event <span class="mono">OrderPaid</span> qua message broker (outbox)</td></tr><tr><td>querydr khi trang kết quả hỏi</td><td>Job định kỳ quét đơn PENDING quá 15 phút</td></tr><tr><td>ngrok</td><td>API Gateway hoặc Ingress, domain và HTTPS riêng</td></tr><tr><td>Key ghi trong code</td><td>Vault hoặc Kubernetes Secret</td></tr><tr><td>IpAddr 127.0.0.1</td><td>IP thật của khách, lấy qua Gateway</td></tr><tr><td>Chưa kiểm tra chữ ký response querydr</td><td>Kiểm tra theo thứ tự trong tài liệu</td></tr></tbody></table></div>
-<div class="foot"><span>Seminar VNPAY Sandbox – Lê Minh Đăng</span><span>26</span></div>
-</body></html>

@@ -1,0 +1,7 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
+<body class="">
+<div class="eyebrow">Chữ ký</div>
+<h1>Vì sao tạo chữ ký theo cách này</h1>
+<div class="content"><ul class="list num"><li><b>Sắp xếp tham số theo tên</b>: hai bên ghép ra cùng một chuỗi, không phụ thuộc thứ tự trong Map</li><li><b>Bỏ tham số rỗng</b>: VNPAY không đưa tham số rỗng vào chuỗi ký</li><li><b>Encode giá trị rồi mới ký</b>: ký đúng chuỗi xuất hiện trên URL</li><li><b>HMAC-SHA512 với HashSecret</b>: chỉ bên có HashSecret tạo được chữ ký. HashSecret không đi trên URL</li><li><b>Gắn chữ ký vào cuối link</b>: <span class="mono">vnp_SecureHash</span> không nằm trong chuỗi đem đi ký</li></ul><pre class="xs"><span class="ln"><span class="c">// 1-3: chuỗi đem đi ký</span></span><span class="ln">vnp_Amount=2500000&amp;vnp_Command=pay&amp;...&amp;vnp_TxnRef=20261010101433482913&amp;vnp_Version=2.1.0</span><span class="ln"><span class="c">// 4: HMAC-SHA512(HashSecret, chuỗi trên)</span></span><span class="ln hl">98bbf7a165e10ad8527a34f48b43c45d...   (128 ký tự)</span></pre><div class="why"><div class="row"><div class="tag v">VNPAY yêu cầu</div><div class="t">Bước 1 đến 5 theo tài liệu và code mẫu VNPAY</div></div></div></div>
+<div class="foot"><span>Seminar VNPAY Sandbox – Lê Minh Đăng</span><span>12</span></div>
+</body></html>

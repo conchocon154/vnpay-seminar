@@ -169,3 +169,7 @@ blockquote .src { display: block; font-size: 17px; color: var(--muted); margin-t
 .arch .node .s { font-size: 19px; }
 .arch .arrow { font-size: 34px; }
 .arch .col { gap: 16px; }
+table.xs { font-size: 21px; } table.xs tbody td { padding: 6px 18px; } table.xs thead th { padding: 12px 18px; font-size: 18px; }
+table.xs td.mono, table.xs td .mono { font-size: 20px; }
+.pair { display: flex; gap: 32px; align-items: flex-start; }
+.pair > div { flex: 1; }

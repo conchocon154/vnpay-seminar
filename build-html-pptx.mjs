@@ -151,6 +151,11 @@ for (const f of files) {
     document.querySelectorAll('pre').forEach(p => {
       if (p.scrollWidth > p.clientWidth + 1) issues.push('code rộng hơn ' + (p.scrollWidth - p.clientWidth) + 'px');
     });
+    const foot = document.querySelector('.foot'), content = document.querySelector('.content');
+    if (foot && content) {
+      const bottom = Math.max(...[...content.querySelectorAll('*')].map(e => e.getBoundingClientRect().bottom));
+      if (bottom > foot.getBoundingClientRect().top - 12) issues.push('đè chân trang');
+    }
     return issues;
   });
   if (over.length) { console.log('  TRÀN', f + ':', over.join(', ')); problems.push(f); }

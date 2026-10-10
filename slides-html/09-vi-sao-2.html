@@ -1,0 +1,7 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><link rel="stylesheet" href="style.css"></head>
+<body class="">
+<div class="eyebrow">Tham số</div>
+<h1>Vì sao bắt buộc: thời gian, hiển thị và bảo mật</h1>
+<div class="content"><table class="sm"><thead><tr><th style="width:26%">Tham số</th><th>Vì sao cần</th></tr></thead><tbody><tr><td><span class="mono">vnp_CreateDate</span></td><td>Thời điểm tạo giao dịch. Khi gọi querydr phải gửi lại giá trị này, nên Payment Service lưu nó cùng đơn</td></tr><tr><td><span class="mono">vnp_ExpireDate</span></td><td>Link chỉ dùng được tới thời điểm này. Mở lại link cũ sau thời hạn thì không thanh toán được</td></tr><tr><td><span class="mono">vnp_OrderInfo</span></td><td>Nội dung hiển thị cho khách và lưu để đối soát. Phải viết không dấu, không ký tự đặc biệt</td></tr><tr><td><span class="mono">vnp_OrderType</span></td><td>Mã loại hàng theo danh mục VNPAY, dùng để phân loại giao dịch</td></tr><tr><td><span class="mono">vnp_IpAddr</span></td><td>IP của khách thực hiện giao dịch</td></tr><tr><td><span class="mono">vnp_Locale</span></td><td>Ngôn ngữ trang thanh toán: vn hoặc en</td></tr><tr><td><span class="mono">vnp_ReturnUrl</span></td><td>VNPAY không biết web của mình ở đâu, cần địa chỉ để đưa khách quay về</td></tr><tr><td><span class="mono">vnp_SecureHash</span></td><td>Chữ ký trên toàn bộ tham số, để VNPAY phát hiện dữ liệu bị sửa trên đường đi</td></tr></tbody></table></div>
+<div class="foot"><span>Seminar VNPAY Sandbox – Lê Minh Đăng</span><span>9</span></div>
+</body></html>
