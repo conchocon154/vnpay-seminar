@@ -8,6 +8,7 @@ Lê Minh Đăng – 520K0108 · Seminar môn SOA
 |---|---|
 | `VNPAY-Seminar.pptx` | Slide thuyết trình |
 | `VNPAY-demo/` | Mã nguồn demo: `SeminarDemo.java`, `DemoChecks.java`, thư viện `lib/json.jar` |
+| `VNPAY-demo/cai-dat.sh`, `cai-dat.bat` | Script cài thư viện (macOS/Linux, Windows) |
 | `VNPAY-demo/THUC-HANH.md` | Bài thực hành tại lớp, có kết quả mong đợi từng bước |
 | `VNPAY-demo/README.md` | Mô tả chi tiết mã nguồn và các endpoint |
 | `HUONG-DAN.pdf` | Bản PDF của hướng dẫn này |
@@ -22,17 +23,47 @@ Lê Minh Đăng – 520K0108 · Seminar môn SOA
     - macOS: chuột phải thư mục `VNPAY-demo` trong Finder, chọn **New Terminal at Folder**.
     - Windows: mở thư mục `VNPAY-demo`, gõ `powershell` vào thanh địa chỉ rồi nhấn Enter.
 
-## 3. Chuẩn bị
+## 3. Cài thư viện
 
-Kiểm tra Java:
+Demo cần các thư viện sau:
+
+| Thư viện | Dùng để | Bắt buộc |
+|---|---|---|
+| JDK 17 trở lên (khuyến nghị Temurin 21) | Biên dịch và chạy Java | Có |
+| org.json 20250517 (`lib/json.jar`) | Đọc, ghi JSON | Có, đã kèm sẵn |
+| ngrok | Mở địa chỉ HTTPS công khai cho VNPAY gọi về | Chỉ khi chạy sandbox thật |
+
+Không cần Maven, Spring hay IDE.
+
+### Cách 1: chạy script cài đặt (khuyến nghị)
+
+Script nằm trong thư mục `VNPAY-demo`. Script kiểm tra Java, cài JDK 21 nếu máy chưa có (hỏi trước khi cài), tải org.json từ Maven Central nếu thiếu và kiểm tra checksum, rồi biên dịch và chạy bộ kiểm tra.
+
+macOS, Linux (mở terminal trong thư mục `VNPAY-demo`):
 
 ```bash
-java -version
+sh cai-dat.sh
 ```
 
-Kết quả phải từ `17` trở lên. Nếu chưa có, cài Temurin JDK 21 tại https://adoptium.net, cài xong mở lại terminal.
+Windows: bấm đúp file `cai-dat.bat`.
 
-Không cần Maven, Spring hay IDE. Chạy với VNPAY Sandbox thật thì cần thêm ngrok (mục 5).
+Cuối cùng hiện 8 dòng `PASS` và dòng `Xong` là cài thành công. Nếu script vừa cài JDK, mở terminal mới rồi chạy lại script một lần nữa.
+
+Cần thêm ngrok để chạy sandbox thật thì thêm tham số:
+
+```bash
+sh cai-dat.sh --ngrok
+```
+
+Windows: mở PowerShell trong thư mục `VNPAY-demo` rồi chạy `.\cai-dat.bat -Ngrok`.
+
+Script dùng Homebrew trên macOS, apt trên Ubuntu, winget trên Windows. Máy không có các công cụ này thì script in ra đường dẫn để tải thủ công.
+
+### Cách 2: cài thủ công
+
+1. JDK: tải Temurin 21 tại https://adoptium.net, cài xong mở terminal mới, gõ `java -version` thấy `21` là được.
+2. org.json: đã có sẵn trong `VNPAY-demo/lib/json.jar`. Nếu thiếu, tải `json-20250517.jar` tại https://repo1.maven.org/maven2/org/json/json/20250517/ rồi đổi tên thành `json.jar`, đặt vào thư mục `lib`.
+3. ngrok (tùy chọn): tải tại https://ngrok.com/download, đăng ký tài khoản miễn phí, chạy `ngrok config add-authtoken <token>`.
 
 ## 4. Chạy chế độ mock (dùng trong buổi học)
 
@@ -67,7 +98,7 @@ Dừng chương trình bằng **Ctrl+C**.
 
 Phần này dùng tài khoản sandbox ghi trong `Thong-tin-sandbox-VNPAY.pdf`. Tài khoản chỉ dùng để học, giao dịch dùng thẻ test, không phát sinh tiền thật.
 
-**Bước 1. Mở ngrok** (tải tại https://ngrok.com/download, đăng ký tài khoản miễn phí, làm theo hướng dẫn cài authtoken). Ở một terminal riêng:
+**Bước 1. Mở ngrok** (cài bằng `sh cai-dat.sh --ngrok` hoặc thủ công theo mục 3). Ở một terminal riêng:
 
 ```bash
 ngrok http 8091
