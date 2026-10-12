@@ -2,7 +2,7 @@
 
 Một chương trình Java mở hai HTTP service: Order Service (8090) và Payment Service (8091). Hai service trao đổi qua HTTP JSON, cùng JVM để chạy gọn. Dữ liệu lưu RAM. Đơn mẫu có giá 25.000 VND do Order Service xác định.
 
-Bài thực hành tại lớp, có kết quả mong đợi từng bước: xem `THUC-HANH.md`.
+Hướng dẫn chung (cài thư viện, chạy demo, thực hành tại lớp): xem `HUONG-DAN.pdf` ở thư mục gốc.
 
 ## Chạy mô phỏng local (không cần key, không gọi VNPAY)
 
